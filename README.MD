@@ -1,7 +1,9 @@
 # Overview
 Anything under the sun related to .NET
 
-# How to view SQLite database file?
+# Entity Framework experiments
+
+[Link to sub folder](MyEntityFramework101/README.MD)
 
 # Where was I?
 
