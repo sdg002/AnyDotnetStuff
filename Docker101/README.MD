@@ -136,21 +136,21 @@ GO
 ```
 I went ahead and created a simple **Employees** table in the database **MyDatabase**
 
-![New database!](/images/ssms_create_mydatabase.png "New database")
+![New database!](images/ssms_create_mydatabase.png "New database")
 
 You should also see the new MDF and LDF files on your host folder *c:\truetemp\dock001*
 
 # How to re-attach the same database across container sessions?
 
 ## Step 1 - Select the Attach option from the context menu
-![Attach database!](/images/ssms_attach_database_right_click_menu.png "Attach database")
+![Attach database!](images/ssms_attach_database_right_click_menu.png "Attach database")
 
 ## Step 2 - Select the mounted path
 This is the folder we have mounted via the **-v** command line option
-![Attach database!](/images/ssms_attach_database.png "Attach database")
+![Attach database!](images/ssms_attach_database.png "Attach database")
 
 ## Step 3 - Run some query
-![Attach database and run query!](/images/ssms_attach_database_run_select_query.png "Attach database and run some query")
+![Attach database and run query!](images/ssms_attach_database_run_select_query.png "Attach database and run some query")
 
 # Simplifying the re-attachment to your MDF/LDF files by specifying a default directory?
 The steps described above are easily repeatable. We could slightly simplify the steps by instructing MSSQL that it should use the mounted folder as the default data directory. We would still need to use the "Attach Database" context menu. However, this folder selection will be initialized with the folder containing our data files
