@@ -1,5 +1,8 @@
 # Running a light weight MSSQL Server instance using Docker Desktop
 
+
+![banner!](images/banner.png "banner")
+
 # Who should read this?
 - You are a learner curious to know more about this wonderful RDBMS. 
 - You are a data analyst who needs a MSSQL instance where you want to load data by importing CSV files
