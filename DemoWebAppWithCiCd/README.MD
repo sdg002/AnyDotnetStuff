@@ -6,9 +6,9 @@ to be done
 - Do the deployment manually (DONE)
 - Script the deployment of back end(DONE)
 - Create a folder with an index.html, index.js  (DONE)
+- Restructure FronEnd , create 2 subfolders 1)src 2)infrastructure  (DONE)
 - a button which invokes the web api (TO BE DONE)
 - Rename **Demo** to **BackEnd** (TO BE DONE)
-- Restructure FronEnd , create 2 subfolders 1)src 2)infrastructure  (TO BE DONE)
 - Front End - Create script to deploy html to Storage account (TO BE DONE)
 - How to set configuration parameters
 - Complete README.MD
