@@ -1,40 +1,12 @@
-const { response } = require("express");
+import {WeatherEndpoint} from "./config.js"
 
-function ClickHandler(){
-    //alert("click")
-    fetch('data.txt')
-    .then(response=>response.text())
-    .then(text=>{
-        console.log(`Fetched data ${text}`)
-        document.getElementById("results").innerText=text    
-    })
-    .catch(error=>{
-        //handle the error
-        console.log(`There was an error ${error}`)
-        console.log(error);
-    });
+
+
+export async function WeatherForeCastClickHandler(){
     
-}
-
-function ClickHandlerWithFailure(){
-    fetch('nonexistent.txt')
-    .then(response=>{
-        console.log(`Got response ${response.status}`)
-    })
-    .then(result => {
-        console.log('Success:', result);
-      })
-    .catch(error=>{
-        //handle the error
-        console.log(`There was an error ${error}`)
-        console.log(error);
-    });
-
-}
-
-async function ClickHandlerWithAwait(){
-    let response=await fetch('data.txt')
+    let response=await fetch(WeatherEndpoint)
     console.log(`Got response ${response.status}`)
-    let data=await response.text()
-    document.getElementById("results").innerText=data
+    let data=await response.json()
+    console.log(`Got response ${data.length}`)
+    document.getElementById("results").innerText=JSON.stringify(data)
 }

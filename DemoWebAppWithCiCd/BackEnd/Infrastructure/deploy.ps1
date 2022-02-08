@@ -25,6 +25,15 @@ $setting.Add("key002","value002")
 Set-AzWebApp -ResourceGroupName $ResourceGroup -Name $WebAppName -AppSettings $setting
 
 
+Write-Host "Removing all CORS sites"
+az webapp cors remove --resource-group $ResourceGroup --name $WebAppName --allowed-origins
 
 
-
+$corsUrls=@(
+    "https://saustorageaccount001.z33.web.core.windows.net",
+    "https://blah"
+)
+foreach ($corsUrl in $corsUrls) {
+    Write-Host "Adding CORS url $corsUrl"
+    az webapp cors add --resource-group $ResourceGroup --name $WebAppName --allowed-origins $corsUrl
+}

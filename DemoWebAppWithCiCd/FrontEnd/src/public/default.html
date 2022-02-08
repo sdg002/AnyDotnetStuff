@@ -1,14 +1,16 @@
 <html>
     <head>
-        <script src="scripts/default.html.js"></script>
+        <script src="scripts/default.html.js" type="module"></script>
+        <script type="module">
+            import {WeatherForeCastClickHandler} from './scripts/default.html.js'
+            document.querySelector('#btnWeatherForecastDemo').addEventListener('click',WeatherForeCastClickHandler)
+        </script>
     </head>
     <body>
         <h1>This is a demo page</h1>
         <hr/>    
-        <button onclick="ClickHandler()">Click me with Success</button>
-        <div id="results"></div>
-        <button onclick="ClickHandlerWithFailure()">Click me with Failure</button>
-        <button onclick="ClickHandlerWithAwait()">Click me with await</button>
+        <button id="btnWeatherForecastDemo">Click to fetch weather forecast</button>
+        <div id="results" style="border: solid 1px blue;"></div>
     </body>
 
 </html>
