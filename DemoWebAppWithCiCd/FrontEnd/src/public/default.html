@@ -1,16 +1,42 @@
-<html>
+<html lang="en">
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>        
         <script src="scripts/default.html.js" type="module"></script>
         <script type="module">
-            import {WeatherForeCastClickHandler} from './scripts/default.html.js'
-            document.querySelector('#btnWeatherForecastDemo').addEventListener('click',WeatherForeCastClickHandler)
+            import * as ClickHandlers from './scripts/default.html.js'
+
+            document.querySelector('#btnRefreshWeatherForecast').addEventListener('click',()=>{
+                ClickHandlers.FetchWeatherForecastHandler(document.getElementById("weatherTableElement"))
+            })
+            document.querySelector('#btnClearWeatherForecast').addEventListener('click',()=>{
+                ClickHandlers.ClearWeatherForecastHandler(document.getElementById("weatherTableElement"))
+            })
+
         </script>
     </head>
     <body>
-        <h1>This is a demo page</h1>
-        <hr/>    
-        <button id="btnWeatherForecastDemo">Click to fetch weather forecast</button>
-        <div id="results" style="border: solid 1px blue;"></div>
+        <h1>This is a demo page which invokes the C# REST end point</h1>
+        <hr/>
+        <form class="form-inline">
+            <button type="button" class="btn btn-primary mb-2" id="btnRefreshWeatherForecast">Refresh</button>
+            <button type="button" class="btn btn-primary mb-2" id="btnClearWeatherForecast">Clear</button>
+        </form>
+        <table class="table table-striped" id="weatherTableElement">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Temperature(F)</th>
+                <th>Temperature(C)</th>
+                <th>Summary</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+                
     </body>
 
 </html>

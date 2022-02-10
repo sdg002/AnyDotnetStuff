@@ -1,18 +1,26 @@
 # What this is project about?
 to be done
 
-- Plan is created (DONE)
-- Create the app service (DONE)
-- Do the deployment manually (DONE)
-- Script the deployment of back end(DONE)
-- Create a folder with an index.html, index.js  (DONE)
-- Restructure FronEnd , create 2 subfolders 1)src 2)infrastructure  (DONE)
-- a button which invokes the web api (TO BE DONE)
-- Rename **Demo** to **BackEnd** (TO BE DONE)
-- Front End - Create script to deploy html to Storage account (TO BE DONE)
-- How to set configuration parameters
+- ~~Plan is created (DONE)~~
+- ~~Create the app service (DONE)~~
+- ~~Do the deployment manually (DONE)~~
+- ~~Script the deployment of back end(DONE)~~
+- ~~Create a folder with an index.html, index.js  (DONE)~~
+- ~~Restructure FronEnd , create 2 subfolders 1)src 2)infrastructure  (DONE)~~
+- ~~Rename **Demo** to **BackEnd** (DONE)~~
+- ~~How to set configuration parameters (DONE)~~
+- ~~Enable CORS (DONE)~~
+- ~~a button which invokes the web api (DONE)~~
+- ~~Front End - Create script to deploy html to Storage account (DONE)~~
+- Back End - Make the structure similar to Front End (infrastructure,src)
+- Create new project in Azure Devops
+- Create new service connection in Azure Devops (will need enterprise application)
+- CI for Back end
+- CI/CD with 3 stages for Back end
+- CI for Front end
+- CI/CD with 3 stages for Front end
 - Complete README.MD
-
+- Complete Article for Medium
 
 
 
