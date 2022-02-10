@@ -16,9 +16,14 @@ to be done
 - Create new project in Azure Devops
 - Create new service connection in Azure Devops (will need enterprise application)
 - CI for Back end
-- CI/CD with 3 stages for Back end
+- CD with 3 stages for Back end
+- Change Web app naming so that it has an environment specific suffix for dev,uat and prod
+- Configure PR policy for Back end
 - CI for Front end
-- CI/CD with 3 stages for Front end
+- Test PR cycle
+- Change storage account so that it has an environment specific suffix for dev,uat and prod
+- CD with 3 stages for Front end
+- Configure PR policy for Back end
 - Complete README.MD
 - Complete Article for Medium
 
