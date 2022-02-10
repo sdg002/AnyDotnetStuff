@@ -20,7 +20,7 @@ namespace UnitTestProject1
 
             foreach (var forecast in forecasts)
             {
-                Assert.AreEqual(forecast.TemperatureF, (forecast.TemperatureC * 9 / 5) + 32, 0.1);
+                Assert.AreEqual(forecast.TemperatureF, (forecast.TemperatureC * 9 / 5) + 32, 1);
             }
         }
     }
