@@ -10,9 +10,9 @@ variables:
     BuildConfiguration: Release
     MajorVersion: 2
     MinorVersion: 0
-    PatchNumber: 0
+    PatchNumber: 3
 
-name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Build.BuildNumber)
+name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
 
 steps:
 - powershell: |
@@ -20,7 +20,6 @@ steps:
    Write-Host "Hello World - dumping all variables"   
    dir env:   
    Write-Host "Hello World - dumping all variables complete"
-   displayName: 'PowerShell Script'
    
 - script: echo $(Build.BuildNumber) #display Run Number
 - task: DotNetCoreCLI@2
