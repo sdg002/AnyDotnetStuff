@@ -3,9 +3,15 @@ $ErrorActionPreference="Stop"
 
 $ResourceGroup="rg-demo-staticwebsite-with-cicd"
 $Location="uksouth"
-$StaticSiteStorageAccount="saustorageaccount001"
 $ContainerForStaticContent="`$web"
+$environment=$env:ENVIRONMENT
+if ([string]::IsNullOrWhiteSpace($environment)){
+    Write-Error -Message "The variable 'environment' was empty"
+}
+$StaticSiteStorageAccount="saustorageaccount001$environment"
+
 $ctx=Get-AzContext
+
 
 Write-Host "Creating resource group $ResourceGroup at location $Location"
 New-AzResourceGroup -Name $ResourceGroup  -Location $Location -Force
@@ -33,3 +39,7 @@ az storage blob delete-batch --account-name $StaticSiteStorageAccount --source $
 $Sourcefolder=Join-Path -Path $PSScriptRoot -ChildPath "../src/public/"
 Write-Host "Uploading files from $Sourcefolder"
 az storage blob upload-batch --account-name $StaticSiteStorageAccount --source $Sourcefolder -d '$web'
+
+Write-Host "Complete"
+$acc=Get-AzStorageAccount -ResourceGroupName $ResourceGroup -Name $StaticSiteStorageAccount
+Write-Host ("Endpoint of static site is {0}" -f $acc.PrimaryEndpoints.Web)

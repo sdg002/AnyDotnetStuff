@@ -3,31 +3,37 @@ import {WeatherEndpoint} from "./config.js"
 
 
 export async function FetchWeatherForecastHandler(tableElement){
-    ClearWeatherForecastHandler(tableElement)
-    console.log("fetching weather")
-    let response=await fetch(WeatherEndpoint)
-    console.log(`Got response ${response.status}`)
-    let data=await response.json()
-    console.log(`Got response ${data.length}`)
-
-    let tbodyElement=tableElement.querySelector("tbody")
-    for (let i in data) {
-        let weather=data[i]
-        let tr=document.createElement("tr")
-
-        let date=CreateTHElement(weather.date)
-        tr.append(date)
-
-        let tempF=CreateTHElement(weather.temperatureF)
-        tr.append(tempF)
-
-        let tempC=CreateTHElement(weather.temperatureC)
-        tr.append(tempC)
-
-        let summary=CreateTHElement(weather.summary)
-        tr.append(summary)
-        tbodyElement.append(tr)
-      }    
+    try{
+        ClearWeatherForecastHandler(tableElement)
+        console.log("fetching weather")
+        let response=await fetch(WeatherEndpoint)
+        console.log(`Got response ${response.status}`)
+        let data=await response.json()
+        console.log(`Got response ${data.length}`)
+    
+        let tbodyElement=tableElement.querySelector("tbody")
+        for (let i in data) {
+            let weather=data[i]
+            let tr=document.createElement("tr")
+    
+            let date=CreateTHElement(weather.date)
+            tr.append(date)
+    
+            let tempF=CreateTHElement(weather.temperatureF)
+            tr.append(tempF)
+    
+            let tempC=CreateTHElement(weather.temperatureC)
+            tr.append(tempC)
+    
+            let summary=CreateTHElement(weather.summary)
+            tr.append(summary)
+            tbodyElement.append(tr)
+          }    
+    
+    }
+    catch(e){
+        alert(e);
+    }
 }
 
 function CreateTHElement(text){
