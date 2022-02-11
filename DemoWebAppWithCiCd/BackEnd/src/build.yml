@@ -15,6 +15,7 @@ variables:
 name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Build.BuildNumber)
 
 steps:
+- script: echo $(Build.BuildNumber) #display Run Number
 - task: DotNetCoreCLI@2
   displayName: Restore
   inputs:
@@ -25,7 +26,7 @@ steps:
   displayName: Build
   inputs:
     projects: '**/*.csproj'
-    arguments: '--configuration $(BuildConfiguration) /p:Version=$(MajorVersion).$(MinorVersion).$(PatchNumber) /p:FileVersion=$(Build.BuildNumber)'
+    arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: Test
@@ -39,7 +40,7 @@ steps:
   inputs:
     command: publish
     publishWebProjects: True
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+    arguments: '--configuration $(BuildConfiguration) /p:Version=$(MajorVersion).$(MinorVersion).$(PatchNumber) /p:FileVersion=$(Build.BuildNumber) --output $(build.artifactstagingdirectory)'
     zipAfterPublish: True
 
 - task: PublishBuildArtifacts@1
