@@ -8,9 +8,9 @@ pool:
 #Your build pipeline references the ‘BuildConfiguration’ variable, which you’ve selected to be settable at queue time. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it settable at queue time. See https://go.microsoft.com/fwlink/?linkid=865971
 variables:
     BuildConfiguration: Release
-    MajorVersion:2
-    MinorVersion:0
-    PatchNumber:0
+    MajorVersion: 2
+    MinorVersion: 0
+    PatchNumber: 0
 
 name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Build.BuildNumber)
 
