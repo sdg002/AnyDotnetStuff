@@ -63,6 +63,6 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish deployment PS script'
   inputs:
-    PathtoPublish: '$(agent.sourcesdirectory)/DemoWebAppWithCiCd/BackEnd/infrastructure/'
+    PathtoPublish: '$(build.sourcesdirectory)/DemoWebAppWithCiCd/BackEnd/infrastructure/'
   condition: succeededOrFailed()
 
