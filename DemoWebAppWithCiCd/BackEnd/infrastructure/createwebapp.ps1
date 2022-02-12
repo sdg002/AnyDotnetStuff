@@ -1,20 +1,12 @@
-﻿
+﻿. $PSScriptRoot\common.ps1
 
 Set-StrictMode -Version "latest"
 $ErrorActionPreference="Stop"
 
-$ResourceGroup="rg-demo-webapp-with-cicd"
-$Location="uksouth"
-$PlanName="WebAppPlanName"
 $NumOfWorkers=2
 $WebAppName="MyDemoWebApi123"
 $PlanSKu="FREE"
-$environment=$env:ENVIRONMENT
-if ([string]::IsNullOrWhiteSpace($environment)){
-    Write-Error -Message "The variable 'environment' was empty"
-}
-$StaticSiteStorageAccount="saustorageaccount001$environment"
-$StaticSiteResourceGroup="rg-demo-staticwebsite-with-cicd"
+
 
 $ctx=Get-AzContext
 New-AzResourceGroup -Name $ResourceGroup  -Location $Location -Force
