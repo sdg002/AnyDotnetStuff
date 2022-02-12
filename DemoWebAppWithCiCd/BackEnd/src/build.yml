@@ -57,12 +57,20 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Webapplication'
   inputs:
+    ArtifactName:  'webappzip'
     PathtoPublish: '$(build.artifactstagingdirectory)'
   condition: succeededOrFailed()
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish deployment PS script'
   inputs:
-    PathtoPublish: '$(build.sourcesdirectory)/DemoWebAppWithCiCd/BackEnd/Infrastructure/'
+    ArtifactName:  'createwebapp'
+    PathtoPublish: '$(build.sourcesdirectory)/DemoWebAppWithCiCd/BackEnd/Infrastructure/createwebapp.ps1'
   condition: succeededOrFailed()
 
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish deployment PS script'
+  inputs:
+    ArtifactName:  'deploy'
+    PathtoPublish: '$(build.sourcesdirectory)/DemoWebAppWithCiCd/BackEnd/Infrastructure/deploy.ps1'
+  condition: succeededOrFailed()
