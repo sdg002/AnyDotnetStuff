@@ -65,12 +65,12 @@ steps:
   displayName: 'Publish deployment PS script'
   inputs:
     ArtifactName:  'createwebapp'
-    PathtoPublish: '$(build.sourcesdirectory)/DemoWebAppWithCiCd/BackEnd/Infrastructure/createwebapp.ps1'
+    PathtoPublish: '$(build.sourcesdirectory)/DemoWebAppWithCiCd/BackEnd/infrastructure/createwebapp.ps1'
   condition: succeededOrFailed()
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish deployment PS script'
   inputs:
     ArtifactName:  'deploy'
-    PathtoPublish: '$(build.sourcesdirectory)/DemoWebAppWithCiCd/BackEnd/Infrastructure/deploy.ps1'
+    PathtoPublish: '$(build.sourcesdirectory)/DemoWebAppWithCiCd/BackEnd/infrastructure/deploy.ps1'
   condition: succeededOrFailed()
