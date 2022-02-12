@@ -21,7 +21,8 @@ steps:
    dir env:   
    Write-Host "Hello World - dumping all variables complete"
    
-- script: echo $(Build.BuildNumber) #display Run Number
+- script: dir /s /b #display complete folder hierarchy
+
 - task: DotNetCoreCLI@2
   displayName: Restore
   inputs:
