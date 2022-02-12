@@ -50,7 +50,14 @@ steps:
     zipAfterPublish: True
 
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
+  displayName: 'Publish Webapplication'
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)'
   condition: succeededOrFailed()
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish deployment PS script'
+  inputs:
+    PathtoPublish: '$(agent.builddirectory)/BackEnd/infrastructure/'
+  condition: succeededOrFailed()
+

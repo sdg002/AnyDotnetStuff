@@ -12,7 +12,7 @@ to be done
 - ~~Enable CORS (DONE)~~
 - ~~a button which invokes the web api (DONE)~~
 - ~~Front End - Create script to deploy html to Storage account (DONE)~~
-- Back End - Make the structure similar to Front End (infrastructure,src)
+- ~~Back End - Make the structure similar to Front End (infrastructure,src)~~
 - Create new project in Azure Devops
 - Create new service connection in Azure Devops (will need enterprise application)
 - CI for Back end
@@ -27,6 +27,10 @@ to be done
 - Complete README.MD
 - Complete Article for Medium
 
+# Challenges
+## [warning]Unable to expand variable 'build.buildNumber'. A cyclical reference was detected.
+https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#pipeline-variables-devops-services
+https://stackoverflow.com/questions/61895363/azure-devops-pipeline-cannot-expand-any-of-the-environment-variables-at-runtime
 
 
 https://mydemowebapi123.azurewebsites.net/WeatherForecast
@@ -49,3 +53,15 @@ dotnet publish --configuration Release --output c:\truetemp\junk1234\ demo.sln
 
 # Front end
 Link to README.MD of front end
+
+
+# References
+## Azure Devops - Configure run or build numbers in Azure Devops
+https://docs.microsoft.com/en-us/azure/devops/pipelines/process/run-number?view=azure-devops&tabs=yaml
+
+## Azure Devops - Use predefined variables
+https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#pipeline-variables-devops-services
+
+## Azure Devops - Add & use variable groups
+https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?tabs=classic&%3Bview=azure-devops&view=azure-devops#use-a-variable-group
+
