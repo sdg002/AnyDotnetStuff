@@ -21,7 +21,11 @@ steps:
    dir env:   
    Write-Host "Hello World - dumping all variables complete"
    
-- script: dir /s /b #display complete folder hierarchy
+- powershell: |
+   # Write your PowerShell commands here.   
+   Write-Host "Dumping all directories begin"
+   dir -Recurse   
+   Write-Host "Dumping all directories complete"
 
 - task: DotNetCoreCLI@2
   displayName: Restore
