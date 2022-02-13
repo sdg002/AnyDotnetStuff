@@ -1,6 +1,18 @@
+trigger: 
+    paths: 
+        include: 
+        - DemoWebAppWithCiCd/FrontEnd/* 
+
 pool:
   name: Azure Pipelines
 
+variables:
+    BuildConfiguration: Release
+    MajorVersion: 2
+    MinorVersion: 0
+    PatchNumber: 3
+
+name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
 
 steps:
 - task: ArchiveFiles@2
