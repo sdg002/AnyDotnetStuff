@@ -9,6 +9,7 @@ $ResourceGroup="rg-$environment-demo-webapp-with-cicd"
 
 $Location="uksouth"
 $PlanName="WebAppPlanName"
+$WebAppName="MyDemoWebApi123"
 
 $StaticSiteStorageAccount="saustorageaccount001$environment"
 $StaticSiteResourceGroup="rg-demo-staticwebsite-with-cicd"

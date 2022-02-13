@@ -4,7 +4,6 @@ Set-StrictMode -Version "latest"
 $ErrorActionPreference="Stop"
 
 $NumOfWorkers=2
-$WebAppName="MyDemoWebApi123"
 $PlanSKu="FREE"
 
 
