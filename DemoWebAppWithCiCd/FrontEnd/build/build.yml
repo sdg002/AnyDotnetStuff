@@ -20,6 +20,7 @@ steps:
   inputs:
     rootFolderOrFile: DemoWebAppWithCiCd/FrontEnd/src/public
     includeRootFolder: false
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).zip'
     verbose: true
 
 - task: PublishBuildArtifacts@1
