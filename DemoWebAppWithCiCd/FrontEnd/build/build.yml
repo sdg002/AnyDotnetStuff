@@ -3,8 +3,10 @@ trigger:
     include:
     - master 
   paths: 
+    exclude:
+    - '/DemoWebAppWithCiCd/BackEnd/*'
     include: 
-    - 'DemoWebAppWithCiCd/FrontEnd/*'
+    - '/DemoWebAppWithCiCd/FrontEnd/*'
 
 pool:
   name: Azure Pipelines
