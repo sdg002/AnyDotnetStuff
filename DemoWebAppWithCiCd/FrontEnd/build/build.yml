@@ -1,0 +1,30 @@
+trigger: 
+    paths: 
+        include: 
+        - DemoWebAppWithCiCd/FrontEnd/* 
+
+pool:
+  name: Azure Pipelines
+
+variables:
+    BuildConfiguration: Release
+    MajorVersion: 2
+    MinorVersion: 0
+    PatchNumber: 3
+
+name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
+
+steps:
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: frontend-pages'
+  inputs:
+    PathtoPublish: '$(Build.SourcesDirectory)/DemoWebAppWithCiCd/FrontEnd/src/public'
+    ArtifactName: 'frontend-pages'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: infrastructure-script'
+  inputs:
+    PathtoPublish: '$(Build.SourcesDirectory)/DemoWebAppWithCiCd/FrontEnd/infrastructure'
+    ArtifactName: 'infrastructure-script'
+

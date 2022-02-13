@@ -1,0 +1,81 @@
+trigger: 
+    paths: 
+        include: 
+        - DemoWebAppWithCiCd/BackEnd/* 
+
+pool:
+  name: Azure Pipelines
+#Your build pipeline references an undefined variable named ‘Parameters.RestoreBuildProjects’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+#Your build pipeline references an undefined variable named ‘Parameters.RestoreBuildProjects’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+#Your build pipeline references the ‘BuildConfiguration’ variable, which you’ve selected to be settable at queue time. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it settable at queue time. See https://go.microsoft.com/fwlink/?linkid=865971
+#Your build pipeline references an undefined variable named ‘Parameters.TestProjects’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+#Your build pipeline references the ‘BuildConfiguration’ variable, which you’ve selected to be settable at queue time. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it settable at queue time. See https://go.microsoft.com/fwlink/?linkid=865971
+#Your build pipeline references the ‘BuildConfiguration’ variable, which you’ve selected to be settable at queue time. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it settable at queue time. See https://go.microsoft.com/fwlink/?linkid=865971
+variables:
+    BuildConfiguration: Release
+    MajorVersion: 2
+    MinorVersion: 0
+    PatchNumber: 3
+
+name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
+
+steps:
+- powershell: |
+   # Write your PowerShell commands here.   
+   Write-Host "Hello World - dumping all variables"   
+   dir env:   
+   Write-Host "Hello World - dumping all variables complete"
+   
+- powershell: |
+   # Write your PowerShell commands here.   
+   Write-Host "Dumping all directories begin"
+   dir -Recurse   
+   Write-Host "Dumping all directories complete"
+
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: restore
+    projects: '**/*.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    projects: '**/*.csproj'
+    arguments: '--configuration $(BuildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Test
+  inputs:
+    command: test
+    projects: '**/*[Tt]est*/*.csproj'
+    arguments: '--configuration $(BuildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Publish
+  inputs:
+    command: publish
+    publishWebProjects: True
+    arguments: '--configuration $(BuildConfiguration) /p:Version=$(MajorVersion).$(MinorVersion).$(PatchNumber) /p:FileVersion=$(Build.BuildNumber) --output $(build.artifactstagingdirectory)'
+    zipAfterPublish: True
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Webapplication'
+  inputs:
+    ArtifactName:  'webappzip'
+    PathtoPublish: '$(build.artifactstagingdirectory)'
+  condition: succeededOrFailed()
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish deployment PS script'
+  inputs:
+    ArtifactName:  'infrastructure-scripts'
+    PathtoPublish: '$(build.sourcesdirectory)/DemoWebAppWithCiCd/BackEnd/infrastructure/'
+  condition: succeededOrFailed()
+
+# - task: PublishBuildArtifacts@1
+#   displayName: 'Publish deployment PS script'
+#   inputs:
+#     ArtifactName:  'deploy'
+#     PathtoPublish: '$(build.sourcesdirectory)/DemoWebAppWithCiCd/BackEnd/infrastructure/'
+#   condition: succeededOrFailed()
