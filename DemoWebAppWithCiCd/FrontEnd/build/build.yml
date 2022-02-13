@@ -1,7 +1,10 @@
 trigger: 
-    paths: 
-        include: 
-        - DemoWebAppWithCiCd/FrontEnd/* 
+  branches:
+    include:
+    - master 
+  paths: 
+    include: 
+    - 'DemoWebAppWithCiCd/FrontEnd/*'
 
 pool:
   name: Azure Pipelines
