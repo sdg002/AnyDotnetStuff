@@ -6,7 +6,7 @@ using WebApplication1.Controllers;
 namespace UnitTestProject1
 {
     /// <summary>
-    /// Some toy unit tests for our Weather forecase API
+    /// Toy unit tests for our Weather forecase API
     /// </summary>
     [TestClass]
     public class WeatherForecastControllerTests
