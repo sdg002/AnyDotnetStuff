@@ -19,5 +19,6 @@ dotnet publish  --configuration Release --output %temp%\DemoWebAppWithCiCd WebAp
 Write-Host "Deploy to $pathtozip"
 
 #DemoWebAppWithCiCd.zip
-
-az webapp deploy --name $WebAppName --resource-group $ResourceGroup --src-path $pathtozip --type zip
+$ctx=Get-AzContext
+az webapp deploy --name $WebAppName --resource-group $ResourceGroup --src-path $pathtozip --type zip --subscription $ctx.Subscription.Id
+az webapp start --name $WebAppName --resource-group $ResourceGroup  --subscription $ctx.Subscription.Id

@@ -12,7 +12,7 @@ New-AzResourceGroup -Name $ResourceGroup  -Location $Location -Force
 
 function CreatePlan(){
     Write-Host "Creating plan $PlanName"
-    az appservice plan create --name $PlanName --resource-group $ResourceGroup --sku $PlanSKu --number-of-workers $NumOfWorkers --subscription $ctx.Subscription.Id    
+    az appservice plan create --name $PlanName --resource-group $ResourceGroup --sku $PlanSKu --number-of-workers $NumOfWorkers --subscription $ctx.Subscription.Id
 }
 
 function CreateWebApp(){
