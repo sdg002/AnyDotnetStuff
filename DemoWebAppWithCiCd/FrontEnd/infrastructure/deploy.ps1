@@ -1,3 +1,8 @@
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$pathhtml
+    )
+
 Set-StrictMode -Version "latest"
 $ErrorActionPreference="Stop"
 
@@ -37,7 +42,7 @@ az storage blob service-properties update --account-name $StaticSiteStorageAccou
 Write-Host "Purging existing files in container $ContainerForStaticContent"
 az storage blob delete-batch --account-name $StaticSiteStorageAccount --source $ContainerForStaticContent --pattern *.* 
 
-$Sourcefolder=Join-Path -Path $PSScriptRoot -ChildPath "../src/public/"
+$Sourcefolder=$pathhtml
 Write-Host "Uploading files from $Sourcefolder"
 az storage blob upload-batch --account-name $StaticSiteStorageAccount --source $Sourcefolder -d '$web'
 
