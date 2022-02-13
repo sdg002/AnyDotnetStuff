@@ -1,14 +1,17 @@
 function GetEnvironmentFromUrl()
 {
     let hostname=window.location.hostname;
+    const envstrings=["dev","uat","prod"]
+    for(let i in envstrings){
+        let envstring=envstrings[i];
+        if (hostname.toLowerCase().endsWith(envstring)){
+            return envstring
+        }
+    }
     if (hostname === "localhost"){
         return "dev";
     }
-    let frags=hostname.split("-");
-    if (frags.length <2){
-        throw `could not parse the host ${hostname} name to get environment`
-    }
-    return frags[1];
+    throw `could not parse the host ${hostname} name to get environment`
 }
 
 export const environment=GetEnvironmentFromUrl()
