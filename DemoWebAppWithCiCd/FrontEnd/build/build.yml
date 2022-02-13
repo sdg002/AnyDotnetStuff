@@ -1,0 +1,24 @@
+pool:
+  name: Azure Pipelines
+
+
+steps:
+- task: ArchiveFiles@2
+  displayName: 'Archive DemoWebAppWithCiCd/FrontEnd/src/public'
+  inputs:
+    rootFolderOrFile: DemoWebAppWithCiCd/FrontEnd/src/public
+    includeRootFolder: false
+    verbose: true
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: frontend-pages'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildNumber).zip'
+    ArtifactName: 'frontend-pages'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: infrastructure-script'
+  inputs:
+    PathtoPublish: DemoWebAppWithCiCd/FrontEnd/infrastructure
+    ArtifactName: 'infrastructure-script'
+

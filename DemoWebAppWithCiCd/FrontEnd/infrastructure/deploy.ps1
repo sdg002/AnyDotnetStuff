@@ -1,13 +1,14 @@
 Set-StrictMode -Version "latest"
 $ErrorActionPreference="Stop"
 
-$ResourceGroup="rg-demo-staticwebsite-with-cicd"
-$Location="uksouth"
-$ContainerForStaticContent="`$web"
 $environment=$env:ENVIRONMENT
 if ([string]::IsNullOrWhiteSpace($environment)){
     Write-Error -Message "The variable 'environment' was empty"
 }
+$Location="uksouth"
+$ContainerForStaticContent="`$web"
+$ResourceGroup="rg-$environment-demo-frontendwebsite-with-cicd"
+
 $StaticSiteStorageAccount="saustorageaccount001$environment"
 
 $ctx=Get-AzContext
