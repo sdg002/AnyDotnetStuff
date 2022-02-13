@@ -2,9 +2,10 @@ function GetEnvironmentFromUrl()
 {
     let hostname=window.location.hostname;
     const envstrings=["dev","uat","prod"]
+    let firstPathOfHost=hostname.split(".")[0]
     for(let i in envstrings){
         let envstring=envstrings[i];
-        if (hostname.toLowerCase().endsWith(envstring)){
+        if (firstPathOfHost.toLowerCase().endsWith(envstring)){
             return envstring
         }
     }
