@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace WebApplication1.Controllers
 {
+    /// <summary>
+    /// One and only one simple REST endpoing which returns weather forecasts
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
