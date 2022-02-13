@@ -27,6 +27,22 @@ to be done
 - Complete README.MD
 - Complete Article for Medium
 
+
+# Overview - What problem are we solving?
+[talk about CI/CD challenge, taking a product from code to deploymnent, passing via build, unit tests, dev, uat and prod stage]
+- Significance of Dev stage
+- Significance of Uat stage
+- Significance of Prod stage
+
+# Solution block diagram
+[ show a picture of the blocks , web app, static site]
+
+# Developer flow
+[show a flow chart]
+code checkin --> PR raied --> CI build pipeline kicks in --> build and tests pass --> CD staqe kicks in --> deployment to Azure --> Developer gets to verify if checked in code is producing the desired functional resutls (e.g. UI tests)
+
+
+
 # Challenges
 ## [warning]Unable to expand variable 'build.buildNumber'. A cyclical reference was detected.
 https://docs.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml#pipeline-variables-devops-services
