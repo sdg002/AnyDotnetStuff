@@ -19,7 +19,7 @@ namespace UnitTestProject1
             var forecasts = api.Get().ToList();
 
             //Assert
-            Assert.IsTrue(forecasts.Count > 2);
+            Assert.IsTrue(forecasts.Count >= 2);
 
             foreach (var forecast in forecasts)
             {
