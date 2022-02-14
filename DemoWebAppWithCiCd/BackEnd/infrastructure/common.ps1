@@ -5,7 +5,7 @@ if ([string]::IsNullOrWhiteSpace($environment)){
     Write-Error -Message "The variable 'environment' was empty"
 }
 
-$ResourceGroup="rg-$environment-demo-webapp-with-cicd"
+$ResourceGroup="rg-demo-backendwebapp-$environment"
 
 $Location="uksouth"
 $PlanName="WebAppPlanName"
