@@ -3,8 +3,11 @@ trigger:
     include:
     - master 
   paths: 
-    exclude:
-    - '/DemoWebAppWithCiCd/BackEnd/*'
+    include: 
+    - '/DemoWebAppWithCiCd/FrontEnd/*'
+
+pr: 
+  paths: 
     include: 
     - '/DemoWebAppWithCiCd/FrontEnd/*'
 
