@@ -117,24 +117,85 @@ show a picture , similar to above, with some arrows, depicting code checkins, sp
 
 ---
 
-# What is the responsibility of the Continuous Integration(CI) pipeline?
+# What is the responsibility of the Continuous Integration(CI) pipeline?  (to be done)
 
-Talk about the basic steps in a CI pipeline, code checkout, compilation, unit tests, code coverage
+1. code checkout
+1. code compilation
+1. unit tests
+1. code coverage analysis
+1. quality gates assessment (e.g. Sonar Cloud integration)
 
-Give an example of YML  with build, unit test and publish steps
+Example of running unit tests from the **BackEnd** project
 
+```
+- task: DotNetCoreCLI@2
+  displayName: Test
+  inputs:
+    command: test
+    projects: '**/*[Tt]est*/*.csproj'
+    arguments: '--configuration $(BuildConfiguration)'
+
+```
 
 ---
 
 # What is the responsibility of the Continuous Integration(CD) pipeline?
 
-Talk about , taking the drops from CI and deploying on DEV. Create DEV infrastructure, deploying on DEV, followed by UAT and PROD
+#### 3 stages of infrastructure deployment (dev/uat/prod)
+![3 stages view](docs/images/cd-3-stages-view.png "3 stages view")
 
+#### Variable initialization
+The variable **environment** (could be any name) influences the PowerShell script. The PowerShell script will use this environment variable to control the names of the assets in the cloud.
+
+
+![variables view](docs/images/cd-variables-view.png "variables view")
+
+#### How does Azure Devops establish a connection with Azure cloud?
+
+![new service connection](docs/images/cd-new-service-connection.png "new service connection")
+
+A one-time connection trust between Azure Devops and Azure cloud needs to be established. This is done via the **Service connections** .You will need to register a new Application in Active Directory
+
+
+![app registration](docs/images/cd-application-registration.png "app registration")
+
+
+
+#### How to specify the connection to Azure cloud?
+The service connection created in the previous step is specified in the drop down labelled "Azure Resource Manager Connection"
+![specify service connection](docs/images/cd-specify-service-connection.png "specify service connection")
+
+#### What are the tasks in each of the stages?
+
+![tasks in each stage](docs/images/cd-tasks-list.png "tasks in each stage")
+
+#### What is the difference between dev,uat and prod stages?
+
+The steps are nearly identical. They all point to the same PowerShell scripts. So what is the difference? 
+ -The variables differ. E.g. the variable *environment*
+ -The service connection used by Devops to connect to the Azure cloud may differ. E.g. An UAT subscription for UAT environment and PROD subscription for production environment
+
+The following snippet from *BackEnd\infrastructure\common.ps1 demonstrates* how we can use the environment to create our assets
+```
+$environment=$env:ENVIRONMENT
+if ([string]::IsNullOrWhiteSpace($environment)){
+    Write-Error -Message "The variable 'environment' was empty"
+}
+
+$ResourceGroup="rg-$environment-demo-webapp-with-cicd"
+
+$Location="uksouth"
+$PlanName="WebAppPlanName"
+$WebAppName="MyDemoWebApi123-$environment"
+
+$StaticSiteStorageAccount="saustorageaccount001$environment"
+$StaticSiteResourceGroup="rg-demo-staticwebsite-with-cicd"
+```
 ---
 
-# How to create a CI pipeline in Azure Devops and link with code in Github ?
+# How to create a CI pipeline in Azure Devops and link with code in Github ? 
 
-Show the visual steps here
+Show the visual steps here ,show a simple pic, stress on master
 
 # How does Azure Devops automatically determine which CI pipeline to run ?
 
