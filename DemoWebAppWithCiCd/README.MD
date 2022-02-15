@@ -3,13 +3,13 @@
 # Overview - What problem are we solving?
 Imagine a very simple distributed application comprising of the following:
 1. Back end tier which has a single REST end point
-1. Static HTML page front end which invokes the end point and renders the data. 
+1. Front end comprises of a static HTML page which invokes the end point and renders the data. 
 1. The code repository is maintained on **Github**
-1. the build and deployment process is on **Azure Devops** and the actual application is deployed to **Azure**
+1. the build and deployment process is on **Azure Devops** and the actual application is deployed to **Azure** App Service and Storage account.
 
-In this article, I have described in a step-by-step fashion how to implement a robust and repeatable **Continuous integration(CI)** and **Continuous deployment(CD)** process which takes the code commits and does the build, unit test, followed by deployment to various environments.
+In this article, I have described in a step-by-step fashion how to implement a robust and repeatable **Continuous integration(CI)** and **Continuous deployment(CD)** process which takes the code commits and does the build, unit test, followed by deployment to various environments.  Links to accompanying code is towards the very end.
 
-![Devops-Flow](docs/images/ci-cd-flow.png "devops github")
+![devops flow](docs/images/ci-cd-flow.png "devops flow")
 
 
 #### Why is it neccessary to have multiple environments (dev/uat/prod)?
@@ -25,11 +25,14 @@ The PR deployment should be automated as much as possible.
 #### How do you automate the deployment of infrastructure to the cloud?
 The accompanying code in this article uses Azure Powershell and Azure CLI to implement the automation of the infrastructure. 
 
+
+
+
 ---
 
 # Why did I write this article?
 
-I wanted to demonstrate that if we stay committed to the fundamental tools and products like **Azure CLI**, **Powershell**, **Github** and **Azure Devops** - then a fairly complex process like CI/CD can be solved with relative ease. I often hear developers stressing how important it is to use a 3rd party Cloud management product like Terraform or Pulumi. If you are on **Azure**, then CLI and PowerShell coupled with an automation agent like **Azure Devops** are all you need for your "Infrastructure as code" solution. This is no way is a criticism of rival products like **AWS**, **Jenkins**, etc. or a promotion of Microsoft. 
+I wanted to demonstrate that if we stay committed to the fundamental tools and products like **Azure CLI**, **Powershell**, **Github** and **Azure Devops** - then a fairly complex process like CI/CD can be solved with relative ease. I often hear developers stressing how important it is to use a 3rd party Cloud management product like Terraform or Pulumi. If you are on **Azure** and have no itention for a multi-cloud solution, then CLI and PowerShell coupled with an automation agent like **Azure Devops** are all you need for your "Infrastructure as code" solution. This is in no way a criticism of rival products like **AWS**, **Jenkins**, etc. or a promotion of Microsoft. 
 
 ---
 
@@ -60,7 +63,7 @@ In a more practical scenario you would have other assets like a central database
 ---
 
 # What is the desired development workflow?
-A classic CI/CD workflow with deployments to dev-uat-prod stages would be as follows. This could be simpler or more complex. Example:
+A classic CI/CD workflow with deployments to **dev-uat-prod** stages would be as follows. The workflow could be even simpler or more complex. Example of complex CI/CD scenarios:
 - Carry out integration test after deployment to Dev where the REST end points are tested
 - Deploy to a QA environment for carrying out load tests
 - Carry out UI automated UI tests immediately after deploying to Dev
@@ -70,7 +73,7 @@ A classic CI/CD workflow with deployments to dev-uat-prod stages would be as fol
 ---
 
 # How do we structure the Github repo?
-I have followed a [Monorepo](https://en.wikipedia.org/wiki/Monorepo) approach for the toy application. This was mainly for simplicity. 
+I have followed a [Monorepo](https://en.wikipedia.org/wiki/Monorepo) approach for the toy application. This was mainly for simplicity. If you are following a Monorepo then there are certain guidelines to be followed in the YAML file, so that the CI/CD automation environment (Azure Devops) can respond correctly to code commits in the source repository (Github). This is discussed further down.
 
 ```
 |                       
@@ -102,14 +105,14 @@ Both the folders have their respective **build.yml** and **IAC** PowerShell scri
 
 ---
 
-# How do we structure our assets on the Azure cloud?
+# How do we structure our assets on the Azure cloud (to be done, is this the right folder)?
 
 1. Show a pic of resource groups
 2. Explain the naming of the resource groups
 
-# How does Azure Devops help us orchestrate our CI/CD pipelines?
+# How does Azure Devops orchestrate our CI/CD pipelines (to be done?
 
-az devops will listen for checkin events via web hooks and kick of the build pipelines
+Azure Devops will listen for checkin events via web hooks and kick of the build pipelines (CI)
 
 ![Devops-Github](docs/images/ms-azdevops-github.png "devops github")
 
@@ -119,13 +122,14 @@ show a picture , similar to above, with some arrows, depicting code checkins, sp
 
 # What is the responsibility of the Continuous Integration(CI) pipeline?  (to be done)
 
+The CI pipeline is defined by a set of ordered tasks written down in a YAML file. The most common tasks performed by CI stage are:
 1. code checkout
 1. code compilation
 1. unit tests
 1. code coverage analysis
 1. quality gates assessment (e.g. Sonar Cloud integration)
 
-Example of running unit tests from the **BackEnd** project
+Example of a YAML snippet which executes the .NET unit tests in the **BackEnd** project
 
 ```
 - task: DotNetCoreCLI@2
@@ -140,6 +144,7 @@ Example of running unit tests from the **BackEnd** project
 ---
 
 # What is the responsibility of the Continuous Integration(CD) pipeline?
+The CD stage is responsible for collecting the build output from CI stage and then executing the IAC scripts. The CD is futher split into environment specific stages. It could get more complex. E.g. Kick of a load test after deployment to Dev environment is complete.
 
 #### 3 stages of infrastructure deployment (dev/uat/prod)
 ![3 stages view](docs/images/cd-3-stages-view.png "3 stages view")
@@ -147,14 +152,26 @@ Example of running unit tests from the **BackEnd** project
 #### Variable initialization
 The variable **environment** (could be any name) influences the PowerShell script. The PowerShell script will use this environment variable to control the names of the assets in the cloud.
 
+**Example**: In the following Powershell snippet, the resource group containing our assets is named as per the environment.
+```
+$environment=$env:ENVIRONMENT
+if ([string]::IsNullOrWhiteSpace($environment)){
+    Write-Error -Message "The variable 'environment' was empty"
+}
+
+$ResourceGroup="rg-$environment-demo-webapp-with-cicd"
+
+```
 
 ![variables view](docs/images/cd-variables-view.png "variables view")
 
 #### How does Azure Devops establish a connection with Azure cloud?
 
+A one-time connection trust between Azure Devops and Azure cloud needs to be established. This is done via the **Service connections** panel of **Azure Devops**.
+
 ![new service connection](docs/images/cd-new-service-connection.png "new service connection")
 
-A one-time connection trust between Azure Devops and Azure cloud needs to be established. This is done via the **Service connections** .You will need to register a new Application in Active Directory
+You will also need to register a new **Application** in Active Directory
 
 
 ![app registration](docs/images/cd-application-registration.png "app registration")
@@ -162,8 +179,10 @@ A one-time connection trust between Azure Devops and Azure cloud needs to be est
 
 
 #### How to specify the connection to Azure cloud?
-The service connection created in the previous step is specified in the drop down labelled "Azure Resource Manager Connection"
+The service connection created in the previous step is now available for use in any of the stages. 
+**Example**: In the case of a **Azure CLI** task or a **Azure PowerShell** task, this can be specified in the drop down labelled *Azure Resource Manager Connection*
 ![specify service connection](docs/images/cd-specify-service-connection.png "specify service connection")
+
 
 #### What are the tasks in each of the stages?
 
@@ -204,12 +223,12 @@ $StaticSiteResourceGroup="rg-demo-staticwebsite-with-cicd"
 - Remember to have tigger elements if you are following a mono-repo approach
 
 # How does Azure Devops automatically determine which CI pipeline to run ?
-If you are following a Monorepo approach, then Azure Devops has a problem. Whenever a file is comitted to the Github repo, how would Devops know which CI pipeline to execute.
+If you are following a **Monorepo** approach, then **Azure Devops** faces a challenge. Whenever a file is comitted to the Github repo, how would Devops know which CI pipeline to execute?
 
-The YML specification addresses this problem using the elements `trigger` and `pr`
+The YML specification addresses this problem by using the elements `trigger` and `pr`
 
 #### Example snippet
-Every YML should have something similar at the very beginning of the file. The `trigger` and `pr` work in tandem to guarantee execution of the correct YML file.
+Every YML should have something similar at the very beginning of the file. The `trigger` and `pr` settings work in tandem to guarantee execution of the correct YML file.
 
 ```
 trigger: 
@@ -227,14 +246,16 @@ pr:
 
 ```
 #### Why do we need a trigger element?
-The `trigger` element places a filter on every commit to the **master** branch
+The `trigger` element places a path filter on every commit to the **master** branch. If any of the committed files match the specified pattern and the branch is master then the CI is kicked off.
 
 #### Why do we need a pr element?
-The `pr` element places a filter on every commit to the feature branch which is under an active pull request.
+The `pr` element places a path filter on every commit to the **feature** branch which is under an active pull request. If any of the committed files in the feature branch match the specified pattern and the branch is under an active PR, then the CI is kicked off.
+
+Every successful Pull Request ends with a merge of the **feature** branch into the **master**. The merge operation kicks of the CI once more. But this time it is on the **master** branch.
 
 ---
 
-# How to create a Continuous Delivery (CD) release in Azure Devops?
+# How to create a Continuous Delivery (CD) release in Azure Devops (redundant)?
 
 to be done. Show the steps
 
@@ -260,6 +281,21 @@ Show the trigger and drop config
 
 # How to create the assets on Azure cloud using PowerShell and CLI?
 
+### Creating a resource group
+to be done
+
+### Creating a App Service Plan
+to be done
+
+### Creating an Web App Service
+to be done
+
+### Creating a Storage Account
+to be done
+
+### Uploading static HTML files to the storage account
+to be done
+
 Do not get into too much details. 
 Talk about a PS script that can be used locally
 Stress on not using Devops for debugging but only for automation
@@ -275,7 +311,7 @@ Show the pic of options
 
 # How to test the infrastructure code by running it on your workstation?
 
-Talk about `set-azcontext` and then running the scripts
+Talk about `set-azcontext` and then running the scripts, you need `az login`
 1. BackEnd/infrastructure/createwebapp.ps1
 1. BackEnd/infrastructure/deploy.ps1
 
