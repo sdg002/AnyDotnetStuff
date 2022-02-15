@@ -195,14 +195,21 @@ $StaticSiteResourceGroup="rg-demo-staticwebsite-with-cicd"
 
 # How to create a CI pipeline in Azure Devops and link with code in Github ? 
 
-Show the visual steps here ,show a simple pic, stress on master
+![new ci pipeline](docs/images/ci-new-pipeline-from-github.png "new ci pipeline")
+
+#### Essential points to remember
+- Devops will expect a YML file in your repo
+- This file must be in the master branch if you want to test out the entire CI/CD flow
+- Therefore you must get a working YML comitted into master before you can finish the rest of the CI/CD pipeline
+- Remember to have tigger elements if you are following a mono-repo approach
 
 # How does Azure Devops automatically determine which CI pipeline to run ?
+If you are following a Monorepo approach, then Azure Devops has a problem. Whenever a file is comitted to the Github repo, how would Devops know which CI pipeline to execute.
 
-Explain the problem of a mono-repo. The YML specification addresses this problem using the elements `trigger` and `pr`
+The YML specification addresses this problem using the elements `trigger` and `pr`
 
 #### Example snippet
-Every YML should have something similar at the very beginning of the file
+Every YML should have something similar at the very beginning of the file. The `trigger` and `pr` work in tandem to guarantee execution of the correct YML file.
 
 ```
 trigger: 
@@ -219,10 +226,11 @@ pr:
     - '/DemoWebAppWithCiCd/BackEnd/*'
 
 ```
-#### Why do we need a pr element?
-to be done
 #### Why do we need a trigger element?
-to be done
+The `trigger` element places a filter on every commit to the **master** branch
+
+#### Why do we need a pr element?
+The `pr` element places a filter on every commit to the feature branch which is under an active pull request.
 
 ---
 
