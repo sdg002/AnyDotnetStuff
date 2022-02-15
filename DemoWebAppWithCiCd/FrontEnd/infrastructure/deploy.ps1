@@ -12,7 +12,7 @@ if ([string]::IsNullOrWhiteSpace($environment)){
 }
 $Location="uksouth"
 $ContainerForStaticContent="`$web"
-$ResourceGroup="rg-$environment-demo-frontendwebsite-with-cicd"
+$ResourceGroup="rg-demo-frontendwebsite-$environment"
 
 $StaticSiteStorageAccount="saustorageaccount001$environment"
 
