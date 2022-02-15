@@ -1,28 +1,35 @@
 # CI/CD solution with Github, Azure Devops, Azure Cloud and CLI/PowerShell - So simple!
 
 # Overview - What problem are we solving?
-[show a block diagram of CI/CD, SOURCE CODE --> BUILD --> DEV-->UAT-->PROD]
-[talk about CI/CD challenge, taking a product from code to deploymnent, passing via build, unit tests, dev, uat and prod stage]
+Imagine a very simple distributed application comprising of the following:
+1. Back end tier which has a single REST end point
+1. Static HTML page front end which invokes the end point and renders the data. 
+1. The code repository is maintained on **Github**
+1. the build and deployment process is on **Azure Devops** and the actual application is deployed to **Azure**
 
-#### Importance of multiple infrastructure environments
-to be done
-- Significance of Dev stage
-- Significance of Uat stage
-- Significance of Prod stage
+In this article, I have described in a step-by-step fashion how to implement a robust and repeatable **Continuous integration(CI)** and **Continuous deployment(CD)** process which takes the code commits and does the build, unit test, followed by deployment to various environments.
 
-#### Automate the deployment of infrastructure
-Talk about IAC and 
+![Devops-Flow](docs/images/ci-cd-flow.png "devops github")
 
 
-#### Improving the Pull Request experience?
-Talk about when a developer raises a Pull Request. Automated CI kicks in --> Automated CD kicks in
+#### Why is it neccessary to have multiple environments (dev/uat/prod)?
 
+- **Dev** - This is where the code that is comitted by the developer and not yet merged into the **master** branch is deployed. This environment gives the developer an opportunity to test her changes and get quick feedback. Pull Request comments are implemented and tested out.
+- **Uat** - After the pull request has been completed, the code is now implemented to the **master** branch. This environment gives the developer and the product owners to examine the product and possibly recommend improvements.
+- **Prod** - When the Product owner is happy , she would approve and trigger the deoployment of the **master** branch. This is a gated stage and might take into several factors. E.g. Deploy during quiter hours, do not deploy during long weekends, etc.
+
+#### Why do we need to have a robust Pull Request experience?
+You want the PR branch to be deoployed to a Dev environment. This is an environment that is safe and allows rapid feedback thereby leading to a better product quality
+The PR deployment should be automated as much as possible.
+
+#### How do you automate the deployment of infrastructure to the cloud?
+The accompanying code in this article uses Azure Powershell and Azure CLI to implement the automation of the infrastructure. 
 
 ---
 
 # Why did I write this article?
 
-I wanted to demonstrate that if we stick to the fundamental tools like Azure CLI, Powershell, Github and Azure Devops - then a fairly complex can be solved with relative ease. I often hear developers stressing how important it is to use a 3rd party Cloud management product like Terraform or Pulumi. If you are on Azure, then CLI and PowerShell are all you need for your "Infrastructure as code" solution.
+I wanted to demonstrate that if we stay committed to the fundamental tools and products like **Azure CLI**, **Powershell**, **Github** and **Azure Devops** - then a fairly complex process like CI/CD can be solved with relative ease. I often hear developers stressing how important it is to use a 3rd party Cloud management product like Terraform or Pulumi. If you are on **Azure**, then CLI and PowerShell coupled with an automation agent like **Azure Devops** are all you need for your "Infrastructure as code" solution. This is no way is a criticism of rival products like **AWS**, **Jenkins**, etc. or a promotion of Microsoft. 
 
 ---
 
