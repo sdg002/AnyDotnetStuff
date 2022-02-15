@@ -35,11 +35,15 @@ I wanted to demonstrate that if we stay committed to the fundamental tools and p
 
 # What sort of application are we automating in this article?
 
-[ show a picture of the blocks , web app, static site]
+The toy application comprises of the following:
+- One REST end point implemented in a .NET Core Web API project. This end point generates dummy weather forecast records
+- Static HTML served out of a storage account (with static web site option enabled). This invokes the REST end point and renders the forecast on the web browser
 
-- out of box web app which generated dummy weather forecast
-- simple static HTML which invokes the REST end point and renders the forecast
+#### Block diagram
+![architecture](docs/images/application-block-diagram.png "app architecture")
 
+#### Browser rendition
+![architecture](docs/images/weather-forecast-browser.png "app architecture")
 
 ---
 
