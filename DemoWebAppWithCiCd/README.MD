@@ -35,9 +35,11 @@ I wanted to demonstrate that if we stay committed to the fundamental tools and p
 
 # What sort of application are we automating in this article?
 
-The toy application comprises of the following:
+For the purpose of demonstrating a working CI/CD solution, I have developed a very simple application which comprises of the following:
 - One REST end point implemented in a .NET Core Web API project. This end point generates dummy weather forecast records
 - Static HTML served out of a storage account (with static web site option enabled). This invokes the REST end point and renders the forecast on the web browser
+
+In a more practical scenario you would have other assets like a central database, Redis cache, message bus and most probably multiple micrososervices hosted in their respective web app.
 
 #### Block diagram
 ![architecture](docs/images/application-block-diagram.png "app architecture")
@@ -49,22 +51,54 @@ The toy application comprises of the following:
 
 # What are the key technologies involved?
 
-- Github for source code
-- Azure Devops for build (CI) and release(CD) pipelines
-- 
+- **Github** - Source code repository
+- **Azure Devops** - Build (CI) and release(CD) pipelines
+- **Azure** - The cloud platform where the infrastructure is deployed
+- **Azure app service** -  Azure serverless compute service for hosting a REST end point implemented on .NET Core Web API
+- **Azure storage account** - Azure storage account configured for serving static HTML content over HTTP
+
 ---
 
 # What is the desired development workflow?
-[show a flow chart]
-code checkin --> PR raied --> CI build pipeline kicks in --> build and tests pass --> CD staqe kicks in --> deployment to Azure --> Developer gets to verify if checked in code is producing the desired functional resutls (e.g. UI tests)
+A classic CI/CD workflow with deployments to dev-uat-prod stages would be as follows. This could be simpler or more complex. Example:
+- Carry out integration test after deployment to Dev where the REST end points are tested
+- Deploy to a QA environment for carrying out load tests
+- Carry out UI automated UI tests immediately after deploying to Dev
+
+![Dev workflow](docs/images/ci-cd-development-workflow.png "dev workflow")
 
 ---
 
 # How do we structure the Github repo?
+I have followed a [Monorepo](https://en.wikipedia.org/wiki/Monorepo) approach for the toy application. This was mainly for simplicity. 
 
-1. Talk about mono repo vs multiple repo. 
-1. Show a tree diagram of the top level. 
-1. Explain the files  (YML, Powershell)
+```
+|                       
++---BackEnd
+|   +---build
+|   |       build.yml
+|   |       
+|   +---infrastructure
+|   |       common.ps1
+|   |       createwebapp.ps1
+|   |       deploy.ps1
+|   |       
+|   \---src
+|                       
+|           
++---FrontEnd
+|   +---build
+|   |       build.yml
+|   |       
+|   +---infrastructure
+|   |       deploy.ps1
+|   |       
+|   \---src
+|                   
+```
+You will notice that the repo is structured into 2 top level folders **BackEnd** and **FrontEnd** which contain a .NET Core WebApp and static HTML assets respectively.
+
+Both the folders have their respective **build.yml** and **IAC** PowerShell scripts.
 
 ---
 
@@ -232,3 +266,10 @@ The output path is missing
 dotnet publish --configuration Release --output c:\truetemp\junk1234\ demo.sln
 ```
 tobe done, how to set file version during build
+
+
+# Further thoughts - extending the toy application by adding a MSSQL database
+Talk about 
+- the source code structure if there were to be a database
+- How would we generate settings
+- Emphasize on key vault 
