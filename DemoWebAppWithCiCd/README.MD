@@ -103,23 +103,17 @@ Both the folders have their respective **build.yml** and **IAC** PowerShell scri
 
 ---
 
-# How do we structure our assets on the Azure cloud (to be done, is this the right folder)?
+# How do we structure our assets on the Azure cloud (to be done)?
 
 1. Show a pic of resource groups
 2. Explain the naming of the resource groups
 
-# How does Azure Devops orchestrate our CI/CD pipelines (remove this, becoming repetitive)?
-
-Azure Devops will listen for checkin events via web hooks and kick of the build pipelines (CI)
-
-![Devops-Github](docs/images/ms-azdevops-github.png "devops github")
-
-show a picture , similar to above, with some arrows, depicting code checkins, split into CI+CD
 
 ---
 
-# What is the responsibility of the Continuous Integration(CI) pipeline?  (to be done)
+# What is the responsibility of the Continuous Integration(CI) pipeline?
 
+#### Overview
 The CI pipeline is defined by a set of ordered tasks written down in a YAML file. The most common tasks performed by CI stage are:
 1. code checkout
 1. code compilation
@@ -138,14 +132,98 @@ Example of a YAML snippet which executes the .NET unit tests in the **BackEnd** 
     arguments: '--configuration $(BuildConfiguration)'
 
 ```
+#### What is not the responsibility of the CI pipeline?
+I would refrain from deploying assets to the Cloud from the CI pipeline. Even though YAML allows you to specify Azure CLI/Powershell Tasks. This should be the responsibility of the CD pipeline
 
 ---
 
 # What is the responsibility of the Continuous Integration(CD) pipeline?
+#### Overview
 The CD stage is responsible for collecting the build output from CI stage and then executing the IAC scripts. The CD is futher split into environment specific stages. It could get more complex. E.g. Kick of a load test after deployment to Dev environment is complete.
 
 #### 3 stages of infrastructure deployment (dev/uat/prod)
 ![3 stages view](docs/images/cd-3-stages-view.png "3 stages view")
+
+
+#### What is the difference between dev,uat and prod stages?
+
+The steps are nearly identical. They all point to the same PowerShell scripts. So what is the difference? 
+ -The variables differ. E.g. the variable *environment*
+ -The service connection used by Devops to connect to the Azure cloud may differ. E.g. An UAT subscription for UAT environment and PROD subscription for production environment
+
+The following snippet from *BackEnd\infrastructure\common.ps1 demonstrates* how we can use the environment to create our assets
+```
+$environment=$env:ENVIRONMENT
+if ([string]::IsNullOrWhiteSpace($environment)){
+    Write-Error -Message "The variable 'environment' was empty"
+}
+
+$ResourceGroup="rg-$environment-demo-webapp-with-cicd"
+
+$Location="uksouth"
+$PlanName="WebAppPlanName"
+$WebAppName="MyDemoWebApi123-$environment"
+
+$StaticSiteStorageAccount="saustorageaccount001$environment"
+$StaticSiteResourceGroup="rg-demo-staticwebsite-with-cicd"
+```
+
+#### What is not the responsibility of the CD pipeline?
+
+Do not compile code here. Do not run unit tests. Let the CI pipeline handle this and be responsible for producing the drops
+
+---
+
+# How to create a CI pipeline in Azure Devops and link with code in Github ? 
+
+![new ci pipeline](docs/images/ci-new-pipeline-from-github.png "new ci pipeline")
+
+#### Essential points to remember
+- Azure Devops will expect a YML file in your repo
+- This file must be in the master branch if you want to test out the entire CI/CD flow
+- Therefore you must get a working YML comitted into master before you can finish the rest of the CI/CD pipeline
+- Remember to have `tigger` and `pr` elements if you are following a mono-repo approach
+
+# How does Azure Devops automatically determine which CI pipeline to run ?
+If you are following a **Monorepo** approach, then **Azure Devops** faces a challenge. Whenever a file is comitted to the Github repo, how would Devops know which CI pipeline to execute?
+
+The YML specification addresses this problem by using the elements `trigger` and `pr`
+
+#### Example snippet
+Every YML should have something similar at the very beginning of the file. The `trigger` and `pr` settings work in tandem to guarantee execution of the correct YML file.
+
+```
+trigger: 
+  branches:
+    include:
+    - master 
+  paths:
+    include: 
+    - '/DemoWebAppWithCiCd/BackEnd/*'
+
+pr: 
+  paths: 
+    include: 
+    - '/DemoWebAppWithCiCd/BackEnd/*'
+
+```
+#### Why do we need a trigger element?
+The `trigger` element places a path filter on every commit to the **master** branch. If any of the committed files match the specified pattern and the branch is master then the CI is kicked off.
+
+#### Why do we need a pr element?
+The `pr` element places a path filter on every commit to the **feature** branch which is under an active pull request. If any of the committed files in the feature branch match the specified pattern and the branch is under an active PR, then the CI is kicked off.
+
+Every successful Pull Request ends with a merge of the **feature** branch into the **master**. The merge operation kicks of the CI once more. But this time it is on the **master** branch.
+
+
+---
+
+# How to configure the CD pipeline?
+
+
+#### Overview
+The CD stage requires configuration at several places
+![cd what each block does](docs/images/cd-high-level-arrows.png "cd arrows")
 
 #### Variable initialization
 The variable **environment** (could be any name) influences the PowerShell script. The PowerShell script will use this environment variable to control the names of the assets in the cloud.
@@ -190,85 +268,6 @@ The service connection created in the previous step is now available for use in 
 
 ![tasks in each stage](docs/images/cd-tasks-list.png "tasks in each stage")
 
-#### What is the difference between dev,uat and prod stages?
-
-The steps are nearly identical. They all point to the same PowerShell scripts. So what is the difference? 
- -The variables differ. E.g. the variable *environment*
- -The service connection used by Devops to connect to the Azure cloud may differ. E.g. An UAT subscription for UAT environment and PROD subscription for production environment
-
-The following snippet from *BackEnd\infrastructure\common.ps1 demonstrates* how we can use the environment to create our assets
-```
-$environment=$env:ENVIRONMENT
-if ([string]::IsNullOrWhiteSpace($environment)){
-    Write-Error -Message "The variable 'environment' was empty"
-}
-
-$ResourceGroup="rg-$environment-demo-webapp-with-cicd"
-
-$Location="uksouth"
-$PlanName="WebAppPlanName"
-$WebAppName="MyDemoWebApi123-$environment"
-
-$StaticSiteStorageAccount="saustorageaccount001$environment"
-$StaticSiteResourceGroup="rg-demo-staticwebsite-with-cicd"
-```
----
-
-# How to create a CI pipeline in Azure Devops and link with code in Github ? 
-
-![new ci pipeline](docs/images/ci-new-pipeline-from-github.png "new ci pipeline")
-
-#### Essential points to remember
-- Devops will expect a YML file in your repo
-- This file must be in the master branch if you want to test out the entire CI/CD flow
-- Therefore you must get a working YML comitted into master before you can finish the rest of the CI/CD pipeline
-- Remember to have tigger elements if you are following a mono-repo approach
-
-# How does Azure Devops automatically determine which CI pipeline to run ?
-If you are following a **Monorepo** approach, then **Azure Devops** faces a challenge. Whenever a file is comitted to the Github repo, how would Devops know which CI pipeline to execute?
-
-The YML specification addresses this problem by using the elements `trigger` and `pr`
-
-#### Example snippet
-Every YML should have something similar at the very beginning of the file. The `trigger` and `pr` settings work in tandem to guarantee execution of the correct YML file.
-
-```
-trigger: 
-  branches:
-    include:
-    - master 
-  paths:
-    include: 
-    - '/DemoWebAppWithCiCd/BackEnd/*'
-
-pr: 
-  paths: 
-    include: 
-    - '/DemoWebAppWithCiCd/BackEnd/*'
-
-```
-#### Why do we need a trigger element?
-The `trigger` element places a path filter on every commit to the **master** branch. If any of the committed files match the specified pattern and the branch is master then the CI is kicked off.
-
-#### Why do we need a pr element?
-The `pr` element places a path filter on every commit to the **feature** branch which is under an active pull request. If any of the committed files in the feature branch match the specified pattern and the branch is under an active PR, then the CI is kicked off.
-
-Every successful Pull Request ends with a merge of the **feature** branch into the **master**. The merge operation kicks of the CI once more. But this time it is on the **master** branch.
-
----
-
-# How to create a Continuous Delivery (CD) release in Azure Devops (redundant)?
-
-to be done. Show the steps
-
----
-
-# How does the CD stage get triggered by the CI pipeline?
-
-
-#### Overview
-The CD stage requires configuration at several places
-![cd what each block does](docs/images/cd-high-level-arrows.png "cd arrows")
 
 #### How to trigger the CD?
 ![cd trigger](docs/images/cd-specify-triggers.png "cd trigger")
@@ -287,7 +286,7 @@ The CD stage requires configuration at several places
 
 ---
 
-# What happens when a Pull Request is raised?
+# What happens when a Pull Request is raised ( to be done)?
 
 - Take the example of a simple back end change
 - Show pic of creating PR
@@ -298,44 +297,61 @@ The CD stage requires configuration at several places
 
 ---
 
-# How to create the assets on Azure cloud using PowerShell and CLI?
+# Important snippets of PowerShell and CLI for creating assets on the Azure Cloud?
+Refer the PowerShell scripts inside the folders **\BackEnd\Infrastructure**  and **\FrontEnd\infrastructure** for the complete Powershell script. 
 
-### Creating a resource group
-to be done
+#### Creating a resource group
+```
+New-AzResourceGroup -Name $ResourceGroup  -Location $Location -Force
+```
 
-### Creating a App Service Plan
-to be done
+#### Creating a App Service Plan
+```
+function CreatePlan(){
+    Write-Host "Creating plan $PlanName"
+    az appservice plan create --name $PlanName --resource-group $ResourceGroup --sku $PlanSKu --number-of-workers $NumOfWorkers --subscription $ctx.Subscription.Id
+}
 
-### Creating an Web App Service
-to be done
+```
 
-### Creating a Storage Account
-to be done
+#### Creating an Web App Service
+```
+function CreateWebApp(){
+    Write-Host "Creating Web App $WebAppName"
+    az webapp create --name $WebAppName --plan $PlanName --resource-group $ResourceGroup --subscription $ctx.Subscription.Id    
+}
+```
+
+#### Creating a Storage Account
+```
+Write-Host "Creating storage account $StaticSiteStorageAccount"
+az storage account create --name $StaticSiteStorageAccount --resource-group $ResourceGroup --location $Location --sku Standard_LRS  --subscription $ctx.Subscription.Id
+```
 
 ### Uploading static HTML files to the storage account
-to be done
+```
+Write-Host "Uploading files from $Sourcefolder"
+az storage blob upload-batch --account-name $StaticSiteStorageAccount --source $Sourcefolder -d '$web'
+```
 
-Do not get into too much details. 
-Talk about a PS script that can be used locally
-Stress on not using Devops for debugging but only for automation
 
 ---
 
-# How does the CD stage kick off the PowerShell/CLI scripts?
+# How does the CD stage kick off the PowerShell/CLI scripts ( to be done)??
 
 Show a pic of Devops Task with Powershell configured
 Show the pic of options
 
 ---
 
-# How to test the infrastructure code by running it on your workstation?
+# How to test the infrastructure code by running it on your workstation ( to be done)?
 
 Talk about `set-azcontext` and then running the scripts, you need `az login`
 1. BackEnd/infrastructure/createwebapp.ps1
 1. BackEnd/infrastructure/deploy.ps1
 
 
-# Getting started with the accompanying code
+# Getting started with the accompanying code ( to be done)
 
 #### Link to accompanying source code
 Link to Github
