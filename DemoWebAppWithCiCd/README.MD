@@ -2,10 +2,10 @@
 
 # Overview - What problem are we solving?
 Imagine a very simple distributed application comprising of the following:
-1. Back end tier which has a single REST end point
+1. Back end tier which implements a single REST end point
 1. Front end comprises of a static HTML page which invokes the end point and renders the data. 
 1. The code repository is maintained on **Github**
-1. the build and deployment process is on **Azure Devops** and the actual application is deployed to **Azure** App Service and Storage account.
+1. the build and deployment process is on **Azure Devops** and the actual application is deployed to **Azure App Service** and **Azure Storage Account**.
 
 In this article, I have described in a step-by-step fashion how to implement a robust and repeatable **Continuous integration(CI)** and **Continuous deployment(CD)** process which takes the code commits and does the build, unit test, followed by deployment to various environments.  Links to accompanying code is towards the very end.
 
@@ -26,13 +26,11 @@ The PR deployment should be automated as much as possible.
 The accompanying code in this article uses Azure Powershell and Azure CLI to implement the automation of the infrastructure. 
 
 
-
-
 ---
 
 # Why did I write this article?
 
-I wanted to demonstrate that if we stay committed to the fundamental tools and products like **Azure CLI**, **Powershell**, **Github** and **Azure Devops** - then a fairly complex process like CI/CD can be solved with relative ease. I often hear developers stressing how important it is to use a 3rd party Cloud management product like Terraform or Pulumi. If you are on **Azure** and have no itention for a multi-cloud solution, then CLI and PowerShell coupled with an automation agent like **Azure Devops** are all you need for your "Infrastructure as code" solution. This is in no way a criticism of rival products like **AWS**, **Jenkins**, etc. or a promotion of Microsoft. 
+I wanted to demonstrate that if we stay committed to the fundamental tools and products like **Azure CLI**, **Powershell**, **Github** and **Azure Devops** - then a fairly complex process like CI/CD can be solved with relative ease. I often hear developers stressing how important it is to use a 3rd party Cloud management product like Terraform or Pulumi. If you are on **Azure** and have no intention for a multi-cloud solution, then CLI and PowerShell coupled with an automation agent like **Azure Devops**/**Jenkins** are all you need for your "Infrastructure as code" solution. 
 
 ---
 
@@ -110,7 +108,7 @@ Both the folders have their respective **build.yml** and **IAC** PowerShell scri
 1. Show a pic of resource groups
 2. Explain the naming of the resource groups
 
-# How does Azure Devops orchestrate our CI/CD pipelines (to be done?
+# How does Azure Devops orchestrate our CI/CD pipelines (remove this, becoming repetitive)?
 
 Azure Devops will listen for checkin events via web hooks and kick of the build pipelines (CI)
 
@@ -152,7 +150,7 @@ The CD stage is responsible for collecting the build output from CI stage and th
 #### Variable initialization
 The variable **environment** (could be any name) influences the PowerShell script. The PowerShell script will use this environment variable to control the names of the assets in the cloud.
 
-**Example**: In the following Powershell snippet, the resource group containing our assets is named as per the environment.
+**Example**: In the following Powershell snippet, the Azure resource group containing our Azure Web app is named as per the environment. Notice that the naming of the environment is also led by the environment variable.
 ```
 $environment=$env:ENVIRONMENT
 if ([string]::IsNullOrWhiteSpace($environment)){
@@ -160,6 +158,10 @@ if ([string]::IsNullOrWhiteSpace($environment)){
 }
 
 $ResourceGroup="rg-$environment-demo-webapp-with-cicd"
+$Location="uksouth"
+$PlanName="WebAppPlanName"
+$WebAppName="MyDemoWebApi123-$environment"
+
 
 ```
 
@@ -263,8 +265,25 @@ to be done. Show the steps
 
 # How does the CD stage get triggered by the CI pipeline?
 
-to be done.
-Show the trigger and drop config
+
+#### Overview
+The CD stage requires configuration at several places
+![cd what each block does](docs/images/cd-high-level-arrows.png "cd arrows")
+
+#### How to trigger the CD?
+![cd trigger](docs/images/cd-specify-triggers.png "cd trigger")
+
+#### How to respond to CI builds from  master branch and Pull Request branch?
+![cd trigger definition](docs/images/cd-define-trigger.png "cd trigger definition")
+
+
+#### How to ensure Prod follows Uat and Uat follows Dev?
+![cd trigger definition](docs/images/cd-uat-after-dev-prod-after-uat.png "cd trigger definition")
+
+
+#### How to create an Approval for the Prod stage?
+
+![cd prod approval](docs/images/cd-define-prod-approval.png "cd prod approval")
 
 ---
 
@@ -366,11 +385,18 @@ https://docs.microsoft.com/en-us/azure/devops-project/azure-devops-project-githu
 
 #### How to build from command line?
 
-The output path is missing
 ```
-dotnet publish --configuration Release --output c:\truetemp\junk1234\ demo.sln
+dotnet publish --configuration Release --output c:\truetemp\someoutput\ demo.sln
 ```
-tobe done, how to set file version during build
+
+Specifying the file version helps immensely in post deployment application support. 
+```
+dotnet publish --output c:\truetemp\someoutput\ /p:FileVersion=1.2.3.4 demo.sln
+```
+
+#### What is a Monorepo?
+https://en.wikipedia.org/wiki/Monorepo
+
 
 
 # Further thoughts - extending the toy application by adding a MSSQL database
