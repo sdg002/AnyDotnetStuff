@@ -103,10 +103,18 @@ Both the folders have their respective **build.yml** and **IAC** PowerShell scri
 
 ---
 
-# How do we structure our assets on the Azure cloud (to be done)?
+# How do we structure our assets on the Azure cloud?
 
-1. Show a pic of resource groups
-2. Explain the naming of the resource groups
+I have separated the deployment into 6 resource groups. 3 resource groups for BackEnd and 3 resource groups for FrontEnd. Such a structure simplifies management and cost monitoring.
+
+#### Breakdown of resource groups
+![list of resource groups](docs/images/azure-resource-groups-list.png "list of resource groups")
+
+#### BackEnd resource groups
+![backend resource group](docs/images/azure-resource-group-backend.png "backend resource group")
+
+#### FrontEnd resource groups
+![front end resource group](docs/images/azure-resource-group-frontend.png "front end resource group")
 
 
 ---
