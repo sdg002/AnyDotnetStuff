@@ -279,6 +279,7 @@ Pay attention to the check boxes. This is neccessary if we want to run Powershel
 
 
 #### How to trigger the CD?
+For full automation, the CD should be configured to "listen" to drops from the CI pipeline.
 ![cd trigger](docs/images/cd-specify-triggers.png "cd trigger")
 
 #### How to respond to CI builds from  master branch and Pull Request branch?
@@ -314,25 +315,49 @@ Talk about `set-azcontext` and then running the scripts, you need `az login`
 1. BackEnd/infrastructure/deploy.ps1
 
 
-# Getting started with the accompanying code ( to be done)
+# Getting started with the accompanying code
 
 #### Link to accompanying source code
-Link to Github
+https://github.com/sdg002/AnyDotnetStuff/tree/master/DemoWebAppWithCiCd
 
 #### Building and deploying the BackEnd from your local workstation
-to be done
+The back end code is managed by the single .SLN file
+https://github.com/sdg002/AnyDotnetStuff/tree/master/DemoWebAppWithCiCd/BackEnd/src/Demo.sln
+
+![cd prod approval](docs/images/code-solution-explorer.png "cd prod approval")
+
+#### How to create the Azure assets for the back end?
+1. Execute the following PS script from a Powershell Core shell.
+1. The script will create the resource group, app service plan and app service.
+https://github.com/sdg002/AnyDotnetStuff/tree/master/DemoWebAppWithCiCd/BackEnd/infrastructure/createwebapp.ps1
+
+#### How to deploy the binaries of the BackEnd to Azure?
+1. Build the solution
+1. Zip the binaries
+1. The ZIP file should contain the assemblies at the very top level
+1. Use the script https://github.com/sdg002/AnyDotnetStuff/tree/master/DemoWebAppWithCiCd/BackEnd/infrastructure/deploy.ps1
+
 
 #### Building and deploying the FrontEnd on your local workstation
-to be done
+The FrontEnd comprises of a simple HTML and JS files. Hence there is no build required - unlike a React or Vue application.
+1. Execute the following PS script from a Powershell Core shell.
+1. The script will upload the static content to the Azure blob container `$web`
+https://github.com/sdg002/AnyDotnetStuff/tree/master/DemoWebAppWithCiCd/FrontEnd/infrastructure/deploy.ps1
+
 
 #### Creating a CI pipeline
-Refer steps in the section [TO BE DONE]
+You will need to create two CI pipelines in your Azure Devops account. These should use the following YML files
+1. https://github.com/sdg002/AnyDotnetStuff/tree/master/DemoWebAppWithCiCd/FrontEnd/build/build.yml
+1. https://github.com/sdg002/AnyDotnetStuff/tree/master/DemoWebAppWithCiCd/BackEnd/build/build.yml
 
 #### Creating a CD pipeline
-Refer steps in the section [TO BE DONE]
+You will need to create 2 CD releases. One wired up with the BackEnd CI and another wired up with the FrontEnd CI.
 
 #### Setting the Github branch policy
-to be done, screen capture of Github which forces a PR
+To see a full Pull Request workflow in action, protection must be applied to the **branch** branch.
+
+![cd prod approval](docs/images/github-master-branch-protection.png "cd prod approval")
+
 
 
 
