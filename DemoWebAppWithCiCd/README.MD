@@ -268,13 +268,14 @@ You will also need to register a new **Application** in Active Directory
 
 #### How to specify the connection to Azure cloud?
 The service connection created in the previous step is now available for use in any of the stages. 
-**Example**: In the case of a **Azure CLI** task or a **Azure PowerShell** task, this can be specified in the drop down labelled *Azure Resource Manager Connection*
+**Example**: In the case of a **Azure CLI** task or a **Azure PowerShell** task, this can be specified in the drop down labelled *Azure Resource Manager Connection*. 
+Pay attention to the check boxes. This is neccessary if we want to run Powershell scripts with **Azure CLI** and **Azure Powershell** commands.
 ![specify service connection](docs/images/cd-specify-service-connection.png "specify service connection")
 
 
 #### What are the tasks in each of the stages?
 
-![tasks in each stage](docs/images/cd-tasks-list.png "tasks in each stage")
+![tasks in each stage](docs/images/cd-tasks-list-with-explanation.png "tasks in each stage")
 
 
 #### How to trigger the CD?
@@ -284,7 +285,7 @@ The service connection created in the previous step is now available for use in 
 ![cd trigger definition](docs/images/cd-define-trigger.png "cd trigger definition")
 
 
-#### How to ensure Prod follows Uat and Uat follows Dev?
+#### How to ensure PROD follows UAT and UAT follows DEV?
 ![cd trigger definition](docs/images/cd-uat-after-dev-prod-after-uat.png "cd trigger definition")
 
 
@@ -304,6 +305,36 @@ The service connection created in the previous step is now available for use in 
 - Show status checks in Github
 
 ---
+
+
+# How to test the infrastructure code by running it on your workstation ( to be done)?
+
+Talk about `set-azcontext` and then running the scripts, you need `az login`
+1. BackEnd/infrastructure/createwebapp.ps1
+1. BackEnd/infrastructure/deploy.ps1
+
+
+# Getting started with the accompanying code ( to be done)
+
+#### Link to accompanying source code
+Link to Github
+
+#### Building and deploying the BackEnd from your local workstation
+to be done
+
+#### Building and deploying the FrontEnd on your local workstation
+to be done
+
+#### Creating a CI pipeline
+Refer steps in the section [TO BE DONE]
+
+#### Creating a CD pipeline
+Refer steps in the section [TO BE DONE]
+
+#### Setting the Github branch policy
+to be done, screen capture of Github which forces a PR
+
+
 
 # Important snippets of PowerShell and CLI for creating assets on the Azure Cloud?
 Refer the PowerShell scripts inside the folders **\BackEnd\Infrastructure**  and **\FrontEnd\infrastructure** for the complete Powershell script. 
@@ -345,44 +376,7 @@ az storage blob upload-batch --account-name $StaticSiteStorageAccount --source $
 
 ---
 
-# How does the CD stage kick off the PowerShell/CLI scripts ( to be done)??
 
-Show a pic of Devops Task with Powershell configured
-Show the pic of options
-
----
-
-# How to test the infrastructure code by running it on your workstation ( to be done)?
-
-Talk about `set-azcontext` and then running the scripts, you need `az login`
-1. BackEnd/infrastructure/createwebapp.ps1
-1. BackEnd/infrastructure/deploy.ps1
-
-
-# Getting started with the accompanying code ( to be done)
-
-#### Link to accompanying source code
-Link to Github
-
-#### Building and deploying the BackEnd from your local workstation
-to be done
-
-#### Building and deploying the FrontEnd on your local workstation
-to be done
-
-#### Creating a CI pipeline
-Refer steps in the section [TO BE DONE]
-
-#### Creating a CD pipeline
-Refer steps in the section [TO BE DONE]
-
-#### Setting the Github branch policy
-to be done, screen capture of Github which forces a PR
-
-# References
-https://mydemowebapi123.azurewebsites.net/WeatherForecast
-
----
 
 # References
 #### Azure Devops - Configure run or build numbers in Azure Devops
