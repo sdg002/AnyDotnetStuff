@@ -334,7 +334,7 @@ https://github.com/sdg002/AnyDotnetStuff/tree/master/DemoWebAppWithCiCd/BackEnd/
 #### How to deploy the binaries of the BackEnd to Azure?
 1. Build the solution
 1. Zip the binaries
-1. The ZIP file should contain the assemblies at the very top level
+1. **Attention!** The ZIP file should contain the assemblies at the very top level
 1. Use the script https://github.com/sdg002/AnyDotnetStuff/tree/master/DemoWebAppWithCiCd/BackEnd/infrastructure/deploy.ps1
 
 
@@ -426,7 +426,7 @@ https://docs.microsoft.com/en-us/cli/azure/webapp?view=azure-cli-latest#az-webap
 https://docs.microsoft.com/en-us/azure/devops-project/azure-devops-project-github
 
 
-#### How to build from command line?
+#### How to build and publish from command line?
 
 ```
 dotnet publish --configuration Release --output c:\truetemp\someoutput\ demo.sln
@@ -437,12 +437,26 @@ Specifying the file version helps immensely in post deployment application suppo
 dotnet publish --output c:\truetemp\someoutput\ /p:FileVersion=1.2.3.4 demo.sln
 ```
 
+
 #### What is a Monorepo?
 https://en.wikipedia.org/wiki/Monorepo
 
 
 
-# Further thoughts - extending the toy application by adding a MSSQL database
+# Further thoughts - extending the toy application (to be done)
+
+#### How would the scripts change if we wanted higher scalability in PROD environment?
+to be done
+
+#### How would the design change if we were to add more micro services?
+to be done
+
+#### How would the repository design change if there were central resources like MSSQL, Redis and KeyVault in the mix?
+to be done
+
+
+
+
 Talk about 
 - the source code structure if there were to be a database
 - How would we generate settings
