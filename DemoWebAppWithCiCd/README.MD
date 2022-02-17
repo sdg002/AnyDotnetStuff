@@ -307,7 +307,7 @@ git checkout feature/do-logging
 ```
 
 #### Write the code
-
+For this excercise, I have simply added 1 line of logging to the API end point.
 ![vs diff](docs/images/pr-demo-code-change-diff.png "vs diff")
 
 #### Push the changes
@@ -328,7 +328,7 @@ Notice that the BackEnd CI has kicked off automatically. The CI is running on th
 When the CI completes, Azure Devops kicks off the CD stage.
 ![cd running](docs/images/pr-demo-devops-backend-cd-running-pr-branch.png "cd running")
 
-#### How does Github react when Azure Devops is executing the CI/CD?
+#### How does Github react when Azure Devops is executing the CI and CD?
 
 Notice that Github is reporting that **BackEnd CI** and **BackEnd CD** are mandatory checks.
 ![pr checks required](docs/images/pr-demo-github-pull-request-checks-required.png "pr checks required")
@@ -353,11 +353,15 @@ Github has merged the Pull Request. Azure Devops will kick off the CI once more.
 
 DEV stage of CD running
 ![cd on master dev](docs/images/pr-demo-devops-backend-cd-running-master-branch-dev-stage.png "cd on master dev")
-UAT stage of CD running
+
+DEV stage is complete.UAT stage of CD is now running
 ![cd on master uat](docs/images/pr-demo-devops-backend-cd-running-master-branch-uat-stage.png "cd on master uat")
-PROD stage waiting for approval
+
+UAT stage is complete. PROD stage waiting for approval
 ![cd on prod waiting for approval](docs/images/pr-demo-devops-backend-cd-running-master-branch-prod-approval-pending-stage.png "cd on prod waiting for approval")
+
 Click on the Approve button
+
 ![prod click on approve](docs/images/pr-demo-devops-backend-cd-running-master-branch-prod-approve-click.png "prod click on approve")
 
 PROD stage of CD is now complete
@@ -365,7 +369,7 @@ PROD stage of CD is now complete
 
 
 #### Evidence of deployment on Azure
-How do we know that our BackEnd assets have actually been updated on Azure cloud?
+How do we know that our BackEnd assets have actually been updated on Azure cloud? The Activity Log of the **App Service** displays the following:
 ![azure activity](docs/images/pr-demo-azure-activity.png "azure activity")
 
 
@@ -373,12 +377,24 @@ How do we know that our BackEnd assets have actually been updated on Azure cloud
 ---
 
 
-# How to test the infrastructure code by running it on your workstation ( to be done)?
+# How to test the infrastructure code by running it on your workstation?
+This is absolutely important. You want to run all the infrastructure scripts from your local workstation before you can expect CI/CD to work smoothly.
+You want a system where there is quick feedback to the developer. CI/CD is an automation engine and should not be used as an debugging environment.
+#### Getting Azure CLI to work?
+You will need to do a `az login`. This will do a one time interactive login into Azure. 
+All subsequent calls to `az` CLI will use saved credentials to interact with Azure.
+https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli#sign-in-interactively
 
-Talk about `set-azcontext` and then running the scripts, you need `az login`
-1. BackEnd/infrastructure/createwebapp.ps1
-1. BackEnd/infrastructure/deploy.ps1
+You can verify by opening another Powershell console and typing `az account show`. 
 
+#### Getting Azure Powershell to work?
+You will need to do a `Set-AzContext` from a Powershell Core shell. This will do a one time interactive login into Azure.
+All subsequent Azure powershell cmdlet invocations will use saved credentials to interact with Azure.
+https://docs.microsoft.com/en-us/powershell/module/az.accounts/set-azcontext?view=azps-7.2.0
+
+You can verify by opening another Powershell Core shell and run `Get-AzContext`
+
+**Attention!** Azure CLI and Azure Powershell require their own authentication and hence you need to do both of the above.
 
 # Getting started with the accompanying code
 
