@@ -14,17 +14,21 @@ In this article, I have described in a step-by-step fashion how to implement a r
 
 #### Why is it neccessary to have multiple environments (dev/uat/prod)?
 
-- **Dev** - This is where the code that is comitted by the developer and not yet merged into the **master** branch is deployed. This environment gives the developer an opportunity to test her changes and get quick feedback. Pull Request comments are implemented and tested out.
-- **Uat** - After the pull request has been completed, the code is now implemented to the **master** branch. This environment gives the developer and the product owners to examine the product and possibly recommend improvements.
-- **Prod** - When the Product owner is happy , she would approve and trigger the deoployment of the **master** branch. This is a gated stage and might take into several factors. E.g. Deploy during quiter hours, do not deploy during long weekends, etc.
+- **DEV** - This is where the code that is comitted by the developer and not yet merged into the **master** branch is deployed. This environment gives the developer an opportunity to test her changes and get quick feedback. Pull Request comments are implemented and tested out.
+- **UAT** - After the pull request has been completed, the code is now implemented to the **master** branch. This environment gives the developer and the product owners to examine the product and possibly recommend improvements.
+- **PROD** - When the Product owner is happy , she would approve and trigger the deoployment of the **master** branch. This is a gated stage and might take into several factors. E.g. Deploy during quiter hours, do not deploy during long weekends, etc.
 
 #### Why do we need to have a robust Pull Request experience?
-You want the PR branch to be deoployed to a Dev environment. This is an environment that is safe and allows rapid feedback thereby leading to a better product quality
+You want your team to follow a Pull Request workflow to ensure good quality code commits. You want the PR branch to be deoployed to a Dev environment. This is an environment that is safe and allows rapid feedback thereby leading to a better product quality
 The PR deployment should be automated as much as possible.
 
 #### How do you automate the deployment of infrastructure to the cloud?
 The accompanying code in this article uses Azure Powershell and Azure CLI to implement the automation of the infrastructure. 
+You do not need any 3 rd party product. Just the following:
+- Azure CLI
+- Powershell Core
 
+I recommend using **Visual Studio Code** for editing **Powershell** scripts
 
 ---
 
@@ -122,7 +126,7 @@ I have separated the deployment into 6 resource groups. 3 resource groups for Ba
 # What is the responsibility of the Continuous Integration(CI) pipeline?
 
 #### Overview
-The CI pipeline is defined by a set of ordered tasks written down in a YAML file. The most common tasks performed by CI stage are:
+The CI pipeline is defined by a list of ordered tasks written down in a YAML file. The most common tasks performed by CI stage are:
 1. code checkout
 1. code compilation
 1. unit tests
@@ -149,15 +153,17 @@ I would refrain from deploying assets to the Cloud from the CI pipeline. Even th
 #### Overview
 The CD stage is responsible for collecting the build output from CI stage and then executing the IAC scripts. The CD is futher split into environment specific stages. It could get more complex. E.g. Kick of a load test after deployment to Dev environment is complete.
 
-#### 3 stages of infrastructure deployment (dev/uat/prod)
+#### 3 stages of infrastructure deployment (DEV/UAT/PROD)
 ![3 stages view](docs/images/cd-3-stages-view.png "3 stages view")
 
 
-#### What is the difference between dev,uat and prod stages?
+#### What is the difference between DEV,UAT and PROD stages?
 
-The steps are nearly identical. They all point to the same PowerShell scripts. So what is the difference? 
- -The variables differ. E.g. the variable *environment*
- -The service connection used by Devops to connect to the Azure cloud may differ. E.g. An UAT subscription for UAT environment and PROD subscription for production environment
+The steps are logically identical. They all point to the same PowerShell scripts. So what is the difference? 
+1. The variables differ. E.g. the variable *environment*
+1. The service connection used by Devops to connect to the Azure cloud may differ. E.g. An UAT subscription for UAT environment and PROD subscription for production environment
+1. Allocate higher compute resources depending on the environment.
+
 
 The following snippet from *BackEnd\infrastructure\common.ps1 demonstrates* how we can use the environment to create our assets
 ```
@@ -346,21 +352,21 @@ Note that Azure Devops has completed the CD stage on the feature branch.
 ![complete the pr](docs/images/pr-demo-github-merge-pull-request-admin-privileges.png "complete the pr")
 
 #### Wait for CI on master branch
-Github has merged the Pull Request. Azure Devops will kick off the CI once more. This time on the **master** branch
+Github has merged the Pull Request. Azure Devops will automatically kick off the CI once more. This time on the **master** branch
 ![ci on master branch](docs/images/pr-demo-devops-backend-ci-running-master-branch.png "ci on master branch")
 
 #### Wait for CD on master
 
-DEV stage of CD running
+CI on master is complete. DEV stage of CD is now running
 ![cd on master dev](docs/images/pr-demo-devops-backend-cd-running-master-branch-dev-stage.png "cd on master dev")
 
 DEV stage is complete.UAT stage of CD is now running
 ![cd on master uat](docs/images/pr-demo-devops-backend-cd-running-master-branch-uat-stage.png "cd on master uat")
 
-UAT stage is complete. PROD stage waiting for approval
+UAT stage is complete. PROD stage is waiting for approval
 ![cd on prod waiting for approval](docs/images/pr-demo-devops-backend-cd-running-master-branch-prod-approval-pending-stage.png "cd on prod waiting for approval")
 
-Click on the Approve button
+Click on the **Approve** button
 
 ![prod click on approve](docs/images/pr-demo-devops-backend-cd-running-master-branch-prod-approve-click.png "prod click on approve")
 
@@ -540,7 +546,7 @@ We could easily tweak the `deploy.ps1` such that the `--sku` parameter is govern
 Example:
 ```
 $sku="FREE"
-if ($env:environment -eq "dev")
+if ($env:environment -eq "prod")
 {
     $sku="P1v2"
 }
