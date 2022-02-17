@@ -373,7 +373,6 @@ How do we know that our BackEnd assets have actually been updated on Azure cloud
 ![azure activity](docs/images/pr-demo-azure-activity.png "azure activity")
 
 
-
 ---
 
 
@@ -524,21 +523,89 @@ https://en.wikipedia.org/wiki/Monorepo
 
 
 
-# Further thoughts - extending the toy application (to be done)
+# Further thoughts - extending the toy application
 
 #### How would the scripts change if we wanted higher scalability in PROD environment?
-to be done
+The Powershell script `BackEnd\infrastructure\deploy.ps1` creates the App Service Plan which then hosts the App Service. 
+The App Service Plan controls the compute resources allocated for the web application. 
+You would like a cheaper resource for DEV. But, PROD and UAT would need more realistic compute resources.
+
+The `--sku` command line parameter governs the compute capabilities of the plan.
+```
+az appservice plan create  --sku "FREE" 
+```
+
+We could easily tweak the `deploy.ps1` such that the `--sku` parameter is governed by the `$env:evironment` variable value
+
+Example:
+```
+$sku="FREE"
+if ($env:environment -eq "dev")
+{
+    $sku="P1v2"
+}
+```
+
+Refer documentation for a full listing of available plans and their pricing
+https://azure.microsoft.com/en-us/pricing/details/app-service/windows/
+
 
 #### How would the design change if we were to add more micro services?
-to be done
+If you continue with the Monorepo approach, then you can create a new folder at the same level as **FrontEnd** and **BackEnd**.
+See **AnotherService1** and **AnotherService2** below
+
+```
+|                       
++---BackEnd
+|   +---build
+|   |       build.yml
+|   |       
+|   +---infrastructure
+|   |       common.ps1
+|   |       createwebapp.ps1
+|   |       deploy.ps1
+|   |       
+|   \---src
+|                       
+|           
++---FrontEnd
+|   +---build
+|   |       build.yml
+|   |       
+|   +---infrastructure
+|   |       deploy.ps1
+|   |       
+|   \---src
+| 
++---AnotherService1
+|   +---build
+|   |       build.yml
+|   |       
+|   +---infrastructure
+|   |       deploy.ps1
+|   |       
+|   \---src
+| 
++---AnotherService2
+|   +---build
+|   |       build.yml
+|   |       
+|   +---infrastructure
+|   |       deploy.ps1
+|   |       
+|   \---src
+| 
+| 
+```
+
+You would a new CI pipeline for and new CD pipeline for each of the new back end services.
 
 #### How would the repository design change if there were central resources like MSSQL, Redis and KeyVault in the mix?
-to be done
 
+As the application matures you would need central infrastructure pieces. Example: SQL Server\Postgres\Cosmos, Redis Cache, Application Insights, KeyVault
 
+- You could follow the Monorepo approach, then you could create a new folder as described above
+- You could create a new repository
 
+Regardless of which approach, you would need a CI YAML and a CD stage.
 
-Talk about 
-- the source code structure if there were to be a database
-- How would we generate settings
-- Emphasize on key vault 
