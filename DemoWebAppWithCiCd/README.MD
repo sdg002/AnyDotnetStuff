@@ -296,14 +296,79 @@ For full automation, the CD should be configured to "listen" to drops from the C
 
 ---
 
-# What happens when a Pull Request is raised ( to be done)?
+# What happens when a Pull Request is raised?
+In this section we will minutely examine the Pull Request workflow. To drive this example, we will make a code commit to our toy BackEnd application.
 
-- Take the example of a simple back end change
-- Show pic of creating PR
-- Show status checks in Github
-- Show CI stage getting kicked in
-- Show CI completing and CD starting
-- Show status checks in Github
+#### Create a feature branch
+
+```
+git branch feature/do-logging
+git checkout feature/do-logging
+```
+
+#### Write the code
+
+![vs diff](docs/images/pr-demo-code-change-diff.png "vs diff")
+
+#### Push the changes
+![vs push the changes](docs/images/pr-demo-git-push.png "vs push the changes")
+
+#### How does Github react after pushing the changes?
+
+![github view new branch](docs/images/pr-demo-github-newbranch-created-pr-button.png "github view new branch")
+
+#### Create a pull request on the feature branch
+
+![create pull request](docs/images/pr-demo-github-create-pull-request.png "create pull request")
+
+#### How does Azure Devops react when a new Pull Request is created on Github?
+Notice that the BackEnd CI has kicked off automatically. The CI is running on the feature branch.
+![ci running](docs/images/pr-demo-devops-backend-ci-running.png "ci running")
+
+When the CI completes, Azure Devops kicks off the CD stage.
+![cd running](docs/images/pr-demo-devops-backend-cd-running-pr-branch.png "cd running")
+
+#### How does Github react when Azure Devops is executing the CI/CD?
+
+Notice that Github is reporting that **BackEnd CI** and **BackEnd CD** are mandatory checks.
+![pr checks required](docs/images/pr-demo-github-pull-request-checks-required.png "pr checks required")
+
+#### How does Github react when CI and CD has completed on Azure Devops?
+
+![pr checks complete](docs/images/pr-demo-github-pull-request-checks-completed.png "pr checks complete")
+
+Note that Azure Devops has completed the CD stage on the feature branch.
+![to be done](docs/images/pr-demo-devops-backend-cd-complete-pr-branch.png "to be done")
+
+#### Complete the Pull Request
+
+
+![complete the pr](docs/images/pr-demo-github-merge-pull-request-admin-privileges.png "complete the pr")
+
+#### Wait for CI on master branch
+Github has merged the Pull Request. Azure Devops will kick off the CI once more. This time on the **master** branch
+![ci on master branch](docs/images/pr-demo-devops-backend-ci-running-master-branch.png "ci on master branch")
+
+#### Wait for CD on master
+
+DEV stage of CD running
+![cd on master dev](docs/images/pr-demo-devops-backend-cd-running-master-branch-dev-stage.png "cd on master dev")
+UAT stage of CD running
+![cd on master uat](docs/images/pr-demo-devops-backend-cd-running-master-branch-uat-stage.png "cd on master uat")
+PROD stage waiting for approval
+![cd on prod waiting for approval](docs/images/pr-demo-devops-backend-cd-running-master-branch-prod-approval-pending-stage.png "cd on prod waiting for approval")
+Click on the Approve button
+![prod click on approve](docs/images/pr-demo-devops-backend-cd-running-master-branch-prod-approve-click.png "prod click on approve")
+
+PROD stage of CD is now complete
+![cd on prod complete](docs/images/pr-demo-devops-backend-cd-running-master-branch-prod-complete.png "cd on prod complete")
+
+
+#### Evidence of deployment on Azure
+How do we know that our BackEnd assets have actually been updated on Azure cloud?
+![azure activity](docs/images/pr-demo-azure-activity.png "azure activity")
+
+
 
 ---
 
