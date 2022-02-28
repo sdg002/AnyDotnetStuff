@@ -14,17 +14,21 @@ In this article, I have described in a step-by-step fashion how to implement a r
 
 #### Why is it neccessary to have multiple environments (dev/uat/prod)?
 
-- **Dev** - This is where the code that is comitted by the developer and not yet merged into the **master** branch is deployed. This environment gives the developer an opportunity to test her changes and get quick feedback. Pull Request comments are implemented and tested out.
-- **Uat** - After the pull request has been completed, the code is now implemented to the **master** branch. This environment gives the developer and the product owners to examine the product and possibly recommend improvements.
-- **Prod** - When the Product owner is happy , she would approve and trigger the deoployment of the **master** branch. This is a gated stage and might take into several factors. E.g. Deploy during quiter hours, do not deploy during long weekends, etc.
+- **DEV** - This is where the code that is comitted by the developer and not yet merged into the **master** branch is deployed. This environment gives the developer an opportunity to test her changes and get quick feedback. Pull Request comments are implemented and tested out.
+- **UAT** - After the pull request has been completed, the code is now implemented to the **master** branch. This environment gives the developer and the product owners to examine the product and possibly recommend improvements.
+- **PROD** - When the Product owner is happy , she would approve and trigger the deoployment of the **master** branch. This is a gated stage and might take into several factors. E.g. Deploy during quiter hours, do not deploy during long weekends, etc.
 
 #### Why do we need to have a robust Pull Request experience?
-You want the PR branch to be deoployed to a Dev environment. This is an environment that is safe and allows rapid feedback thereby leading to a better product quality
+You want your team to follow a Pull Request workflow to ensure good quality code commits. You want the PR branch to be deoployed to a Dev environment. This is an environment that is safe and allows rapid feedback thereby leading to a better product quality
 The PR deployment should be automated as much as possible.
 
 #### How do you automate the deployment of infrastructure to the cloud?
 The accompanying code in this article uses Azure Powershell and Azure CLI to implement the automation of the infrastructure. 
+You do not need any 3 rd party product. Just the following:
+- Azure CLI
+- Powershell Core
 
+I recommend using **Visual Studio Code** for editing **Powershell** scripts
 
 ---
 
@@ -122,7 +126,7 @@ I have separated the deployment into 6 resource groups. 3 resource groups for Ba
 # What is the responsibility of the Continuous Integration(CI) pipeline?
 
 #### Overview
-The CI pipeline is defined by a set of ordered tasks written down in a YAML file. The most common tasks performed by CI stage are:
+The CI pipeline is defined by a list of ordered tasks written down in a YAML file. The most common tasks performed by CI stage are:
 1. code checkout
 1. code compilation
 1. unit tests
@@ -149,15 +153,17 @@ I would refrain from deploying assets to the Cloud from the CI pipeline. Even th
 #### Overview
 The CD stage is responsible for collecting the build output from CI stage and then executing the IAC scripts. The CD is futher split into environment specific stages. It could get more complex. E.g. Kick of a load test after deployment to Dev environment is complete.
 
-#### 3 stages of infrastructure deployment (dev/uat/prod)
+#### 3 stages of infrastructure deployment (DEV/UAT/PROD)
 ![3 stages view](docs/images/cd-3-stages-view.png "3 stages view")
 
 
-#### What is the difference between dev,uat and prod stages?
+#### What is the difference between DEV,UAT and PROD stages?
 
-The steps are nearly identical. They all point to the same PowerShell scripts. So what is the difference? 
- -The variables differ. E.g. the variable *environment*
- -The service connection used by Devops to connect to the Azure cloud may differ. E.g. An UAT subscription for UAT environment and PROD subscription for production environment
+The steps are logically identical. They all point to the same PowerShell scripts. So what is the difference? 
+1. The variables differ. E.g. the variable *environment*
+1. The service connection used by Devops to connect to the Azure cloud may differ. E.g. An UAT subscription for UAT environment and PROD subscription for production environment
+1. Allocate higher compute resources depending on the environment.
+
 
 The following snippet from *BackEnd\infrastructure\common.ps1 demonstrates* how we can use the environment to create our assets
 ```
@@ -296,24 +302,104 @@ For full automation, the CD should be configured to "listen" to drops from the C
 
 ---
 
-# What happens when a Pull Request is raised ( to be done)?
+# What happens when a Pull Request is raised?
+In this section we will minutely examine the Pull Request workflow. To drive this example, we will make a code commit to our toy BackEnd application.
 
-- Take the example of a simple back end change
-- Show pic of creating PR
-- Show status checks in Github
-- Show CI stage getting kicked in
-- Show CI completing and CD starting
-- Show status checks in Github
+#### Create a feature branch
+
+```
+git branch feature/do-logging
+git checkout feature/do-logging
+```
+
+#### Write the code
+For this excercise, I have simply added 1 line of logging to the API end point.
+![vs diff](docs/images/pr-demo-code-change-diff.png "vs diff")
+
+#### Push the changes
+![vs push the changes](docs/images/pr-demo-git-push.png "vs push the changes")
+
+#### How does Github react after pushing the changes?
+
+![github view new branch](docs/images/pr-demo-github-newbranch-created-pr-button.png "github view new branch")
+
+#### Create a pull request on the feature branch
+
+![create pull request](docs/images/pr-demo-github-create-pull-request.png "create pull request")
+
+#### How does Azure Devops react when a new Pull Request is created on Github?
+Notice that the BackEnd CI has kicked off automatically. The CI is running on the feature branch.
+![ci running](docs/images/pr-demo-devops-backend-ci-running.png "ci running")
+
+When the CI completes, Azure Devops kicks off the CD stage.
+![cd running](docs/images/pr-demo-devops-backend-cd-running-pr-branch.png "cd running")
+
+#### How does Github react when Azure Devops is executing the CI and CD?
+
+Notice that Github is reporting that **BackEnd CI** and **BackEnd CD** are mandatory checks.
+![pr checks required](docs/images/pr-demo-github-pull-request-checks-required.png "pr checks required")
+
+#### How does Github react when CI and CD has completed on Azure Devops?
+
+![pr checks complete](docs/images/pr-demo-github-pull-request-checks-completed.png "pr checks complete")
+
+Note that Azure Devops has completed the CD stage on the feature branch.
+![to be done](docs/images/pr-demo-devops-backend-cd-complete-pr-branch.png "to be done")
+
+#### Complete the Pull Request
+
+
+![complete the pr](docs/images/pr-demo-github-merge-pull-request-admin-privileges.png "complete the pr")
+
+#### Wait for CI on master branch
+Github has merged the Pull Request. Azure Devops will automatically kick off the CI once more. This time on the **master** branch
+![ci on master branch](docs/images/pr-demo-devops-backend-ci-running-master-branch.png "ci on master branch")
+
+#### Wait for CD on master
+
+CI on master is complete. DEV stage of CD is now running
+![cd on master dev](docs/images/pr-demo-devops-backend-cd-running-master-branch-dev-stage.png "cd on master dev")
+
+DEV stage is complete.UAT stage of CD is now running
+![cd on master uat](docs/images/pr-demo-devops-backend-cd-running-master-branch-uat-stage.png "cd on master uat")
+
+UAT stage is complete. PROD stage is waiting for approval
+![cd on prod waiting for approval](docs/images/pr-demo-devops-backend-cd-running-master-branch-prod-approval-pending-stage.png "cd on prod waiting for approval")
+
+Click on the **Approve** button
+
+![prod click on approve](docs/images/pr-demo-devops-backend-cd-running-master-branch-prod-approve-click.png "prod click on approve")
+
+PROD stage of CD is now complete
+![cd on prod complete](docs/images/pr-demo-devops-backend-cd-running-master-branch-prod-complete.png "cd on prod complete")
+
+
+#### Evidence of deployment on Azure
+How do we know that our BackEnd assets have actually been updated on Azure cloud? The Activity Log of the **App Service** displays the following:
+![azure activity](docs/images/pr-demo-azure-activity.png "azure activity")
+
 
 ---
 
 
-# How to test the infrastructure code by running it on your workstation ( to be done)?
+# How to test the infrastructure code by running it on your workstation?
+This is absolutely important. You want to run all the infrastructure scripts from your local workstation before you can expect CI/CD to work smoothly.
+You want a system where there is quick feedback to the developer. CI/CD is an automation engine and should not be used as an debugging environment.
+#### Getting Azure CLI to work?
+You will need to do a `az login`. This will do a one time interactive login into Azure. 
+All subsequent calls to `az` CLI will use saved credentials to interact with Azure.
+https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli#sign-in-interactively
 
-Talk about `set-azcontext` and then running the scripts, you need `az login`
-1. BackEnd/infrastructure/createwebapp.ps1
-1. BackEnd/infrastructure/deploy.ps1
+You can verify by opening another Powershell console and typing `az account show`. 
 
+#### Getting Azure Powershell to work?
+You will need to do a `Set-AzContext` from a Powershell Core shell. This will do a one time interactive login into Azure.
+All subsequent Azure powershell cmdlet invocations will use saved credentials to interact with Azure.
+https://docs.microsoft.com/en-us/powershell/module/az.accounts/set-azcontext?view=azps-7.2.0
+
+You can verify by opening another Powershell Core shell and run `Get-AzContext`
+
+**Attention!** Azure CLI and Azure Powershell require their own authentication and hence you need to do both of the above.
 
 # Getting started with the accompanying code
 
@@ -443,21 +529,89 @@ https://en.wikipedia.org/wiki/Monorepo
 
 
 
-# Further thoughts - extending the toy application (to be done)
+# Further thoughts - extending the toy application
 
 #### How would the scripts change if we wanted higher scalability in PROD environment?
-to be done
+The Powershell script `BackEnd\infrastructure\deploy.ps1` creates the App Service Plan which then hosts the App Service. 
+The App Service Plan controls the compute resources allocated for the web application. 
+You would like a cheaper resource for DEV. But, PROD and UAT would need more realistic compute resources.
+
+The `--sku` command line parameter governs the compute capabilities of the plan.
+```
+az appservice plan create  --sku "FREE" 
+```
+
+We could easily tweak the `deploy.ps1` such that the `--sku` parameter is governed by the `$env:evironment` variable value
+
+Example:
+```
+$sku="FREE"
+if ($env:environment -eq "prod")
+{
+    $sku="P1v2"
+}
+```
+
+Refer documentation for a full listing of available plans and their pricing
+https://azure.microsoft.com/en-us/pricing/details/app-service/windows/
+
 
 #### How would the design change if we were to add more micro services?
-to be done
+If you continue with the Monorepo approach, then you can create a new folder at the same level as **FrontEnd** and **BackEnd**.
+See **AnotherService1** and **AnotherService2** below
+
+```
+|                       
++---BackEnd
+|   +---build
+|   |       build.yml
+|   |       
+|   +---infrastructure
+|   |       common.ps1
+|   |       createwebapp.ps1
+|   |       deploy.ps1
+|   |       
+|   \---src
+|                       
+|           
++---FrontEnd
+|   +---build
+|   |       build.yml
+|   |       
+|   +---infrastructure
+|   |       deploy.ps1
+|   |       
+|   \---src
+| 
++---AnotherService1
+|   +---build
+|   |       build.yml
+|   |       
+|   +---infrastructure
+|   |       deploy.ps1
+|   |       
+|   \---src
+| 
++---AnotherService2
+|   +---build
+|   |       build.yml
+|   |       
+|   +---infrastructure
+|   |       deploy.ps1
+|   |       
+|   \---src
+| 
+| 
+```
+
+You would a new CI pipeline for and new CD pipeline for each of the new back end services.
 
 #### How would the repository design change if there were central resources like MSSQL, Redis and KeyVault in the mix?
-to be done
 
+As the application matures you would need central infrastructure pieces. Example: SQL Server\Postgres\Cosmos, Redis Cache, Application Insights, KeyVault
 
+- You could follow the Monorepo approach, then you could create a new folder as described above
+- You could create a new repository
 
+Regardless of which approach, you would need a CI YAML and a CD stage.
 
-Talk about 
-- the source code structure if there were to be a database
-- How would we generate settings
-- Emphasize on key vault 
