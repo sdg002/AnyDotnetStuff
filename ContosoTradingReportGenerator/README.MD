@@ -29,12 +29,11 @@
 
 ---
 
-
-
 # Solution overview
 
-[[show a diagram of trading system, worker, reports repo]]
-[[mark the interfaces that are implemented]]
+The solution has been implemented using a *componentized ASP.NET Worker process* approach
+
+
 ## ASP.NET Core Worker class
 
 The core scheduler is implemented as an inheritance from Microsoft's `BackgroundService` class. 
@@ -52,6 +51,29 @@ public class RecurringAggregatorJob : Microsoft.Extensions.Hosting.BackgroundSer
             }
         }
 }
+```
+- The class `RecurringAggregatorJob` is desinged to poll the trading system at configured intervals
+- The configuration is read from `appSettings.json`
+- Dependencies like logger, trading connector and reports repository are wired through Dependency Injection
+
+Structure of appSettings.json is as below:
+```
+{
+  "ReportsFolder": "c:\\truetemp\\pitl_challenge\\",
+  "MaximumSecondsDelayBetweenConsecutiveReporExtrations": 100,
+  "SecondsDelayBetweenConsecutiveAttempts": 30
+
+```
+The settings are serialized during DI initialization:
+```
+                    services.AddSingleton<TradingAggregatorJobConfig>(sp =>
+                    {
+                        var configuration = sp.GetService<IConfiguration>();
+                        var jobConfig = new TradingAggregatorJobConfig();
+                        configuration.Bind(jobConfig);
+                        return jobConfig;
+                    });
+
 ```
 
 ## Trading systems connector
@@ -75,10 +97,7 @@ The popular 3rd party nuget package `CsvHelper` has been used. Refer class `Simp
 
 ![csv!](docs/images/csvgenerator_component.png "csv")
 
-# When does the recurring approach get more complex?
-to be done
-Talk about long running reporting jobs and using multiple job instances
-You would need a central scheduler
+
 
 # Logging
 For this solution, the popular logging library `log4net` has been used. This was primarily for simplicity. 
