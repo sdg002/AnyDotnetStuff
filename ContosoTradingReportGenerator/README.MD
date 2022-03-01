@@ -116,6 +116,24 @@ Sample DI code for Application Insights below:
 https://docs.microsoft.com/en-us/azure/azure-monitor/app/ilogger#console-application
 
 
+# How to ensure that no scheduled report generation has been missed?
+Consider the case of a temporary outage. This could be a case of a container instance failing or an Azure web job instance not responding. To handle such situations, the following logic has been employed in the class `RecurringAggregatorJob.cs`
+- Wake up
+- Query the reports repository for all reports that have been generated so far
+- Compute a table of desired report run timings
+- Compare the desired run timings with the reports that have been already generated
+- Find missing reports
+- Generate the missing reports
+- Repeat the above
+
+So essentially, the report generation plays a catch up. To make this successful, it is important that the the report polling should run at a frequency higher than the report extraction frequency.
+Example:
+If we expect a report to be generated every X minutes, then polling delay should be X/2 minutes (as an example).
+
+## Caveats
+The above approach works robustly if the report generation task is not a very long one.
+
+
 # Understanding the accompanying code
 ## Running the EXE
 - The main executable is implemented in the project **Contoso.TradingAggregator.Host** project
