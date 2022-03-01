@@ -29,13 +29,13 @@ namespace Contoso.TradingReportsRepository
         {
             var csviles = System.IO.Directory.GetFiles(_baseFolder, "*.csv");
 
-            var results = new List<AggregatedReport>();
+            var results = new List<FileSystemAggregatedReport>();
             csviles.ToList().ForEach(f =>
             {
                 var date = System.IO.Path.GetFileName(f).ToDateTime();
                 if (date != null)
                 {
-                    results.Add(new AggregatedReport(date.Value, date.Value.ConvertDateToPeriod(), f));
+                    results.Add(new FileSystemAggregatedReport(date.Value, date.Value.ConvertDateToPeriod(), f));
                 }
             });
 

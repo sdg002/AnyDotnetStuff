@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CD5CB927-7763-4D3B-B68B-3DE28BCC6D7D}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		PITL Coding Challenge - 1.pdf = PITL Coding Challenge - 1.pdf
 		PowerService.dll = PowerService.dll
 		README.MD = README.MD
 	EndProjectSection

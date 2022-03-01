@@ -19,7 +19,7 @@ namespace Contoso.TradingAggregator.UnitTests
     public class RecurringAggregatorJobTests
     {
         private static readonly string FakeCsvContents = "fake csv contents";
-        private readonly List<AggregatedReport> _fakeReportsList = new List<AggregatedReport>();
+        private readonly List<FileSystemAggregatedReport> _fakeReportsList = new List<FileSystemAggregatedReport>();
         private readonly List<TradePosition> _fakeTradePositions = new List<TradePosition>();
         private Mock<ICsvGenerator> _csvGenerator;
         private DateTime _currentClockTime = DateTime.MinValue;
@@ -43,7 +43,7 @@ namespace Contoso.TradingAggregator.UnitTests
                 .Setup(x => x.SaveReport(It.IsAny<DateTime>(), It.IsAny<string>()))
                 .Callback((DateTime reportDate, string contents) =>
                 {
-                    var report = new AggregatedReport(reportDate, reportDate.ConvertDateToPeriod(), reportDate.ToReportFileName());
+                    var report = new FileSystemAggregatedReport(reportDate, reportDate.ConvertDateToPeriod(), reportDate.ToReportFileName());
                     _fakeReportsList.Add(report);
                 });
             _reportsRepository = mockReportsRepo.Object;
@@ -189,10 +189,10 @@ namespace Contoso.TradingAggregator.UnitTests
             _csvGenerator.Verify(m => m.GenerateCsv(It.IsAny<List<AggregatedTradePosition>>()), Times.Never);
         }
 
-        private AggregatedReport CreateFakeReport(int year, int month, int day, int hour, int minute)
+        private FileSystemAggregatedReport CreateFakeReport(int year, int month, int day, int hour, int minute)
         {
             var date = new DateTime(year, month, day, hour, minute, 0);
-            var fakeReport = new AggregatedReport(date, date.ConvertDateToPeriod(), date.ToReportFileName());
+            var fakeReport = new FileSystemAggregatedReport(date, date.ConvertDateToPeriod(), date.ToReportFileName());
             return fakeReport;
         }
     }

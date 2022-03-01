@@ -8,11 +8,11 @@ namespace Contoso.TradingReportsRepository
     /// <summary>
     /// Represents file based aggregated Trading CSV report generated at a specified Date
     /// </summary>
-    public class AggregatedReport : AggregatedReportBase
+    public class FileSystemAggregatedReport : AggregatedReportBase
     {
         private readonly string _absolutePathCsvFile;
 
-        public AggregatedReport(DateTime date, int period, string csvFile)
+        public FileSystemAggregatedReport(DateTime date, int period, string csvFile)
         {
             Guard.Argument(csvFile, nameof(csvFile)).NotEmpty("Absolute CSV file name expected");
             this.ReportDate = date;
