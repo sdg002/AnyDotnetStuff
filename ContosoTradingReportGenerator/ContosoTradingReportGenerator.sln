@@ -1,0 +1,63 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32106.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CD5CB927-7763-4D3B-B68B-3DE28BCC6D7D}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		PITL Coding Challenge - 1.pdf = PITL Coding Challenge - 1.pdf
+		PowerService.dll = PowerService.dll
+		README.MD = README.MD
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contoso.TradingConnector", "Contoso.TradingConnector\Contoso.TradingConnector.csproj", "{29005FB9-0827-406C-ABF6-16B434E4F640}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contoso.TradingAggregator.Domain", "Contoso.TradingAggregator.Domain\Contoso.TradingAggregator.Domain.csproj", "{592871A9-2812-4A74-A706-E20DF9457DD2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contoso.TradingAggregator.UnitTests", "Contoso.TradingAggregator.UnitTests\Contoso.TradingAggregator.UnitTests.csproj", "{68CC74C1-9A3A-4B22-9184-DA5869D78C05}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contoso.TradingAggregator.Jobs", "Contoso.TradingAggregator.Jobs\Contoso.TradingAggregator.Jobs.csproj", "{6573FFD7-98C4-4593-AF05-4662B8CFCB45}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contoso.TradingAggregator.Host", "Contoso.TradingAggregator.Host\Contoso.TradingAggregator.Host.csproj", "{3DE5CE9D-CA81-4ADC-A0A4-9C96931672F0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contoso.TradingReportsRepository", "Contoso.TradingReportsRepository\Contoso.TradingReportsRepository.csproj", "{C6327986-B691-4D52-AF84-EF4FBCC8C075}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{29005FB9-0827-406C-ABF6-16B434E4F640}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29005FB9-0827-406C-ABF6-16B434E4F640}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29005FB9-0827-406C-ABF6-16B434E4F640}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29005FB9-0827-406C-ABF6-16B434E4F640}.Release|Any CPU.Build.0 = Release|Any CPU
+		{592871A9-2812-4A74-A706-E20DF9457DD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{592871A9-2812-4A74-A706-E20DF9457DD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{592871A9-2812-4A74-A706-E20DF9457DD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{592871A9-2812-4A74-A706-E20DF9457DD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68CC74C1-9A3A-4B22-9184-DA5869D78C05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68CC74C1-9A3A-4B22-9184-DA5869D78C05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68CC74C1-9A3A-4B22-9184-DA5869D78C05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68CC74C1-9A3A-4B22-9184-DA5869D78C05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6573FFD7-98C4-4593-AF05-4662B8CFCB45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6573FFD7-98C4-4593-AF05-4662B8CFCB45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6573FFD7-98C4-4593-AF05-4662B8CFCB45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6573FFD7-98C4-4593-AF05-4662B8CFCB45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DE5CE9D-CA81-4ADC-A0A4-9C96931672F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DE5CE9D-CA81-4ADC-A0A4-9C96931672F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DE5CE9D-CA81-4ADC-A0A4-9C96931672F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DE5CE9D-CA81-4ADC-A0A4-9C96931672F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6327986-B691-4D52-AF84-EF4FBCC8C075}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6327986-B691-4D52-AF84-EF4FBCC8C075}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6327986-B691-4D52-AF84-EF4FBCC8C075}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6327986-B691-4D52-AF84-EF4FBCC8C075}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FED8A736-54A5-4CA2-89E7-3CE37CE2B1A9}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Contoso.TradingAggregator.Domain\Contoso.TradingAggregator.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PowerService">
+      <HintPath>..\PowerService.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
