@@ -118,13 +118,14 @@ https://docs.microsoft.com/en-us/azure/azure-monitor/app/ilogger#console-applica
 
 # How to ensure that no scheduled report generation has been missed?
 Consider the case of a temporary outage. This could be a case of a container instance failing or an Azure web job instance not responding. To handle such situations, the following logic has been employed in the class `RecurringAggregatorJob.cs`
-- Wake up
-- Query the reports repository for all reports that have been generated so far
-- Compute a table of desired report run timings
-- Compare the desired run timings with the reports that have been already generated
-- Find missing reports
-- Generate the missing reports
-- Repeat the above
+1. Wake up
+1. Query the reports repository for all reports that have been generated so far
+1. Compute a table of desired report run timings
+1. Compare the desired run timings with the reports that have been already generated
+1. Find missing reports
+1. Generate the missing reports
+1. Wait for a configured delay
+3. Repeat the above
 
 So essentially, the report generation plays a catch up. To make this successful, it is important that the the report polling should run at a frequency higher than the report extraction frequency.
 Example:
