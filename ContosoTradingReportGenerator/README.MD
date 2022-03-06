@@ -202,6 +202,7 @@ The deployment script (Infrastructure as Code) can use the Powershell cmdlet `Ge
 
 ![flowchart!](docs/images/flow-chart.png "flowchart")
 
+
 Consider the case of a temporary outage. This could be caused by several reasons:
 - A case of a container instance failing or an Azure web job instance not responding. 
 - The trading system not responding in a timely fashion
@@ -221,9 +222,6 @@ So essentially, the report generation plays a catch up. To make this successful,
 Example:
 If we expect a report to be generated every **X minutes**, then polling delay should be X/2 minutes (as an example).
 
-## Caveats
-The above approach works robustly if the report generation task is not a very long one.
-TODO improve this, is this caveat enough
 
 # How does ASP.NET Worker process deal with configuration files?
 The settings are first read from the file  `appSettings.json` and then layered with values from the environment variables (if any)
@@ -234,7 +232,6 @@ Structure of appSettings.json is as below:
 {
   "ReportsFolder": "c:\\truetemp\\pitl_challenge\\",
   "MaximumSecondsDelayBetweenConsecutiveReporExtrations": 100,
-  "SecondsDelayBetweenConsecutiveAttempts": 30
 }
 ```
 
@@ -255,7 +252,7 @@ The `CreateHostBuilder` method reads the file `appSettings.json` and produces an
     .
     .
 ```
-**Example:** If there is an environment variable **SecondsDelayBetweenConsecutiveAttempts** defined then the environment variable takes precedence.
+**Example:** If there is an environment variable **MaximumSecondsDelayBetweenConsecutiveReporExtrations** defined then the environment variable takes precedence over the the value in the appsettings.json file.
 
 
 ## How are the settings passed into the various components?
@@ -321,8 +318,28 @@ services.AddSingleton<IReportsRepo>(sp =>
 ```
 
 # Improving the resilience of by incorporating retry logic
-TODO polly. Talk about the importance of retry, services running in different zones and regions
+Any cloud native application has to interact with services sooner or later. Some of these services could be in a different data center or availability zone. It is safe to assume that there could be moments of disruption caused by network outages or some form of infrastructure unavailability.
 
+```dotnetcli
+
+public void SomeActivity()
+{
+    AsyncRetryPolicy retryPolicy = CreateExponentialBackoffPolicy();
+    var allExistingReports = await retryPolicy
+        .ExecuteAsync<List<AggregatedReportBase>>(() => _reportsRepo.GetReports());
+
+}
+        
+private static AsyncRetryPolicy CreateExponentialBackoffPolicy()
+{
+    return Policy
+        .Handle<Exception>()
+        .WaitAndRetryAsync(
+        RetryAttempts,
+        attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)));
+}
+
+```
 # Alternative Scheduling approaches
 Not in the scope of this solution. We could think of moving away from a polling based approach to a system which is trigerred by an external scheduling engine.
 Such a system offers the advantage of complex schedules and load balancing.
@@ -338,3 +355,4 @@ Such a system offers the advantage of complex schedules and load balancing.
 - [Using Application Insights for logging](https://docs.microsoft.com/en-us/azure/azure-monitor/app/ilogger)
 - [How to retrieve the Azure Application Insights instrumentation key using Poweshell?](https://docs.microsoft.com/en-us/powershell/module/az.applicationinsights/get-azapplicationinsightsapikey?view=azps-7.3.0)
 - [How to configure the app settings of an Azure Web app?](https://docs.microsoft.com/en-us/powershell/module/az.websites/set-azwebapp?view=azps-7.3.0#examples)
+- [Using Polly policies to improve resilience](https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/implement-http-call-retries-exponential-backoff-polly)
