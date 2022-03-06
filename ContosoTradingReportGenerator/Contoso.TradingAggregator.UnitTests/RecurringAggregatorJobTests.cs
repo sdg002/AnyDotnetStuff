@@ -25,8 +25,8 @@ namespace Contoso.TradingAggregator.UnitTests
         private DateTime _currentClockTime = DateTime.MinValue;
         private IClock _fakeClock;
 
-        private IReportsRepo _reportsRepository;
-        private ITradingService _tradingService;
+        private Mock<IReportsRepo> _mockReportsRepository;
+        private Mock<ITradingService> _mockTradingService;
 
         [TestInitialize]
         public void Init()
@@ -35,24 +35,22 @@ namespace Contoso.TradingAggregator.UnitTests
             mockClock.Setup(x => x.GetCurrentTime()).Returns(() => { return _currentClockTime; });
             _fakeClock = mockClock.Object;
 
-            var mockReportsRepo = new Mock<IReportsRepo>();
-            mockReportsRepo
+            _mockReportsRepository = new Mock<IReportsRepo>();
+            _mockReportsRepository
                 .Setup(x => x.GetReports()).ReturnsAsync(() => _fakeReportsList.Cast<AggregatedReportBase>().ToList());
 
-            mockReportsRepo
+            _mockReportsRepository
                 .Setup(x => x.SaveReport(It.IsAny<DateTime>(), It.IsAny<string>()))
                 .Callback((DateTime reportDate, string contents) =>
                 {
                     var report = new FileSystemAggregatedReport(reportDate, reportDate.ConvertDateToPeriod(), reportDate.ToReportFileName());
                     _fakeReportsList.Add(report);
                 });
-            _reportsRepository = mockReportsRepo.Object;
 
-            var mockTradingService = new Mock<ITradingService>();
-            mockTradingService
+            _mockTradingService = new Mock<ITradingService>();
+            _mockTradingService
                 .Setup(x => x.GetTradesAsync(It.IsAny<DateTime>()))
                 .ReturnsAsync((DateTime dt) => { return _fakeTradePositions.ToList(); });
-            _tradingService = mockTradingService.Object;
 
             _csvGenerator = new Mock<ICsvGenerator>();
             _csvGenerator.Setup(x => x.GenerateCsv(It.IsAny<List<AggregatedTradePosition>>())).Returns(FakeCsvContents);
@@ -92,6 +90,102 @@ namespace Contoso.TradingAggregator.UnitTests
         }
 
         [TestMethod]
+        [DataRow("2025-12-25T05:30", "2025-12-24T23:00", "2025-12-25T22:59")]
+        [DataRow("2025-12-25T22:30", "2025-12-24T23:00", "2025-12-25T22:59")]
+        [DataRow("2025-12-25T23:30", "2025-12-25T23:00", "2025-12-26T22:59")]
+        public void The_StartOfReportingDay_And_EndOfReportingDay_MustBe_CalculatedCorrectly(
+            string isoCurrentClockTime,
+            string isoExpectedStartOfReportingDay,
+            string isoExpectedEndOfReportingDay)
+        {
+            //Arrange
+            _currentClockTime = DateTime.Parse(isoCurrentClockTime);
+            var expectedStartOfReportingDate = DateTime.Parse(isoExpectedStartOfReportingDay);
+            var expectedEndOfReportingDate = DateTime.Parse(isoExpectedEndOfReportingDay);
+
+            var job = new RecurringAggregatorJob(
+                null,
+                null,
+                null,
+                _fakeClock,
+                new TradingAggregatorJobConfig { MaximumSecondsDelayBetweenConsecutiveReporExtrations = 0 },
+                null);
+
+            //Act
+            var actualStartOfReportingDate = job.GetStartOfReportingDay();
+            var actualEndOfReportingDate = job.GetEndOfReportingDay();
+
+            //Assert
+            actualStartOfReportingDate.Should().Be(expectedStartOfReportingDate);
+            actualEndOfReportingDate.Should().Be(expectedEndOfReportingDate);
+        }
+
+        [TestMethod]
+        public async Task When_Job_Runs_And_Exception_WasThrown_By_ReportsRepository_Then_Exception_MustBe_PropagatedUpTheStack()
+        {
+            //Arrange
+            var expectedExceptionMessage = $"some error while querying Trading service at {DateTime.Now}";
+
+            var mockReportsRepo = new Mock<IReportsRepo>();
+            mockReportsRepo
+                .Setup(x => x.GetReports()).ReturnsAsync(() => throw new Exception(expectedExceptionMessage));
+
+            _currentClockTime = DateTime.Now;
+            int minutesOfDelayBetweenExecution = 20;
+
+            //Act
+            var job = new RecurringAggregatorJob(
+                NullLogger<RecurringAggregatorJob>.Instance,
+                mockReportsRepo.Object,
+                _mockTradingService.Object,
+                _fakeClock,
+                new TradingAggregatorJobConfig { MaximumSecondsDelayBetweenConsecutiveReporExtrations = minutesOfDelayBetweenExecution * 60 },
+                _csvGenerator.Object);
+
+            Func<Task> act = async () => await job.ExecuteEarliestReportGenerationAsync();
+
+            //Assert
+            await act.Should().ThrowAsync<Exception>().WithMessage(expectedExceptionMessage);
+
+            _mockTradingService.Verify(m => m.GetTradesAsync(It.IsAny<DateTime>()), Times.Never);
+
+            mockReportsRepo.Verify(m => m.GetReports(), Times.AtLeast(RecurringAggregatorJob.RetryAttempts));
+            mockReportsRepo.Verify(m => m.SaveReport(It.IsAny<DateTime>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [TestMethod]
+        public async Task When_Job_Runs_And_Exception_WasThrown_By_TradingService_Then_Exception_MustBe_PropagatedUpTheStack()
+        {
+            //Arrange
+            var expectedExceptionMessage = $"some error while querying Trading service at {DateTime.Now}";
+            var mockTradingService = new Mock<ITradingService>();
+            mockTradingService
+                .Setup(x => x.GetTradesAsync(It.IsAny<DateTime>()))
+                .ReturnsAsync((DateTime dt) => { throw new Exception(expectedExceptionMessage); });
+
+            _currentClockTime = DateTime.Now;
+            int minutesOfDelayBetweenExecution = 20;
+
+            //Act
+            var job = new RecurringAggregatorJob(
+                NullLogger<RecurringAggregatorJob>.Instance,
+                _mockReportsRepository.Object,
+                mockTradingService.Object,
+                _fakeClock,
+                new TradingAggregatorJobConfig { MaximumSecondsDelayBetweenConsecutiveReporExtrations = minutesOfDelayBetweenExecution * 60 },
+                _csvGenerator.Object);
+
+            Func<Task> act = async () => await job.ExecuteEarliestReportGenerationAsync();
+
+            //Assert
+            await act.Should().ThrowAsync<Exception>().WithMessage(expectedExceptionMessage);
+            mockTradingService.Verify(m => m.GetTradesAsync(It.IsAny<DateTime>()), Times.AtLeast(RecurringAggregatorJob.RetryAttempts));
+
+            _mockReportsRepository.Verify(m => m.GetReports(), Times.Once);
+            _mockReportsRepository.Verify(m => m.SaveReport(It.IsAny<DateTime>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [TestMethod]
         public async Task When_Job_Runs_And_NoReports_HaveBeenExtracted_Then_The_Job_Must_Generate_The_Report_For_2300()
         {
             //Arrange
@@ -105,21 +199,27 @@ namespace Contoso.TradingAggregator.UnitTests
             //Act
             var job = new RecurringAggregatorJob(
                 NullLogger<RecurringAggregatorJob>.Instance,
-                _reportsRepository,
-                _tradingService,
+                _mockReportsRepository.Object,
+                _mockTradingService.Object,
                 _fakeClock,
                 new TradingAggregatorJobConfig { MaximumSecondsDelayBetweenConsecutiveReporExtrations = minutesOfDelayBetweenExecution * 60 },
                 _csvGenerator.Object);
-            await job.ExecuteEarliestReportGenerationAsync();
+            int pendingReports = await job.ExecuteEarliestReportGenerationAsync();
 
             //Assert
+            pendingReports.Should().Be(0);
             _fakeReportsList.Count.Should().Be(1);
             _fakeReportsList[0].ReportDate.Should().Be(expectedDateTimeForFirstReport);
             _csvGenerator.Verify(m => m.GenerateCsv(It.IsAny<List<AggregatedTradePosition>>()), Times.Once);
+
+            _mockTradingService.Verify(m => m.GetTradesAsync(It.IsAny<DateTime>()), Times.Once);
+
+            _mockReportsRepository.Verify(m => m.GetReports(), Times.Once);
+            _mockReportsRepository.Verify(m => m.SaveReport(It.IsAny<DateTime>(), It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]
-        public async Task When_Job_Runs_And_Scheduled_ReportExtracts_HaveBeen_Missed_Then_Job_Must_Generate_MissedOut_Reports()
+        public async Task When_Job_Runs_And_Scheduled_ReportExtracts_HaveBeen_Missed_Then_Job_Must_Generate_MissedOut_Report()
         {
             //Arrange
             var thirtyMinutesPast12AM = new DateTime(2025, 12, 26, 01, 30, 0);
@@ -142,17 +242,23 @@ namespace Contoso.TradingAggregator.UnitTests
             //Act
             var job = new RecurringAggregatorJob(
                 NullLogger<RecurringAggregatorJob>.Instance,
-                _reportsRepository,
-                _tradingService,
+                _mockReportsRepository.Object,
+                _mockTradingService.Object,
                 _fakeClock,
                 new TradingAggregatorJobConfig { MaximumSecondsDelayBetweenConsecutiveReporExtrations = minutesOfDelayBetweenExecution * 60 },
                 _csvGenerator.Object);
-            await job.ExecuteEarliestReportGenerationAsync();
+            int pendingReports = await job.ExecuteEarliestReportGenerationAsync();
 
             //Assert
+            pendingReports.Should().BeGreaterThan(0);
             _fakeReportsList.Count.Should().Be(countOfReportsBeforeExecution + 1);
             _fakeReportsList.Any(rpt => rpt.ReportDate == expectedReportDateTime).Should().BeTrue();
             _csvGenerator.Verify(m => m.GenerateCsv(It.IsAny<List<AggregatedTradePosition>>()), Times.Once);
+
+            _mockTradingService.Verify(m => m.GetTradesAsync(It.IsAny<DateTime>()), Times.Once);
+
+            _mockReportsRepository.Verify(m => m.GetReports(), Times.Once);
+            _mockReportsRepository.Verify(m => m.SaveReport(It.IsAny<DateTime>(), It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]
@@ -177,16 +283,22 @@ namespace Contoso.TradingAggregator.UnitTests
             //Act
             var job = new RecurringAggregatorJob(
                 NullLogger<RecurringAggregatorJob>.Instance,
-                _reportsRepository,
-                _tradingService,
+                _mockReportsRepository.Object,
+                _mockTradingService.Object,
                 _fakeClock,
                 new TradingAggregatorJobConfig { MaximumSecondsDelayBetweenConsecutiveReporExtrations = minutesOfDelayBetweenExecution * 60 },
                 _csvGenerator.Object);
-            await job.ExecuteEarliestReportGenerationAsync();
+            var pendingReports = await job.ExecuteEarliestReportGenerationAsync();
 
             //Assert
+            pendingReports.Should().Be(0);
             _fakeReportsList.Count.Should().Be(countOfReportsBeforeExecution);
             _csvGenerator.Verify(m => m.GenerateCsv(It.IsAny<List<AggregatedTradePosition>>()), Times.Never);
+
+            _mockTradingService.Verify(m => m.GetTradesAsync(It.IsAny<DateTime>()), Times.Never);
+
+            _mockReportsRepository.Verify(m => m.GetReports(), Times.Once);
+            _mockReportsRepository.Verify(m => m.SaveReport(It.IsAny<DateTime>(), It.IsAny<string>()), Times.Never);
         }
 
         private FileSystemAggregatedReport CreateFakeReport(int year, int month, int day, int hour, int minute)

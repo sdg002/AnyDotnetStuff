@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Comment CommentText="The method GetTradesAsync returns a List of TradePosition instances">
+    <Position X="10.351" Y="3.644" Height="0.75" Width="3.845" />
+  </Comment>
+  <Comment CommentText="The property Periods returns a List of TradePeriod instances">
+    <Position X="10.955" Y="0.991" Height="0.494" Width="3.086" />
+  </Comment>
+  <Class Name="Contoso.TradingAggregator.Domain.entity.TradePeriod">
+    <Position X="0.75" Y="0.75" Width="4" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Contoso.TradingAggregator.Domain.entity.TradePosition">
+    <Position X="5" Y="0.75" Width="5.75" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="Contoso.TradingConnector.FakeTradingConnector">
+    <Position X="5.25" Y="4.75" Width="5.5" />
+    <TypeIdentifier />
+    <Lollipop Orientation="Left" Position="0.1" />
+  </Class>
+  <Class Name="Contoso.TradingConnector.LiveTradingConnector">
+    <Position X="5.25" Y="6.5" Width="5.5" />
+    <TypeIdentifier />
+    <Lollipop Orientation="Left" Position="0.392" />
+  </Class>
+  <Interface Name="Contoso.TradingAggregator.Domain.interfaces.ITradingService">
+    <Position X="5.5" Y="3.5" Width="4.25" />
+    <TypeIdentifier />
+  </Interface>
+  <Font Name="Courier New" Size="10" />
+</ClassDiagram>
