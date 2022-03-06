@@ -158,15 +158,17 @@ This not only separates the worker job from the CSV generation component during 
 ```dotnetcli
 _csvGenerator.Verify(m => m.GenerateCsv(It.IsAny<List<AggregatedTradePosition>>()), Times.Once);
 ```
-TODO Why is it advantegous to abstract the CSV? Importance of unit testing
+
 
 
 # Logging
+Logging is essential for post-deployment support. You want to know what is going on your production boxes. We want to log exceptions and also general informational messages. This gives us insight into the performance and behaviour of the job. Think of logging as the black box of an aircraft. 
 
 ## How are we abstracting the logging?
-TODO Abstracting the logging, talk about ILogger<T>, show a small snippet of logger in use
+All the components are using the `ILogger<T>` interface for logging. The `ILogger` interface comes from the `Microsoft.Extensions.Logging.Abstractions` package.
 
-For this solution, the popular logging library `log4net` has been used. This was primarily for simplicity. 
+## What logging system are we using for this solution?
+For this solution, the popular logging library **log4net** has been used. This was primarily for simplicity. 
 
 ```
     /*
@@ -178,20 +180,34 @@ For this solution, the popular logging library `log4net` has been used. This was
 ```
 The loggers are injected via dependency injection. Therefore replacing with a centralized logging like **Application Insights** should be fairly easy.
 
-## How to use Application Insights for logging?
+## How to use Azure Application Insights for logging?
 Sample DI code for Application Insights below:
 https://docs.microsoft.com/en-us/azure/azure-monitor/app/ilogger#console-application
 
+```dotnetcli
+                IServiceCollection services = new ServiceCollection();
+
+                services.AddLogging(builder =>
+                {
+                    // Only Application Insights is registered as a logger provider
+                    builder.AddApplicationInsights("<YourInstrumentationKey>");
+                });
+```
 This is where we see **Dependency Injection** shining. Just a couple of lines of change in the initialization and we have re-wired the entire logging.
 
 ## How to initialize the destination store for Application Insights?
-TODO talk about instrumentation key and how AI collects data from all over
+The deployment script (Infrastructure as Code) can use the Powershell cmdlet `Get-AzApplicationInsightsApiKey` to retrieve the key and then set this into app settings using the `Set-AzWebApp`
 
 # How to ensure that no scheduled report generation has been missed?
 
-TODO Put this along with the flow chart
+![flowchart!](docs/images/flow-chart.png "flowchart")
 
-Consider the case of a temporary outage. This could be a case of a container instance failing or an Azure web job instance not responding. To handle such situations, the following logic has been employed in the class `RecurringAggregatorJob.cs`
+Consider the case of a temporary outage. This could be caused by several reasons:
+- A case of a container instance failing or an Azure web job instance not responding. 
+- The trading system not responding in a timely fashion
+- A temporary outage while writing the CSV to the reports repository
+
+To handle such situations, the following logic has been employed in the class `RecurringAggregatorJob.cs`
 1. Wake up
 1. Query the reports repository for all reports that have been generated so far
 1. Compute a table of desired report run timings
@@ -203,7 +219,7 @@ Consider the case of a temporary outage. This could be a case of a container ins
 
 So essentially, the report generation plays a catch up. To make this successful, it is important that the the report polling should run at a frequency higher than the report extraction frequency.
 Example:
-If we expect a report to be generated every X minutes, then polling delay should be X/2 minutes (as an example).
+If we expect a report to be generated every **X minutes**, then polling delay should be X/2 minutes (as an example).
 
 ## Caveats
 The above approach works robustly if the report generation task is not a very long one.
@@ -304,6 +320,9 @@ services.AddSingleton<IReportsRepo>(sp =>
 
 ```
 
+# Improving the resilience of by incorporating retry logic
+TODO polly. Talk about the importance of retry, services running in different zones and regions
+
 # Alternative Scheduling approaches
 Not in the scope of this solution. We could think of moving away from a polling based approach to a system which is trigerred by an external scheduling engine.
 Such a system offers the advantage of complex schedules and load balancing.
@@ -312,6 +331,10 @@ Such a system offers the advantage of complex schedules and load balancing.
 - Azure Deferred messages
 
 
+
 # References
 
 - [ASP.NET Worker Service](https://docs.microsoft.com/en-us/dotnet/core/extensions/workers)
+- [Using Application Insights for logging](https://docs.microsoft.com/en-us/azure/azure-monitor/app/ilogger)
+- [How to retrieve the Azure Application Insights instrumentation key using Poweshell?](https://docs.microsoft.com/en-us/powershell/module/az.applicationinsights/get-azapplicationinsightsapikey?view=azps-7.3.0)
+- [How to configure the app settings of an Azure Web app?](https://docs.microsoft.com/en-us/powershell/module/az.websites/set-azwebapp?view=azps-7.3.0#examples)
