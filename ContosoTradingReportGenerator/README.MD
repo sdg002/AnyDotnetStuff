@@ -7,9 +7,13 @@ This is an abstraction of a real life problem. For the purpose of this discussio
 Contoso wants a solution where aggregated trading reports can be produced at a regular intervals and saved to a certain data store.
 
 ![blockdiagram!](docs/images/block_diagram.png "blockdiagram")
+---
 
+# Why the name Contoso?
+Consotos is a fictitious company [created by Microsoft](https://docs.microsoft.com/en-us/microsoft-365/enterprise/contoso-case-study?view=o365-worldwide) and used by Microsoft for documenting various technological white papers and paradigms.
 
 ---
+
 
 
 # Core requirements
