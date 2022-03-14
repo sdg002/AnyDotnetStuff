@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>WebsiteCrawler</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebsiteCrawler.Infrastructure\WebsiteCrawler.Infrastructure.csproj" />
+    <ProjectReference Include="..\WebsiteCrawler.Service\WebsiteCrawler.Service.csproj" />
+  </ItemGroup>
+
+</Project>
