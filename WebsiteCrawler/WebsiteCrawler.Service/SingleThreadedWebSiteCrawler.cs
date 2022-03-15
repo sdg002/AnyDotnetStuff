@@ -1,19 +1,17 @@
 ﻿using Dawn;
-using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
+using Polly;
+using Polly.Retry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using WebsiteCrawler.Infrastructure.entity;
 using WebsiteCrawler.Infrastructure.extensions;
 using WebsiteCrawler.Infrastructure.interfaces;
 using WebsiteCrawler.Service.entity;
-using Polly;
-using Polly.Retry;
-using System.Net;
 
 namespace WebsiteCrawler.Service
 {

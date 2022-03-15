@@ -77,6 +77,12 @@ The component **CommandLineParser** is being used. This component uses the follo
 # How are we logging?
 **log4net** is being used. In the current implementation, the logging output is displayed on the **Console**
 
+# Scenarios that have not been tested
+
+- Intergration test on the executable
+- Explore if we have covered all HTTP status code while doing a Polly retry. 
+- Better approach to recording errors. Currently being logged. Should have an errors collection and this should be unit tested
+- Better approach to ignored links. Currently being logged. Can be incorporated as another collection.
 
 # Further improvements
 ## Making it multi-threaded
