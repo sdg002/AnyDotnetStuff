@@ -12,10 +12,8 @@ namespace WebsiteCrawler.Infrastructure.interfaces
         /// <summary>
         /// Returns all hyper link URLs from the given HTML document
         /// </summary>
-        /// <param name="html"></param>
+        /// <param name="html">The HTML content to scan</param>
         /// <returns></returns>
-        List<Uri> GetLinks(string html);
-
-        //TODO Change from Uri to string
+        List<string> GetLinks(string htmlContent);
     }
 }

@@ -153,22 +153,7 @@ namespace WebsiteCrawler.Service
 
         private List<string> FindLinksWithinHtml(string htmlContent)
         {
-            //TODO put this in the wrapper service for link parsing
-            if (string.IsNullOrWhiteSpace(htmlContent))
-            {
-                _logger.LogInformation("Found empty HTML page");
-                return new List<string>();
-            }
-            var document = new HtmlDocument();
-            document.LoadHtml(htmlContent);
-            var linkNodes = document.DocumentNode.SelectNodes("//a[@href]");
-            if (linkNodes == null)
-            {
-                return new List<string>();
-            }
-            var links = linkNodes.Where(n => n.Attributes.Contains("href")).Select(n => n.Attributes["href"]).ToList();
-            //return links.Where(l=>l.hr)
-            return links.Select(l => l.Value).ToList();
+            return _htmlParser.GetLinks(htmlContent);
         }
 
         private bool IsLinkAcceptable(SearchJob searchJob, SearchResult searchResult)
