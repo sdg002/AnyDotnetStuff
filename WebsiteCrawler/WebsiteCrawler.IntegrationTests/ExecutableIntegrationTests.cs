@@ -9,9 +9,10 @@ namespace WebsiteCrawler.IntegrationTests
     public class ExecutableIntegrationTests
     {
         [TestMethod]
+        [Ignore("Work in progress")]
         public void MyTestMethod()
         {
-            //TODO Test the EXe
+            //TODO Perform an integration test on the executable, launch the process, test the output
         }
     }
 }

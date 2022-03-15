@@ -62,15 +62,10 @@ namespace WebsiteCrawler.Executable
     }
 }
 
-//TODO Create DI and add dependencies
-//TODO Write class to capture command line arguments
-
 /*
  *
  Webrawler.exe -url http://somesite.com	-maxpages 10
  */
-
-//TODO Parse command line arguments
 
 //TODO finish Readme
 

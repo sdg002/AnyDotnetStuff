@@ -11,17 +11,20 @@ using WebsiteCrawler.Infrastructure.entity;
 using WebsiteCrawler.Infrastructure.extensions;
 using WebsiteCrawler.Infrastructure.interfaces;
 using WebsiteCrawler.Service.entity;
+using Polly;
+using Polly.Retry;
+using System.Net;
 
 namespace WebsiteCrawler.Service
 {
     public class SingleThreadedWebSiteCrawler : IWebSiteCrawler
     {
+        public const int RetryAttempts = 2;
         private readonly List<HttpError> _errors = new List<HttpError>();
         private readonly IHtmlParser _htmlParser;
         private readonly HttpClient _httpClient;
         private readonly Queue<SearchJob> _jobQueue;
         private readonly ILogger<SingleThreadedWebSiteCrawler> _logger;
-
         private readonly SortedDictionary<string, WebsiteCrawler.Infrastructure.entity.SearchResult> _searchResults;
 
         public SingleThreadedWebSiteCrawler(
@@ -55,6 +58,16 @@ namespace WebsiteCrawler.Service
             }
 
             return _searchResults.Values.ToList();
+        }
+
+        private static AsyncRetryPolicy<HttpResponseMessage> CreateExponentialBackoffPolicy()
+        {
+            var unAcceptableResponses = new HttpStatusCode[] { HttpStatusCode.GatewayTimeout, HttpStatusCode.GatewayTimeout };
+            return Policy
+                .HandleResult<HttpResponseMessage>(resp => unAcceptableResponses.Contains(resp.StatusCode))
+                .WaitAndRetryAsync(
+                RetryAttempts,
+                attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)));
         }
 
         private async Task DiscoverLinks(string startingSite)
@@ -131,12 +144,17 @@ namespace WebsiteCrawler.Service
                 return null;
             }
 
-            var htmlResponse = await _httpClient.GetAsync(searchJob.Url);
+            var retryPolicy = CreateExponentialBackoffPolicy();
+
+            var htmlResponse = await retryPolicy
+                .ExecuteAsync(() => _httpClient.GetAsync(searchJob.Url));
+
             if (!htmlResponse.IsSuccessStatusCode)
             {
                 //throw new NotImplementedException("How do we handle errors? Think"); //TODO handle non-sucess response, Polly retry
                 _logger.LogError($"Error while downloading page {searchJob}");
                 _errors.Add(new HttpError { Url = searchJob.Url, HttpStatusCode = htmlResponse.StatusCode });
+                return null;
             }
 
             var ctype = htmlResponse.Content.Headers.ContentType;
@@ -145,7 +163,6 @@ namespace WebsiteCrawler.Service
                 _logger.LogInformation($"Content in url:{searchJob} has content type:{ctype}. This is non-html Ignoring!");
                 return null;
             }
-            //TODO Handle non-text content type gracefully
 
             var htmlContent = await htmlResponse.Content.ReadAsStringAsync();
             return htmlContent;
@@ -159,17 +176,6 @@ namespace WebsiteCrawler.Service
         private bool IsLinkAcceptable(SearchJob searchJob, SearchResult searchResult)
         {
             var childLink = searchResult.OriginalLink;
-            //TODO  skip if mailto or email
-            /*
-WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Found a link 'mailto:ask@reedexpo.com.au'
-WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Found a child link:'mailto:ask@reedexpo.com.au' which is relative to container page:mailto:ask@reedexpo.com.au under parent:https://rxglobal.com/
-WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Child link:mailto:ask@reedexpo.com.au was added to results
-WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Queue=52 Search results=53
-WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Found a link 'tel:61%202%209422%202500'
-WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Found a child link:'tel:61%202%209422%202500' which is relative to container page:tel:61 2 9422 2500 under parent:https://rxglobal.com/
-WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Child link:tel:61 2 9422 2500 was added to results
-
-             */
             if (string.IsNullOrEmpty(childLink))
             {
                 return false;
@@ -186,6 +192,18 @@ WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Child link:tel
                 return false;
             }
 
+            if (childLink.StartsWith("mailto:"))
+            {
+                //Email links are not wanted
+                return false;
+            }
+
+            if (childLink.StartsWith("tel:"))
+            {
+                //Phone links are not wanted
+                return false;
+            }
+
             if (childLink.ToLower().StartsWith("http:") || childLink.ToLower().StartsWith("https:"))
             {
                 searchResult.IsLinkFullyQualified = true;
@@ -196,65 +214,9 @@ WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Child link:tel
                     return false;
                 }
                 searchResult.IsLinkExternalDomain = false;
-                //TODO handle child links which are fully qualified
             }
 
             return true;
         }
     }
 }
-
-/*
- * skip /
- * skip ""
- * You will need to figure out how to handle relative domain rx-italy as opposed to fully qualified domain name
- *
-
-    [0]: Name: "href", Value: "/"
-    [1]: Name: "href", Value: "rx-australia"
-    [2]: Name: "href", Value: "rx-austria-germany"
-    [3]: Name: "href", Value: "rx-brazil"
-    [4]: Name: "href", Value: "rx-china"
-    [5]: Name: "href", Value: "rx-france"
-    [6]: Name: "href", Value: "rx-india"
-    [7]: Name: "href", Value: "rx-indonesia"
-    [8]: Name: "href", Value: "rx-italy"
-    [9]: Name: "href", Value: "rx-japan"
-    [10]: Name: "href", Value: "rx-korea"
-    [11]: Name: "href", Value: "rx-mexico"
-    [12]: Name: "href", Value: "rx-middle-east"
-    [13]: Name: "href", Value: "rx-russia"
-    [14]: Name: "href", Value: "rx-singapore"
-    [15]: Name: "href", Value: "rx-south-africa"
-    [16]: Name: "href", Value: "rx-tradex-thailand"
-    [17]: Name: "href", Value: "rx-tradex-vietnam"
-    [18]: Name: "href", Value: "rx-tuyap"
-    [19]: Name: "href", Value: "rx-uk"
-    [20]: Name: "href", Value: "rx-usa"
-    [21]: Name: "href", Value: "rx-mack-brooks"
-    [22]: Name: "href", Value: "/"
-    [23]: Name: "href", Value: "/about-rx"
-    [24]: Name: "href", Value: "/leadership-team"
-    [25]: Name: "href", Value: "/why-rx"
-    [26]: Name: "href", Value: "/events"
-    [27]: Name: "href", Value: "/life-at-rx"
-    [28]: Name: "href", Value: "/our-values"
-    [29]: Name: "href", Value: "/inclusion-diversity"
-    [30]: Name: "href", Value: "/corporate-responsibility"
-    [31]: Name: "href", Value: "/join-us"
-    [32]: Name: "href", Value: "/our-stories"
-    [33]: Name: "href", Value: "/our-stories"
-    [34]: Name: "href", Value: "/our-stories?created=&amp;field_story_type_target_id%5B0%5D=10&amp;field_story_type_target_id%5B1%5D=2"
-    [35]: Name: "href", Value: "/our-stories?created=&amp;field_story_type_target_id%5B0%5D=19&amp;field_story_type_target_id%5B1%5D=3"
-    [36]: Name: "href", Value: "/our-stories?created=&amp;field_story_type_target_id%5B0%5D=18&amp;field_story_type_target_id%5B1%5D=1"
-    [37]: Name: "href", Value: "/press-kit"
-    [38]: Name: "href", Value: "/contact-us"
-    [39]: Name: "href", Value: "/events"
-    [40]: Name: "href", Value: "/events?map=true"
-    [41]: Name: "href", Value: "https://fastenerfair-connect.com/"
-    [42]: Name: "href", Value: "https://www.fastenerfairfrance.com/"
-    [43]: Name: "href", Value: "http://www.brasiloffshore.com"
-    [44]: Name: "href", Value: ""
-
- *
- */

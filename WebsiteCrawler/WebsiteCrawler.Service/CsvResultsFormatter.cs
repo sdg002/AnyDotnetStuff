@@ -13,10 +13,10 @@ namespace WebsiteCrawler.Service
         {
             var swriter = new StreamWriter(output);
             swriter.AutoFlush = true;
-            swriter.WriteLine($"Url,ParentPageUrl");
+            swriter.WriteLine($"Url");
             foreach (var result in searchResults)
             {
-                swriter.WriteLine($"{result.AbsoluteLink},{result.ParentPageUrl}");
+                swriter.WriteLine($"{result.AbsoluteLink}");
             }
         }
     }

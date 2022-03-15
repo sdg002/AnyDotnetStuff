@@ -21,7 +21,7 @@ namespace WebsiteCrawler.IntegrationTests
             var htmlParser = new HtmlAgilityParser();
             var httpClient = new HttpClient();
             var maxPagesToSearch = 20;
-            var expectedResults = new string[]
+            var someOfTheExpectedResults = new string[]
             {
                 "https://www.bbc.co.uk/sport",
                 "https://www.bbc.co.uk/weather",
@@ -39,7 +39,7 @@ namespace WebsiteCrawler.IntegrationTests
             //Assert
             crawlResults.Should().HaveCountGreaterThan(maxPagesToSearch);
 
-            expectedResults.ToList().ForEach(link =>
+            someOfTheExpectedResults.ToList().ForEach(link =>
             {
                 crawlResults
                 .Any(r => r.AbsoluteLink.ToString().Trim('/') == link)
@@ -48,7 +48,39 @@ namespace WebsiteCrawler.IntegrationTests
             });
         }
 
-        //TODO Add integration test for https://rxglobal.com
+        [TestMethod]
+        public async Task When_rxglobal_Is_Crawled()
+        {
+            //Arrange
+            var htmlParser = new HtmlAgilityParser();
+            var httpClient = new HttpClient();
+            var maxPagesToSearch = 20;
+            var someOfTheExpectedResults = new string[]
+            {
+                "https://rxglobal.com/rx-korea",
+                "https://rxglobal.com/rx-brazil",
+            };
+
+            var crawler = new SingleThreadedWebSiteCrawler(
+                this.CreateOutputWindowLogger<SingleThreadedWebSiteCrawler>(),
+                htmlParser,
+                httpClient);
+
+            //Act
+            var urlToCrawl = "https://rxglobal.com";
+            var crawlResults = await crawler.Run(urlToCrawl, maxPagesToSearch);
+
+            //Assert
+            crawlResults.Should().HaveCountGreaterThan(maxPagesToSearch);
+
+            someOfTheExpectedResults.ToList().ForEach(link =>
+            {
+                crawlResults
+                .Any(r => r.AbsoluteLink.ToString().Trim('/') == link)
+                .Should()
+                .BeTrue("The link {0} was not found in the crawl results", link);
+            });
+        }
 
         /// <summary>
         /// Helps you view logging results in the Output Window of Visual Studio
