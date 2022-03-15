@@ -1,27 +1,81 @@
-﻿using System;
+﻿using CommandLine;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using WebsiteCrawler.Infrastructure.interfaces;
+using WebsiteCrawler.Service;
 
 namespace WebsiteCrawler.Executable
 {
-    internal class Program
+    internal static class Program
     {
-        private static void Main(string[] args)
+        private static IServiceProvider _provider;
+
+        private static ServiceProvider ConfigureServices()
         {
-            Console.WriteLine("Hello World!");
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddTransient<IWebSiteCrawler, SingleThreadedWebSiteCrawler>();
+            serviceCollection.AddTransient<IHtmlParser, HtmlAgilityParser>();
+            serviceCollection.AddTransient<HttpClient>();
+            serviceCollection.AddLogging(builder => builder.AddConsole());  //TODO Change to nlog
+            serviceCollection.AddTransient<ICrawlerResultsFormatter, CsvResultsFormatter>();
+            return serviceCollection.BuildServiceProvider();
+        }
 
-            var formatter = new WebsiteCrawler.Service.CsvResultsFormatter();
-            formatter.WriteResults(Console.OpenStandardOutput(), new System.Collections.Generic.List<Infrastructure.entity.SearchResult>());
+        private static void DisplayCommandLineArguments(string[] args)
+        {
+            Console.WriteLine("Arguments:");
+            Console.WriteLine("--------------");
+            for (int index = 0; index < args.Length; index++)
+            {
+                Console.WriteLine($"{index}\t\t\t{args[index]}");
+            }
+            Console.WriteLine("--------------");
+        }
 
-            //TODO Create DI and add dependencies
+        private static async Task Main(string[] args)
+        {
+            try
+            {
+                DisplayCommandLineArguments(args);
+                _provider = ConfigureServices();
 
-            //TODO Write class to capture command line arguments
-            /*
-             *
-             Webrawler.exe -url http://somesite.com	-levels 10
-             */
+                await Parser.Default.ParseArguments<CmdLineArgumentModel>(args).WithParsedAsync(Run);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
 
-            //TODO Parse command line arguments
+        private static async Task Run(CmdLineArgumentModel arg)
+        {
+            var crawler = _provider.GetService<IWebSiteCrawler>();
+            var results = await crawler.Run(arg.Url, arg.MaxSites);
+            var formatter = _provider.GetService<ICrawlerResultsFormatter>();
+            var stdOut = Console.OpenStandardOutput();
+            stdOut.Flush();
+            formatter.WriteResults(stdOut, results);
         }
     }
 }
 
+//TODO Create DI and add dependencies
+//TODO Write class to capture command line arguments
+
+/*
+ *
+ Webrawler.exe -url http://somesite.com	-maxpages 10
+ */
+
+//TODO Parse command line arguments
+
 //TODO finish Readme
+
+/*
+             var formatter = new WebsiteCrawler.Service.CsvResultsFormatter();
+            formatter.WriteResults(Console.OpenStandardOutput(), new System.Collections.Generic.List<Infrastructure.entity.SearchResult>());
+
+ */

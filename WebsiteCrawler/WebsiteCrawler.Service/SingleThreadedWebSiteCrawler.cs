@@ -21,31 +21,29 @@ namespace WebsiteCrawler.Service
         private readonly HttpClient _httpClient;
         private readonly Queue<SearchJob> _jobQueue;
         private readonly ILogger<SingleThreadedWebSiteCrawler> _logger;
-        private readonly int _maxPagesToSearch;
+
         private readonly SortedDictionary<string, WebsiteCrawler.Infrastructure.entity.SearchResult> _searchResults;
 
         public SingleThreadedWebSiteCrawler(
             ILogger<SingleThreadedWebSiteCrawler> logger,
             IHtmlParser htmlParser,
-            HttpClient httpClient, int maxPagesToSearch)
+            HttpClient httpClient)
         {
             this._logger = logger;
             this._htmlParser = htmlParser;
             this._httpClient = httpClient;
-            this._maxPagesToSearch = maxPagesToSearch;
-            Guard.Argument(maxPagesToSearch, nameof(maxPagesToSearch)).NotNegative();
 
             _searchResults = new SortedDictionary<string, WebsiteCrawler.Infrastructure.entity.SearchResult>();
             _jobQueue = new Queue<SearchJob>();
         }
 
-        public async Task<List<SearchResult>> Run(string url)
+        public async Task<List<SearchResult>> Run(string url, int maxPagesToSearch)
         {
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "Other");
             _jobQueue.Enqueue(new entity.SearchJob(url, 0));
 
-            for (int pageCount = 0; pageCount < this._maxPagesToSearch; pageCount++)
+            for (int pageCount = 0; pageCount < maxPagesToSearch; pageCount++)
             {
                 if (_jobQueue.Count == 0)
                 {

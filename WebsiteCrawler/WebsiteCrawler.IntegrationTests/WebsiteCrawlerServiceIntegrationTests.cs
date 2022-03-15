@@ -30,11 +30,11 @@ namespace WebsiteCrawler.IntegrationTests
             var crawler = new SingleThreadedWebSiteCrawler(
                 this.CreateOutputWindowLogger<SingleThreadedWebSiteCrawler>(),
                 htmlParser,
-                httpClient, maxPagesToSearch);
+                httpClient);
 
             //Act
             var urlToCrawl = "http://www.bbc.co.uk/";
-            var crawlResults = await crawler.Run(urlToCrawl);
+            var crawlResults = await crawler.Run(urlToCrawl, maxPagesToSearch);
 
             //Assert
             crawlResults.Should().HaveCountGreaterThan(maxPagesToSearch);
