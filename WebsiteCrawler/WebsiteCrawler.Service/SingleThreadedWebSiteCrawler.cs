@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using Dawn;
+using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -15,73 +16,139 @@ namespace WebsiteCrawler.Service
 {
     public class SingleThreadedWebSiteCrawler : IWebSiteCrawler
     {
+        private readonly List<HttpError> _errors = new List<HttpError>();
         private readonly IHtmlParser _htmlParser;
         private readonly HttpClient _httpClient;
+        private readonly Queue<SearchJob> _jobQueue;
         private readonly ILogger<SingleThreadedWebSiteCrawler> _logger;
+        private readonly int _maxPagesToSearch;
+        private readonly SortedDictionary<string, WebsiteCrawler.Infrastructure.entity.SearchResult> _searchResults;
 
         public SingleThreadedWebSiteCrawler(
             ILogger<SingleThreadedWebSiteCrawler> logger,
             IHtmlParser htmlParser,
-            HttpClient httpClient)
+            HttpClient httpClient, int maxPagesToSearch)
         {
             this._logger = logger;
             this._htmlParser = htmlParser;
             this._httpClient = httpClient;
+            this._maxPagesToSearch = maxPagesToSearch;
+            Guard.Argument(maxPagesToSearch, nameof(maxPagesToSearch)).NotNegative();
+
+            _searchResults = new SortedDictionary<string, WebsiteCrawler.Infrastructure.entity.SearchResult>();
+            _jobQueue = new Queue<SearchJob>();
         }
 
         public async Task<List<SearchResult>> Run(string url)
         {
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "Other");
+            _jobQueue.Enqueue(new entity.SearchJob(url, 0));
 
-            //TODO you were here, do the single threaded thing
-
-            var results = new SortedDictionary<string, WebsiteCrawler.Infrastructure.entity.SearchResult>();
-            var jobQueue = new Queue<SearchJob>(new SearchJob[] { new entity.SearchJob { Level = 0, Url = url } });
-            while (jobQueue.Count > 0)
+            for (int pageCount = 0; pageCount < this._maxPagesToSearch; pageCount++)
             {
-                await DiscoverLinks(jobQueue, results);
+                if (_jobQueue.Count == 0)
+                {
+                    _logger.LogInformation("No more pages to search");
+                    break;
+                }
+                await DiscoverLinks(url);
+                _logger.LogInformation($"----Pages searched={pageCount}, Job Queue={_jobQueue.Count}, results={_searchResults.Count}, Errors={_errors.Count}");
             }
 
-            //var allLinks = _htmlParser.GetLinks(htmlContent);
-
-            //Old stuff
-
-            throw new NotImplementedException();
+            return _searchResults.Values.ToList();
         }
 
-        private async Task DiscoverLinks(Queue<entity.SearchJob> jobQueue, IDictionary<string, SearchResult> results)
+        private async Task DiscoverLinks(string startingSite)
         {
-            var urlToSearch = jobQueue.Dequeue();
-            string urlContents = await DownloadPage(urlToSearch.Url);
-            var links = FindLinksWithinHtml(urlContents);
+            var searchJob = _jobQueue.Dequeue();
+            string pageContents = await DownloadPage(searchJob);
+            if (pageContents == null)
+            {
+                return;
+            }
+            _logger.LogInformation($"Downloaded page:{searchJob.Url}, Content is {pageContents.Length} characters long");
+            var links = FindLinksWithinHtml(pageContents);
+            _logger.LogInformation($"Found {links.Count} hyperlinks in the page {searchJob.Url}");
             links.ForEach(link =>
             {
-                bool isLinkAcceptable = IsLinkAcceptable(urlToSearch.Url, link);
+                _logger.LogInformation($"Found a link '{link}'");
+                var searchResult = new SearchResult
+                {
+                    ParentPageUrl = searchJob.Url,
+                    OriginalLink = link,
+                    Level = searchJob.Level + 1
+                };
+                bool isLinkAcceptable = IsLinkAcceptable(searchJob, searchResult);
                 if (!isLinkAcceptable)
                 {
+                    _logger.LogInformation($"Ignoring link {link}");
                     return;
                 }
-                var newUrl = UrlExtensions.Combine(urlToSearch.Url, link);
-                var searchResult = new SearchResult(urlToSearch.Url, newUrl.ToString(), urlToSearch.Level + 1);
-                results.Add(searchResult.ChildPageUrl, searchResult);
 
-                jobQueue.Enqueue(new SearchJob { Level = searchResult.Level, Url = searchResult.ChildPageUrl });
+                if (link.StartsWith("/"))
+                {
+                    searchResult.AbsoluteLink = UrlExtensions.Combine(startingSite, link);
+                    _logger.LogInformation($"Found a child link:'{link}' which is relateive to top level page:{searchResult.AbsoluteLink} under root:{startingSite}");
+                }
+                else
+                {
+                    if (searchResult.IsLinkFullyQualified)
+                    {
+                        searchResult.AbsoluteLink = new Uri(searchResult.OriginalLink);
+                    }
+                    else
+                    {
+                        var parentLink = searchJob.Uri.GetParentUriString();
+                        var absoluteUri = UrlExtensions.Combine(parentLink, link);
+                        _logger.LogInformation($"Found a child link:'{link}' which is relative to container page:{absoluteUri} under parent:{parentLink}");
+                        searchResult.AbsoluteLink = absoluteUri;
+                    }
+                }
+
+                if (
+                (searchResult.AbsoluteLink.Host.ToLower() == searchJob.Uri.Host.ToLower()) &&
+                (searchResult.AbsoluteLink.PathAndQuery.ToLower() == searchJob.Uri.PathAndQuery.ToLower())
+                )
+                {
+                    _logger.LogInformation($"Not adding child link:{searchResult.AbsoluteLink.ToString()} because it is the same as parent page");
+                    return;
+                }
+                if (_searchResults.ContainsKey(searchResult.AbsoluteLink.ToString()))
+                {
+                    _logger.LogInformation($"Child link:{searchResult.AbsoluteLink.ToString()} already added to results");
+                    return;
+                }
+                _searchResults.Add(searchResult.AbsoluteLink.ToString(), searchResult);
+                _jobQueue.Enqueue(new SearchJob(searchResult.AbsoluteLink.ToString(), searchResult.Level));
+                _logger.LogInformation($"Child link:{searchResult.AbsoluteLink} was added to results");
+                _logger.LogInformation($"Queue={_jobQueue.Count} Search results={_searchResults.Count}");
             });
         }
 
-        private async Task<string> DownloadPage(string urlToSearch)
+        private async Task<string> DownloadPage(SearchJob searchJob)
         {
-            var htmlResponse = await _httpClient.GetAsync(urlToSearch);
+            if ((searchJob.Uri.Scheme.ToLower() != "http") && (searchJob.Uri.Scheme.ToLower() != "https"))
+            {
+                return null;
+            }
+
+            var htmlResponse = await _httpClient.GetAsync(searchJob.Url);
             if (!htmlResponse.IsSuccessStatusCode)
             {
-                throw new NotImplementedException("How do we handle errors? Think"); //TODO handle non-sucess response, Polly retry
+                //throw new NotImplementedException("How do we handle errors? Think"); //TODO handle non-sucess response, Polly retry
+                _logger.LogError($"Error while downloading page {searchJob}");
+                _errors.Add(new HttpError { Url = searchJob.Url, HttpStatusCode = htmlResponse.StatusCode });
             }
 
             var ctype = htmlResponse.Content.Headers.ContentType;
+            if (!ctype.MediaType.Contains("text/html"))
+            {
+                _logger.LogInformation($"Content in url:{searchJob} has content type:{ctype}. This is non-html Ignoring!");
+                return null;
+            }
             //TODO Handle non-text content type gracefully
 
-            var header = htmlResponse.Headers;
             var htmlContent = await htmlResponse.Content.ReadAsStringAsync();
             return htmlContent;
         }
@@ -89,18 +156,37 @@ namespace WebsiteCrawler.Service
         private List<string> FindLinksWithinHtml(string htmlContent)
         {
             //TODO put this in the wrapper service for link parsing
+            if (string.IsNullOrWhiteSpace(htmlContent))
+            {
+                _logger.LogInformation("Found empty HTML page");
+                return new List<string>();
+            }
             var document = new HtmlDocument();
             document.LoadHtml(htmlContent);
             var linkNodes = document.DocumentNode.SelectNodes("//a[@href]");
-            var links = linkNodes.Select(n => n.Attributes["href"]).ToList();
+            if (linkNodes == null)
+            {
+                return new List<string>();
+            }
+            var links = linkNodes.Where(n => n.Attributes.Contains("href")).Select(n => n.Attributes["href"]).ToList();
             //return links.Where(l=>l.hr)
             return links.Select(l => l.Value).ToList();
         }
 
-        private bool IsLinkAcceptable(string parentUrl, string childLink)
+        private bool IsLinkAcceptable(SearchJob searchJob, SearchResult searchResult)
         {
-            //TODO you were here, skip if empty, skip if host name does not match, bookmarks
+            var childLink = searchResult.OriginalLink;
+            //TODO  skip if mailto or email
+            /*
+WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Found a link 'mailto:ask@reedexpo.com.au'
+WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Found a child link:'mailto:ask@reedexpo.com.au' which is relative to container page:mailto:ask@reedexpo.com.au under parent:https://rxglobal.com/
+WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Child link:mailto:ask@reedexpo.com.au was added to results
+WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Queue=52 Search results=53
+WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Found a link 'tel:61%202%209422%202500'
+WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Found a child link:'tel:61%202%209422%202500' which is relative to container page:tel:61 2 9422 2500 under parent:https://rxglobal.com/
+WebsiteCrawler.Service.SingleThreadedWebSiteCrawler: Information: Child link:tel:61 2 9422 2500 was added to results
 
+             */
             if (string.IsNullOrEmpty(childLink))
             {
                 return false;
@@ -111,11 +197,25 @@ namespace WebsiteCrawler.Service
                 return false;
             }
 
-            if (childLink.ToLower().StartsWith("http:") || childLink.ToLower().StartsWith("https:"))
+            if (childLink.StartsWith("#"))
             {
-                //TODO handle child links which are fully qualified
+                //Book marks are not wanted
                 return false;
             }
+
+            if (childLink.ToLower().StartsWith("http:") || childLink.ToLower().StartsWith("https:"))
+            {
+                searchResult.IsLinkFullyQualified = true;
+                var uri = new Uri(childLink);
+                if (uri.Host != searchJob.Uri.Host)
+                {
+                    searchResult.IsLinkExternalDomain = true;
+                    return false;
+                }
+                searchResult.IsLinkExternalDomain = false;
+                //TODO handle child links which are fully qualified
+            }
+
             return true;
         }
     }
