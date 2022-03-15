@@ -204,6 +204,12 @@ namespace WebsiteCrawler.Service
                 return false;
             }
 
+            if (childLink.StartsWith("sms:"))
+            {
+                //sms links are not wanted
+                return false;
+            }
+
             if (childLink.ToLower().StartsWith("http:") || childLink.ToLower().StartsWith("https:"))
             {
                 searchResult.IsLinkFullyQualified = true;

@@ -19,7 +19,8 @@ namespace WebsiteCrawler.Executable
             serviceCollection.AddTransient<IWebSiteCrawler, SingleThreadedWebSiteCrawler>();
             serviceCollection.AddTransient<IHtmlParser, HtmlAgilityParser>();
             serviceCollection.AddTransient<HttpClient>();
-            serviceCollection.AddLogging(builder => builder.AddConsole());  //TODO Change to nlog
+            serviceCollection.AddLogging(builder => builder.AddLog4Net("log4net.config"));
+
             serviceCollection.AddTransient<ICrawlerResultsFormatter, CsvResultsFormatter>();
             return serviceCollection.BuildServiceProvider();
         }
@@ -58,19 +59,7 @@ namespace WebsiteCrawler.Executable
             var stdOut = Console.OpenStandardOutput();
             stdOut.Flush();
             formatter.WriteResults(stdOut, results);
+            Console.WriteLine($"Found {results.Count} sites in the Url:'{arg.Url}', after searching a maximum of {arg.MaxSites} sites");
         }
     }
 }
-
-/*
- *
- Webrawler.exe -url http://somesite.com	-maxpages 10
- */
-
-//TODO finish Readme
-
-/*
-             var formatter = new WebsiteCrawler.Service.CsvResultsFormatter();
-            formatter.WriteResults(Console.OpenStandardOutput(), new System.Collections.Generic.List<Infrastructure.entity.SearchResult>());
-
- */
