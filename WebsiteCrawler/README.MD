@@ -52,9 +52,15 @@ WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30
 ```
 
 # Sample output with BBC
+```
+WebsiteCrawler.exe --url https://www.bbc.co.uk --maxsites 5
+```
 ![image](docs/images/example_output_bbc.png)
 
 # Sample output with CNN
+```
+WebsiteCrawler.exe --url https://www.cnn.com --maxsites 30
+```
 ![image](docs/images/example_output_cnn.png)
 
 # How are we parsing the HTML?
