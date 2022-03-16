@@ -1,9 +1,9 @@
-# Periodic report generation system for Contoso using .NET Core
+# Periodic report generation system for Contoso using C# and .NET Core
 
 
 # Overview
 
-This is an abstraction of a real life problem. For the purpose of this discussion we will talk in terms of a fictious company called Contoso. The company **Contoso** has a Trading system which captures trading volumes for every stock position on an hourly basis.
+This is an abstraction of a real life business problem that I faced at work. For the purpose of this discussion we will talk in terms of a fictious company called Contoso. The company **Contoso** has a Trading system which captures trading volumes for every stock position on an hourly basis.
 Contoso wants a solution where aggregated trading reports can be produced at a regular intervals and saved to a certain data store.
 
 ![blockdiagram!](docs/images/block_diagram.png "blockdiagram")
@@ -14,10 +14,18 @@ Consotos is a fictitious company [created by Microsoft](https://docs.microsoft.c
 
 ---
 
+# Why did I write this article?
+I wanted to share my approach for solving this problem. 
+I believe this is a relatively simple business problem but with a non-trivial implementation. 
+Looking at the final solution, I believe there are some valuable ideas here. 
+In return, I hope to get feedback from the wider technical community. How would you address this problem? I would love to hear from you.
 
 
 # Core requirements
 1. The implementation should be an application which can run as a background service (daemon). 
+2. The implementation should be deployable using either of the following approaches
+   - Deployed on a Windows server (in premise)
+   - Deployed using Cloud Native approaches. (Azure web ap or Docker image)
 1. Trading day starts at **23:00** on the previous day and spans for 24 hours
 1. For the sake of simplicity, the **GMT** timezone will be used to obtain the current clock time
 1. All trades must be aggregated on an hourly basis (i.e. sum of all trades across all positions in any given hour ,23:00 to 00:00, 00:00 to 01:00, etc.)
@@ -37,11 +45,11 @@ LocalTime,Volume
 00:00,150
 ```
 
-## Column definitions
+#### Column definitions
 1. **LocalTime** - Denotes the start of an hour (23:00, 00:00, 01:00, ... 22:00)
 1. **Volume** - The sum of all volumes traded in the specified hour
 
-## How many rows are expected in the CSV?
+#### How many rows are expected in the CSV?
 The report must capture trade volumes starting from 23:00 previous day upto the current hour.
 Example:
 If the report extraction runs at 02:30, then the last row in the CSV should capture all trades upto 02:00 to 03:00 hour period
@@ -63,14 +71,14 @@ With the above raw information coming from the trading system over a 24 hour per
 
 # What are the various solution approaches?
 
-## 1-Naive solution - A single command line executable written in procedural style using C# on the .NET Core platform
+#### 1-Naive solution - A single command line executable written in procedural style using C# on the .NET Core platform
 - A single .NET Core executable written in a procedural style
 - The EXE polls the trading system at desired intervals
 - The executable can be deployed to a physical server or a virtual machine on Azure.
 - The scheduling can be done via Windows Task Scheduler or other enterprise schedulers like Autosys
 
 
-## 2-A more robust solution  - A componentized .NET Core ASP.NET worker process deployable to Azure
+#### 2-A more robust solution  - A componentized .NET Core ASP.NET worker process deployable to Azure
 
 - ASP.NET Core worker process as the outer shell
 - Split into testable components and abstractions
@@ -78,7 +86,7 @@ With the above raw information coming from the trading system over a 24 hour per
 - Can be easily deployed on cheap containers or app services. No need for expensive Virtual Machines on the Cloud
 
 
-## 3-Non coded approaches
+#### 3-Non coded approaches
 - Sql Server Integration services  (SSIS)
 - Azure Data factory
 - Azure Synapse pipelines
@@ -89,10 +97,10 @@ With the above raw information coming from the trading system over a 24 hour per
 
 In this article, we will implement a solution using a **componentized ASP.NET Worker process** approach.
 
-## Flowchart
+#### Flowchart
 ![flowchart!](docs/images/flow-chart.png "flowchart")
 
-## What is an ASP.NET Worker process?
+#### What is an ASP.NET Worker process?
 There are numerous reasons for creating long-running services such as:
 - Processing CPU intensive data.
 - Queuing work items in the background.
@@ -100,12 +108,12 @@ There are numerous reasons for creating long-running services such as:
 
 With .NET, you're no longer restricted to Windows. You can develop cross-platform background services. Hosted services are logging, configuration, and dependency injection (DI) ready. 
 
-## How to create an ASP.NET Worker Service project using Visual Studio?
+#### How to create an ASP.NET Worker Service project using Visual Studio?
 
 ![visualstudio-workerservice-template.png](docs/images/visualstudio-workerservice-template.png)
 
 
-## ASP.NET Core Worker class
+#### ASP.NET Core Worker class
 
 The core scheduler is implemented as an inheritance from Microsoft's `BackgroundService` class. 
 The virtual method `ExecuteAsync` is designed to keep polling using a configured delay.
@@ -131,6 +139,16 @@ public class RecurringAggregatorJob : Microsoft.Extensions.Hosting.BackgroundSer
 - The configuration is read from `appSettings.json`
 - Dependencies like logger, trading connector and reports repository are wired through Dependency Injection
 
+#### Interacting via interfaces as opposed to concrete implementations
+This is one of the principles of SOLID. 
+The code within the class `RecurringAggregatorJob` is designed to invoke interfaces, thereby facilitating unit testing and avoiding design time coupling.
+It is the responsibility of the **Dependency Injection** container to instantiate and inject the concrete classes.
+
+
+![recurringaggregatorjob!](docs/images/recurringaggregatorjob-component.png "recurringaggregatorjob")
+
+---
+
 # Abstracting the trading systems connector component
 
 The trading system is abstracted through the interface `ITradingService`. There are 2 implementations provided
@@ -139,6 +157,7 @@ The trading system is abstracted through the interface `ITradingService`. There 
 
 ![tradingcomponent!](docs/images/trading_component.png "tradingcomponent")
 
+---
 
 # Abstracting the reports repository
 
@@ -148,13 +167,14 @@ For this exercise a simple file based repository has been implemented in the cla
 ![reportsrepo!](docs/images/reportsrepo_component.png "reportsrepo")
 
 
+---
 
 # How to produce CSV content?
 The popular 3rd party nuget package `CsvHelper` has been used. Refer class `SimpleCsvGenerator` which hides the implementation details
 
 ![csv!](docs/images/csvgenerator_component.png "csv")
 
-## Why is it advantegous to abstract the CSV? 
+#### Why is it advantegous to abstract the CSV? 
 Abstracting the CSV production using the interface `ICsvGenerator` allows us to inject an instance via dependency injection. Refer the constructor of the **RecurringAggregatorJob** class below:
 
 This not only separates the worker job from the CSV generation component during compile time, it also simplifies the unit testing. You do not need to test the actual CSV content while testing the work job class.  Just testing that the mocked object is more productive.
@@ -164,14 +184,15 @@ _csvGenerator.Verify(m => m.GenerateCsv(It.IsAny<List<AggregatedTradePosition>>(
 ```
 
 
+---
 
 # Logging
 Logging is essential for post-deployment support. You want to know what is going on your production boxes. We want to log exceptions and also general informational messages. This gives us insight into the performance and behaviour of the job. Think of logging as the black box of an aircraft. 
 
-## How are we abstracting the logging?
+#### How are we abstracting the logging?
 All the components are using the `ILogger<T>` interface for logging. The `ILogger` interface comes from the `Microsoft.Extensions.Logging.Abstractions` package.
 
-## What logging system are we using for this solution?
+#### What logging system are we using for this solution?
 For this solution, the popular logging library **log4net** has been used. This was primarily for simplicity. 
 
 ```
@@ -184,7 +205,7 @@ For this solution, the popular logging library **log4net** has been used. This w
 ```
 The loggers are injected via dependency injection. Therefore replacing with a centralized logging like **Application Insights** should be fairly easy.
 
-## How to use Azure Application Insights for logging?
+#### How to use Azure Application Insights for logging?
 Sample DI code for Application Insights below:
 https://docs.microsoft.com/en-us/azure/azure-monitor/app/ilogger#console-application
 
@@ -199,7 +220,7 @@ https://docs.microsoft.com/en-us/azure/azure-monitor/app/ilogger#console-applica
 ```
 This is where we see **Dependency Injection** shining. Just a couple of lines of change in the initialization and we have re-wired the entire logging.
 
-## How to initialize the destination store for Application Insights?
+#### How to initialize the destination store for Application Insights?
 The deployment script (Infrastructure as Code) can use the Powershell cmdlet `Get-AzApplicationInsightsApiKey` to retrieve the key and then set this into app settings using the `Set-AzWebApp`
 
 # How to ensure that no scheduled report generation has been missed?
@@ -226,11 +247,12 @@ So essentially, the report generation plays a catch up. To make this successful,
 Example:
 If we expect a report to be generated every **X minutes**, then polling delay should be X/2 minutes (as an example).
 
+---
 
 # How does ASP.NET Worker process deal with configuration files?
 The settings are first read from the file  `appSettings.json` and then layered with values from the environment variables (if any)
 
-## What is the structure of the appSettings.json file?
+#### What is the structure of the appSettings.json file?
 Structure of appSettings.json is as below:
 ```
 {
@@ -239,7 +261,7 @@ Structure of appSettings.json is as below:
 }
 ```
 
-## How is the settings file read by the application?
+#### How is the settings file read by the application?
 
 The `CreateHostBuilder` method reads the file `appSettings.json` and produces an `IConfiguration` instance. 
 ```
@@ -259,7 +281,7 @@ The `CreateHostBuilder` method reads the file `appSettings.json` and produces an
 **Example:** If there is an environment variable **MaximumSecondsDelayBetweenConsecutiveReporExtrations** defined then the environment variable takes precedence over the the value in the appsettings.json file.
 
 
-## How are the settings passed into the various components?
+#### How are the settings passed into the various components?
 
 The settings are serialized during DI initialization:
 ```
@@ -272,20 +294,45 @@ The settings are serialized during DI initialization:
     });
 
 ```
+---
 
+# How to ensure that the daemon uses the GMT time zone and not the machine time zone?
+This is a subtle but very important feature. 
+When you deploy to the Cloud, the container instance or Azure Web Job instance, you do not have any control on the system time zone.
+The .NET class **System.TimeZoneInfo** is our friend here.  
+The clock has been abstracted by the custom interface **IClock**
+```
+    public class Clock : IClock
+    {
+        private const string BritishTimeZone = "Greenwich Standard Time";
+
+        public DateTime GetCurrentTime()
+        {
+            var zoneInfo = System.TimeZoneInfo.FindSystemTimeZoneById(BritishTimeZone);
+            var gmtClockTime = System.TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zoneInfo);
+            return gmtClockTime;
+        }
+    }
+```
+---
 
 # Understanding the accompanying code
-## Running the EXE
+
+#### Github repo
+The working source code can be found in this repository
+https://github.com/sdg002/AnyDotnetStuff/tree/master/ContosoTradingReportGenerator
+
+#### Running the EXE
 - The main executable is implemented in the project **Contoso.TradingAggregator.Host** project
 - The configuration file **appsettings.json** has the path to the folder used as a reports repository
 - The configuration file also controls the report generation interval and polling interval
 
-## Running the unit tests
+#### Running the unit tests
 
 Implemented in the project **Contoso.TradingAggregator.UnitTests**
 ![csv!](docs/images/unittests_green.png "csv")
 
-## List of projects
+#### List of projects
 
 - **Contoso.TradingAggregator.Domain** - Core domain classes and interfaces
 - **Contoso.TradingAggregator.TradingConnector** - Implements a random trade generator for demonstration and a live connector using Contoso's proprietary assembly
@@ -321,7 +368,8 @@ services.AddSingleton<IReportsRepo>(sp =>
 
 ```
 
-# Improving the resilience of by incorporating retry logic
+---
+# Improving the resilience by incorporating retry logic
 Any cloud native application has to interact with services sooner or later. Some of these services could be in a different data center or availability zone. It is safe to assume that there could be moments of disruption caused by network outages or some form of infrastructure unavailability.
 
 ```dotnetcli
@@ -344,6 +392,9 @@ private static AsyncRetryPolicy CreateExponentialBackoffPolicy()
 }
 
 ```
+
+---
+
 # Alternative Scheduling approaches
 Not in the scope of this solution. We could think of moving away from a polling based approach to a system which is trigerred by an external scheduling engine.
 Such a system offers the advantage of complex schedules and load balancing.
@@ -352,6 +403,7 @@ Such a system offers the advantage of complex schedules and load balancing.
 - Azure Deferred messages
 
 
+---
 
 # References
 
