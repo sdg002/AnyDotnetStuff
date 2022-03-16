@@ -280,7 +280,27 @@ The settings are serialized during DI initialization:
     });
 
 ```
+---
 
+# How to ensure that the daemon uses the GMT time zone and not the machine time zone?
+This is a subtle but very important feature. 
+When you deploy to the Cloud, the container instance or Azure Web Job instance, you do not have any control on the system time zone.
+The .NET class **System.TimeZoneInfo** is our friend here.  
+The clock has been abstracted by the custom interface **IClock**
+```
+    public class Clock : IClock
+    {
+        private const string BritishTimeZone = "Greenwich Standard Time";
+
+        public DateTime GetCurrentTime()
+        {
+            var zoneInfo = System.TimeZoneInfo.FindSystemTimeZoneById(BritishTimeZone);
+            var gmtClockTime = System.TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zoneInfo);
+            return gmtClockTime;
+        }
+    }
+```
+---
 
 # Understanding the accompanying code
 #### Running the EXE
