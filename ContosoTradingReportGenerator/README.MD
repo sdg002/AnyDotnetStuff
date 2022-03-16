@@ -139,6 +139,16 @@ public class RecurringAggregatorJob : Microsoft.Extensions.Hosting.BackgroundSer
 - The configuration is read from `appSettings.json`
 - Dependencies like logger, trading connector and reports repository are wired through Dependency Injection
 
+#### Interacting via interfaces as opposed to concrete implementations
+This is one of the principles of SOLID. 
+The code within the class `RecurringAggregatorJob` is designed to invoke interfaces, thereby facilitating unit testing and avoiding design time coupling.
+It is the responsibility of the **Dependency Injection** container to instantiate and inject the concrete classes.
+
+
+![recurringaggregatorjob!](docs/images/recurringaggregatorjob-component.png "recurringaggregatorjob")
+
+---
+
 # Abstracting the trading systems connector component
 
 The trading system is abstracted through the interface `ITradingService`. There are 2 implementations provided
@@ -147,6 +157,7 @@ The trading system is abstracted through the interface `ITradingService`. There 
 
 ![tradingcomponent!](docs/images/trading_component.png "tradingcomponent")
 
+---
 
 # Abstracting the reports repository
 
@@ -156,6 +167,7 @@ For this exercise a simple file based repository has been implemented in the cla
 ![reportsrepo!](docs/images/reportsrepo_component.png "reportsrepo")
 
 
+---
 
 # How to produce CSV content?
 The popular 3rd party nuget package `CsvHelper` has been used. Refer class `SimpleCsvGenerator` which hides the implementation details
@@ -172,6 +184,7 @@ _csvGenerator.Verify(m => m.GenerateCsv(It.IsAny<List<AggregatedTradePosition>>(
 ```
 
 
+---
 
 # Logging
 Logging is essential for post-deployment support. You want to know what is going on your production boxes. We want to log exceptions and also general informational messages. This gives us insight into the performance and behaviour of the job. Think of logging as the black box of an aircraft. 
@@ -234,6 +247,7 @@ So essentially, the report generation plays a catch up. To make this successful,
 Example:
 If we expect a report to be generated every **X minutes**, then polling delay should be X/2 minutes (as an example).
 
+---
 
 # How does ASP.NET Worker process deal with configuration files?
 The settings are first read from the file  `appSettings.json` and then layered with values from the environment variables (if any)
@@ -349,7 +363,8 @@ services.AddSingleton<IReportsRepo>(sp =>
 
 ```
 
-# Improving the resilience of by incorporating retry logic
+---
+# Improving the resilience by incorporating retry logic
 Any cloud native application has to interact with services sooner or later. Some of these services could be in a different data center or availability zone. It is safe to assume that there could be moments of disruption caused by network outages or some form of infrastructure unavailability.
 
 ```dotnetcli
@@ -372,6 +387,9 @@ private static AsyncRetryPolicy CreateExponentialBackoffPolicy()
 }
 
 ```
+
+---
+
 # Alternative Scheduling approaches
 Not in the scope of this solution. We could think of moving away from a polling based approach to a system which is trigerred by an external scheduling engine.
 Such a system offers the advantage of complex schedules and load balancing.
@@ -380,6 +398,7 @@ Such a system offers the advantage of complex schedules and load balancing.
 - Azure Deferred messages
 
 
+---
 
 # References
 
