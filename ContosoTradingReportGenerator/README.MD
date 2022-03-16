@@ -317,6 +317,11 @@ The clock has been abstracted by the custom interface **IClock**
 ---
 
 # Understanding the accompanying code
+
+#### Github repo
+The working source code can be found in this repository
+https://github.com/sdg002/AnyDotnetStuff/tree/master/ContosoTradingReportGenerator
+
 #### Running the EXE
 - The main executable is implemented in the project **Contoso.TradingAggregator.Host** project
 - The configuration file **appsettings.json** has the path to the folder used as a reports repository
