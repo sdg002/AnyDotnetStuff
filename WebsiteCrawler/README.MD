@@ -133,7 +133,7 @@ start --->  master thread manages a queue of work items ---> spawns child Tasks 
 
 ```
 
-#### Do we really stand to gain my making it multi-threaded?
+#### Do we really stand to gain by making the component multi-threaded?
 Rewriting the component as a multithreaded is possible, but makes the coding and testing more complex.
 But, what do we gain? Consider the scenario where we have a multiple sites to crawl (www.site1.com, www.site2.com, www.site3.com) . Why not created independent threads , one each for www.site1.com, www.site2.com and www.site3.com?
 This might be a win-win solution.
