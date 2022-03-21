@@ -79,9 +79,11 @@ namespace WebsiteCrawler.Service
             _logger.LogInformation($"Downloaded page:{searchJob.Url}, Content is {pageContents.Length} characters long");
             var links = FindLinksWithinHtml(pageContents);
             _logger.LogInformation($"Found {links.Count} hyperlinks in the page {searchJob.Url}");
-            links.ForEach(link =>
+            links.ForEach(rawLink =>
             {
-                _logger.LogInformation($"Found a link '{link}'");
+                _logger.LogInformation($"Found a link '{rawLink}'");
+                var link = rawLink.Trim().Trim('\n');
+                _logger.LogInformation($"After trimming link becomes '{link}'");
                 var searchResult = new SearchResult
                 {
                     ParentPageUrl = searchJob.Url,

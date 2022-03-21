@@ -1,12 +1,16 @@
 # Overview
-This is an elementary Web site crawler written using C# on .NET Core 
+This is an elementary Web site crawler written using C# on .NET Core . What do we mean by **crawling a web site** ? 
+No! We are not indexing the content of the pages.
+
+This is a simple component which will crawl through a web site (example: www.cnn.com), find sub-links and in turn crawl those pages . 
+Only links which fall the under the domain of the parent site are accepted. 
 
 # Implementation overview
-```dotnetcli
+The accompanying code produces a command line application. The results are written directly to the console.
+![overview-flow](docs/images/overview-flow.png)
 
-[command line executable]  --> [parse arguments for site url] -->  [invoke C# component to crawl site]  --> [format results to simple flat text]
-```
-## Sample output
+#### Sample output
+Here is the output when https://www.cnn.com/ was crawled
 ```
 https://www.cnn.com/videos/world/2021/11/16/uganda-explosions-madowo-live-nr-ovn-intl-ldn-vpx.cnn
 https://www.cnn.com/videos/world/2021/11/17/lagos-nigeria-erosion-climate-change-ctw-busari-pkg-intl-vpx.cnn
@@ -27,46 +31,57 @@ Found 663 sites in the Url:'https://www.cnn.com', after searching a maximum of 3
 # What kind of hyperlinks are we processing?
 Only links with references to pages on the same domain as the specified URL are extracted. 
 
-## The following links are ignored:
+#### The following links are ignored:
 - Any external site. E.g. www.twitter.com
 - Links which are `mailto:` or `tel:` or `sms:`
 - Bookmarks Example: `<a href='#chapter1'>Chapter 1</a>`
 - Any link which produces a content type other than **text/html** is ignored. Example: A link to pdf document
+- Any link which is under a sub-domain of the root domain.E.g. if the www.cnn.com was being crawled, then a link such as sports.cnn.com would be ignored
 
-## The following links are accepted:
+#### The following links are accepted:
 - `<a href='/contactus.htm'>Contact us</a>`
 - `<a href='/Careers'>Careers</a>`
+- if www.cnn.com was being crawled then `<a href='https://www.cnn.com/Careers'>Careers</a>` would be acceptable.
 
 # How to compile and run the code?
 The current version has been build on **Visual Studio 2019** and **.NET Core 3.1**
 
-## Solution structure
+#### Solution structure
 ![image](docs/images/solution_explorer.png)
 
-## Unit and integration tests
+#### Unit and integration tests
 ![image](docs/images/visual_studio_testexplorer.png)
 
-## Running from command line
+#### Running from command line
 ```dotnetcli
 WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30
 ```
 
-# Sample output with BBC
+# Sample outputs
+Here are some examples of the output produced by the web site crawler
+
+#### WWW.BBC.CO.UK
 ```
 WebsiteCrawler.exe --url https://www.bbc.co.uk --maxsites 5
 ```
 ![image](docs/images/example_output_bbc.png)
 
-# Sample output with CNN
+#### WWW.CNN.COM
 ```
 WebsiteCrawler.exe --url https://www.cnn.com --maxsites 30
 ```
 ![image](docs/images/example_output_cnn.png)
 
+#### WWW.PREMIERLEAGUE.COM
+```
+WebsiteCrawler.exe --maxsites 10 --url https://www.premierleague.com
+```
+![image](docs/images/example_output_premierleague.png)
+
 # How are we parsing the HTML?
 The component **HtmlAgilityPack** is being used for parsing the links out of a HTML fragment. Refer class `HtmlAgilityParser.cs`
 
-# How are command line arguments being passed?
+# How are command line arguments being processed?
 The component **CommandLineParser** is being used. This component uses the following model class to interpret the command line arguments:
 ```dotnetcli
     public class CmdLineArgumentModel
@@ -79,9 +94,29 @@ The component **CommandLineParser** is being used. This component uses the follo
     }
 
 ```
+Refer the [project site](https://github.com/commandlineparser/commandline) of this component for more information
 
 # How are we logging?
+All C# code is written with the expection that `ILogger<T>` would be injected via **Dependency Injection**.
+
+#### Logging in the executable
 **log4net** is being used. In the current implementation, the logging output is displayed on the **Console**
+
+#### Logging in the unit tests and integration tests
+
+Logging to the output window of Visual Studio helps in examining the log outputs.
+```
+        ILogger<SingleThreadedWebSiteCrawler> logger=CreateOutputWindowLogger<SingleThreadedWebSiteCrawler>();
+
+        /// <summary>
+        /// Helps you view logging results in the Output Window of Visual Studio
+        /// </summary>
+        private ILogger<T> CreateOutputWindowLogger<T>()
+        {
+            var serviceProvider = new ServiceCollection().AddLogging(builder => builder.AddDebug()).BuildServiceProvider();
+            return serviceProvider.GetService<ILogger<T>>();
+        }
+```
 
 # Scenarios that have not been tested
 
@@ -91,17 +126,35 @@ The component **CommandLineParser** is being used. This component uses the follo
 - Better approach to ignored links. Currently being logged. Can be incorporated as another collection.
 
 # Further improvements
-## Making it multi-threaded
+#### Making it multi-threaded
 The current implementation is single threaded. This is obviously slow. A more sophisticated implementation would be broadly as follows:
 ```
 start --->  master thread manages a queue of work items ---> spawns child Tasks --> each Task will pull first available item from work queue , parse links and add to same queue
 
 ```
 
-## Specify output format
-We could think of providing the ability to produce JSON format
+#### Do we really stand to gain by making the component multi-threaded?
+Rewriting the component as a multithreaded is possible, but makes the coding and testing more complex.
+But, what do we gain? Consider the scenario where we have a multiple sites to crawl (www.site1.com, www.site2.com, www.site3.com) . Why not created independent threads , one each for www.site1.com, www.site2.com and www.site3.com?
+This might be a win-win solution.
 
-## Can we make a full blown web crawler?
+![overview-flow](docs/images/multi-threaded.png)
+
+
+#### Specify output format
+We could think of providing the ability to produce JSON format
+Example:
+```
+WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30 --format csv
+```
+
+#### Specify the output file
+Example:
+```
+WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30 --output c:\temp\results.csv
+```
+
+#### Can we make a full blown web crawler?
 - We could turn this into an ASP.NET worker service 
 - The service would be running as a Web job in Azure or in some container.
 - The worker service would be passively waiting for messages in a queue

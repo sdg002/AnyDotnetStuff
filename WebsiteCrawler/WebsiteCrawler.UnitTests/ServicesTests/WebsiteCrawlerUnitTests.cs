@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -55,10 +56,34 @@ namespace WebsiteCrawler.UnitTests
         }
 
         [TestMethod]
-        [Ignore("Work in progress")]
-        public void When_MaxPages_Exceeded_Limit_Then_Crawler_Must_Stop()
+        public async Task When_MaxPages_Exceeded_Limit_Then_Crawler_Must_Stop()
         {
-            //TODO Test for an upper limit on how many pages to scan
+            //Arrange
+            Mock<HttpMessageHandler> handlerMock = Mocks.CreateHttpMessageHandlerMock(
+                @"<html>HTML with some internal anchor tags <a href='link1'>Link 1</a> <a href='link2'>Link 2</a> <a href='link3'>Link 3</a> <a href='link4'>Link 4</a></html>",
+                HttpStatusCode.OK,
+                "text/html");
+
+            var httpClient = new HttpClient(handlerMock.Object);
+            var site = "http://www.sitewithsomelinks.com";
+
+            var crawler = new SingleThreadedWebSiteCrawler(
+                CreateOutputWindowLogger<SingleThreadedWebSiteCrawler>(),
+                _htmlParser,
+                httpClient);
+            int expectedPagesToCrawl = 3;
+
+            //Act
+            var crawlerResults = await crawler.Run(site, expectedPagesToCrawl);
+
+            //Assert
+            crawlerResults.Should().HaveCount(4);
+
+            handlerMock.Protected().Verify(
+                "SendAsync",
+                Times.Exactly(expectedPagesToCrawl),
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>());
         }
 
         [TestMethod]
@@ -66,7 +91,7 @@ namespace WebsiteCrawler.UnitTests
         {
             //Arrange
             Mock<HttpMessageHandler> handlerMock = Mocks.CreateHttpMessageHandlerMock(
-                @"<html>HTML without any anchor tags  <a href='somelink.html'></a></html>",
+                @"This is some raw text, that is not considered as HTML",
                 HttpStatusCode.OK,
                 "text/plain");
 
@@ -163,6 +188,43 @@ namespace WebsiteCrawler.UnitTests
             //Arrange
             Mock<HttpMessageHandler> handlerMock = Mocks.CreateHttpMessageHandlerMock(
                 @"<html>HTML without some internal achor tags  <a href='link1'>Link 1<a> <a href='link2'>Link 2<a></html>",
+                HttpStatusCode.OK,
+                "text/html");
+
+            var httpClient = new HttpClient(handlerMock.Object);
+            var site = "http://www.contoso.com";
+
+            var crawler = new SingleThreadedWebSiteCrawler(
+                CreateOutputWindowLogger<SingleThreadedWebSiteCrawler>(),
+                _htmlParser,
+                httpClient);
+
+            var expectedResults = new string[]
+            {
+                "http://www.contoso.com/link1",
+                "http://www.contoso.com/link2",
+            };
+
+            //Act
+            var crawlerResults = await crawler.Run(site, 5);
+
+            //Assert
+            crawlerResults.Should().HaveCount(2);
+            expectedResults.ToList().ForEach(link =>
+            {
+                crawlerResults
+                .Any(r => r.AbsoluteLink.ToString().Trim('/') == link)
+                .Should()
+                .BeTrue("The link {0} was not found in the crawl results", link);
+            });
+        }
+
+        [TestMethod]
+        public async Task When_Page_Has_LinksWith_LeadingAndTrailing_Spaces_Then_Crawler_Must_Trim_The_Link()
+        {
+            //Arrange
+            Mock<HttpMessageHandler> handlerMock = Mocks.CreateHttpMessageHandlerMock(
+                @$"<html>HTML without some internal achor tags  <a href=' http://www.contoso.com/link1{Environment.NewLine} '>Link 1 with leading and trailing spaces<a> <a href='link2'>This is link2<a></html>",
                 HttpStatusCode.OK,
                 "text/html");
 

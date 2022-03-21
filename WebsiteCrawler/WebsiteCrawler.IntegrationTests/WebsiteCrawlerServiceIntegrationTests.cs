@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -13,17 +14,12 @@ namespace WebsiteCrawler.IntegrationTests
     public class WebsiteCrawlerServiceIntegrationTests
     {
         [TestMethod]
-        public async Task When_bbccouk_Is_Crawled()
+        [DynamicData(nameof(GetTestData), DynamicDataSourceType.Method)]
+        public async Task When_Site_Is_Crawled_Then_Actual_Results_Must_Match_Expected(string urlToCrawl, int maxPagesToCrawl, int expectedLinks, string[] someExpectedLinks)
         {
             //Arrange
             var htmlParser = new HtmlAgilityParser();
             var httpClient = new HttpClient();
-            var maxPagesToSearch = 20;
-            var someOfTheExpectedResults = new string[]
-            {
-                "https://www.bbc.co.uk/sport",
-                "https://www.bbc.co.uk/weather",
-            };
 
             var crawler = new SingleThreadedWebSiteCrawler(
                 this.CreateOutputWindowLogger<SingleThreadedWebSiteCrawler>(),
@@ -31,13 +27,12 @@ namespace WebsiteCrawler.IntegrationTests
                 httpClient);
 
             //Act
-            var urlToCrawl = "http://www.bbc.co.uk/";
-            var crawlResults = await crawler.Run(urlToCrawl, maxPagesToSearch);
+            var crawlResults = await crawler.Run(urlToCrawl, maxPagesToCrawl);
 
             //Assert
-            crawlResults.Should().HaveCountGreaterThan(maxPagesToSearch);
+            crawlResults.Should().HaveCountGreaterThan(expectedLinks);
 
-            someOfTheExpectedResults.ToList().ForEach(link =>
+            someExpectedLinks.ToList().ForEach(link =>
             {
                 crawlResults
                 .Any(r => r.AbsoluteLink.ToString().Trim('/') == link)
@@ -46,38 +41,45 @@ namespace WebsiteCrawler.IntegrationTests
             });
         }
 
-        [TestMethod]
-        public async Task When_rxglobal_Is_Crawled()
+        internal static IEnumerable<object[]> GetTestData()
         {
-            //Arrange
-            var htmlParser = new HtmlAgilityParser();
-            var httpClient = new HttpClient();
-            var maxPagesToSearch = 20;
-            var someOfTheExpectedResults = new string[]
-            {
+            yield return CreateTestDataAsArray(
+                "https://rxglobal.com",
+                10, 50,
+                "https://rxglobal.com/rx-australia",
                 "https://rxglobal.com/rx-korea",
-                "https://rxglobal.com/rx-brazil",
+                "https://rxglobal.com/join-us",
+                "https://rxglobal.com/leadership-team");
+
+            yield return CreateTestDataAsArray(
+                "https://www.premierleague.com/",
+                10, 300,
+                "https://www.premierleague.com/photos",
+                "https://www.premierleague.com/players",
+                "https://www.premierleague.com/news");
+
+            yield return CreateTestDataAsArray(
+                "https://www.bbc.co.uk/",
+                11, 300,
+                "https://www.bbc.co.uk/sport",
+                "https://www.bbc.co.uk/weather",
+                "https://www.bbc.co.uk/weather/search",
+                "https://www.bbc.co.uk/weather/warnings/floods",
+                "https://www.bbc.co.uk/tv/cbbc");
+        }
+
+        private static object[] CreateTestDataAsArray(
+            string siteUrl,
+            int maxPagesToCrawl,
+            int expectedCountOfLinks,
+            params string[] someExpectedLinks)
+        {
+            return new object[] {
+                siteUrl,
+                maxPagesToCrawl,
+                expectedCountOfLinks,
+                someExpectedLinks
             };
-
-            var crawler = new SingleThreadedWebSiteCrawler(
-                this.CreateOutputWindowLogger<SingleThreadedWebSiteCrawler>(),
-                htmlParser,
-                httpClient);
-
-            //Act
-            var urlToCrawl = "https://rxglobal.com";
-            var crawlResults = await crawler.Run(urlToCrawl, maxPagesToSearch);
-
-            //Assert
-            crawlResults.Should().HaveCountGreaterThan(maxPagesToSearch);
-
-            someOfTheExpectedResults.ToList().ForEach(link =>
-            {
-                crawlResults
-                .Any(r => r.AbsoluteLink.ToString().Trim('/') == link)
-                .Should()
-                .BeTrue("The link {0} was not found in the crawl results", link);
-            });
         }
 
         /// <summary>
