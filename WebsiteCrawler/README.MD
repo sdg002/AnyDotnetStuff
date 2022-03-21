@@ -9,7 +9,7 @@ Only links which fall the under the domain of the parent site are accepted.
 The accompanying code produces a command line application. The results are written directly to the console.
 ![overview-flow](docs/images/overview-flow.png)
 
-## Sample output
+#### Sample output
 Here is the output when https://www.cnn.com/ was crawled
 ```
 https://www.cnn.com/videos/world/2021/11/16/uganda-explosions-madowo-live-nr-ovn-intl-ldn-vpx.cnn
@@ -31,14 +31,14 @@ Found 663 sites in the Url:'https://www.cnn.com', after searching a maximum of 3
 # What kind of hyperlinks are we processing?
 Only links with references to pages on the same domain as the specified URL are extracted. 
 
-## The following links are ignored:
+#### The following links are ignored:
 - Any external site. E.g. www.twitter.com
 - Links which are `mailto:` or `tel:` or `sms:`
 - Bookmarks Example: `<a href='#chapter1'>Chapter 1</a>`
 - Any link which produces a content type other than **text/html** is ignored. Example: A link to pdf document
 - Any link which is under a sub-domain of the root domain.E.g. if the www.cnn.com was being crawled, then a link such as sports.cnn.com would be ignored
 
-## The following links are accepted:
+#### The following links are accepted:
 - `<a href='/contactus.htm'>Contact us</a>`
 - `<a href='/Careers'>Careers</a>`
 - if www.cnn.com was being crawled then `<a href='https://www.cnn.com/Careers'>Careers</a>` would be acceptable.
@@ -46,13 +46,13 @@ Only links with references to pages on the same domain as the specified URL are 
 # How to compile and run the code?
 The current version has been build on **Visual Studio 2019** and **.NET Core 3.1**
 
-## Solution structure
+#### Solution structure
 ![image](docs/images/solution_explorer.png)
 
-## Unit and integration tests
+#### Unit and integration tests
 ![image](docs/images/visual_studio_testexplorer.png)
 
-## Running from command line
+#### Running from command line
 ```dotnetcli
 WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30
 ```
@@ -141,10 +141,20 @@ This might be a win-win solution.
 ![overview-flow](docs/images/multi-threaded.png)
 
 
-## Specify output format
+#### Specify output format
 We could think of providing the ability to produce JSON format
+Example:
+```
+WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30 --format csv
+```
 
-## Can we make a full blown web crawler?
+#### Specify the output file
+Example:
+```
+WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30 --output c:\temp\results.csv
+```
+
+#### Can we make a full blown web crawler?
 - We could turn this into an ASP.NET worker service 
 - The service would be running as a Web job in Azure or in some container.
 - The worker service would be passively waiting for messages in a queue
