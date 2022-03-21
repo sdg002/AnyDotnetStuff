@@ -81,7 +81,7 @@ WebsiteCrawler.exe --maxsites 10 --url https://www.premierleague.com
 # How are we parsing the HTML?
 The component **HtmlAgilityPack** is being used for parsing the links out of a HTML fragment. Refer class `HtmlAgilityParser.cs`
 
-# How are command line arguments being passed?
+# How are command line arguments being processed?
 The component **CommandLineParser** is being used. This component uses the following model class to interpret the command line arguments:
 ```dotnetcli
     public class CmdLineArgumentModel
@@ -94,9 +94,29 @@ The component **CommandLineParser** is being used. This component uses the follo
     }
 
 ```
+Refer the [project site](https://github.com/commandlineparser/commandline) of this component for more information
 
 # How are we logging?
+All C# code is written with the expection that `ILogger<T>` would be injected via **Dependency Injection**.
+
+#### Logging in the executable
 **log4net** is being used. In the current implementation, the logging output is displayed on the **Console**
+
+#### Logging in the unit tests and integration tests
+
+Logging to the output window of Visual Studio helps in examining the log outputs.
+```
+        ILogger<SingleThreadedWebSiteCrawler> logger=CreateOutputWindowLogger<SingleThreadedWebSiteCrawler>();
+
+        /// <summary>
+        /// Helps you view logging results in the Output Window of Visual Studio
+        /// </summary>
+        private ILogger<T> CreateOutputWindowLogger<T>()
+        {
+            var serviceProvider = new ServiceCollection().AddLogging(builder => builder.AddDebug()).BuildServiceProvider();
+            return serviceProvider.GetService<ILogger<T>>();
+        }
+```
 
 # Scenarios that have not been tested
 
@@ -106,12 +126,20 @@ The component **CommandLineParser** is being used. This component uses the follo
 - Better approach to ignored links. Currently being logged. Can be incorporated as another collection.
 
 # Further improvements
-## Making it multi-threaded
+#### Making it multi-threaded
 The current implementation is single threaded. This is obviously slow. A more sophisticated implementation would be broadly as follows:
 ```
 start --->  master thread manages a queue of work items ---> spawns child Tasks --> each Task will pull first available item from work queue , parse links and add to same queue
 
 ```
+
+#### Do we really stand to gain my making it multi-threaded?
+Rewriting the component as a multithreaded is possible, but makes the coding and testing more complex.
+But, what do we gain? Consider the scenario where we have a multiple sites to crawl (www.site1.com, www.site2.com, www.site3.com) . Why not created independent threads , one each for www.site1.com, www.site2.com and www.site3.com?
+This might be a win-win solution.
+
+![overview-flow](docs/images/multi-threaded.png)
+
 
 ## Specify output format
 We could think of providing the ability to produce JSON format

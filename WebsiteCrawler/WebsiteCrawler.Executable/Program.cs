@@ -63,6 +63,3 @@ namespace WebsiteCrawler.Executable
         }
     }
 }
-
-//TODO Set some expectations, single threaded, same site domain, etc. (under Overview) (Readme.md)
-//TODO Why use OutputDebugger during unit tests (Readme.md)
