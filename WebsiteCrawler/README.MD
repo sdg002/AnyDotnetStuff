@@ -1,12 +1,16 @@
 # Overview
-This is an elementary Web site crawler written using C# on .NET Core 
+This is an elementary Web site crawler written using C# on .NET Core . What do we mean by **crawling a web site** ? 
+No! We are not indexing the content of the pages.
+
+This is a simple component which will crawl through a web site (example: www.cnn.com), find sub-links and in turn crawl those pages . 
+Only links which fall the under the domain of the parent site are accepted. 
 
 # Implementation overview
-```dotnetcli
+The accompanying code produces a command line application. The results are written directly to the console.
+![overview-flow](docs/images/overview-flow.png)
 
-[command line executable]  --> [parse arguments for site url] -->  [invoke C# component to crawl site]  --> [format results to simple flat text]
-```
 ## Sample output
+Here is the output when https://www.cnn.com/ was crawled
 ```
 https://www.cnn.com/videos/world/2021/11/16/uganda-explosions-madowo-live-nr-ovn-intl-ldn-vpx.cnn
 https://www.cnn.com/videos/world/2021/11/17/lagos-nigeria-erosion-climate-change-ctw-busari-pkg-intl-vpx.cnn
@@ -32,10 +36,12 @@ Only links with references to pages on the same domain as the specified URL are 
 - Links which are `mailto:` or `tel:` or `sms:`
 - Bookmarks Example: `<a href='#chapter1'>Chapter 1</a>`
 - Any link which produces a content type other than **text/html** is ignored. Example: A link to pdf document
+- Any link which is under a sub-domain of the root domain.E.g. if the www.cnn.com was being crawled, then a link such as sports.cnn.com would be ignored
 
 ## The following links are accepted:
 - `<a href='/contactus.htm'>Contact us</a>`
 - `<a href='/Careers'>Careers</a>`
+- if www.cnn.com was being crawled then `<a href='https://www.cnn.com/Careers'>Careers</a>` would be acceptable.
 
 # How to compile and run the code?
 The current version has been build on **Visual Studio 2019** and **.NET Core 3.1**
@@ -51,17 +57,26 @@ The current version has been build on **Visual Studio 2019** and **.NET Core 3.1
 WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30
 ```
 
-# Sample output with BBC
+# Sample outputs
+Here are some examples of the output produced by the web site crawler
+
+#### WWW.BBC.CO.UK
 ```
 WebsiteCrawler.exe --url https://www.bbc.co.uk --maxsites 5
 ```
 ![image](docs/images/example_output_bbc.png)
 
-# Sample output with CNN
+#### WWW.CNN.COM
 ```
 WebsiteCrawler.exe --url https://www.cnn.com --maxsites 30
 ```
 ![image](docs/images/example_output_cnn.png)
+
+#### WWW.PREMIERLEAGUE.COM
+```
+WebsiteCrawler.exe --maxsites 10 --url https://www.premierleague.com
+```
+![image](docs/images/example_output_premierleague.png)
 
 # How are we parsing the HTML?
 The component **HtmlAgilityPack** is being used for parsing the links out of a HTML fragment. Refer class `HtmlAgilityParser.cs`
