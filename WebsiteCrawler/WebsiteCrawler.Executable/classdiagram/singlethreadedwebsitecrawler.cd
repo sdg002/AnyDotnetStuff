@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="WebsiteCrawler.Service.SingleThreadedWebSiteCrawler">
+    <Position X="1" Y="1.5" Width="5.75" />
+    <TypeIdentifier />
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="WebsiteCrawler.Infrastructure.interfaces.ICrawlerResultsFormatter">
+    <Position X="7.25" Y="0.75" Width="2.75" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="WebsiteCrawler.Infrastructure.interfaces.IHtmlParser">
+    <Position X="7.25" Y="2.25" Width="2.75" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="WebsiteCrawler.Infrastructure.interfaces.IWebSiteCrawler">
+    <Position X="7.25" Y="3.75" Width="2.75" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="Microsoft.Extensions.Logging.ILogger">
+    <Position X="7.25" Y="5.25" Width="2.75" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier />
+  </Interface>
+  <Font Name="Courier New" Size="10" />
+</ClassDiagram>

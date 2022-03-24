@@ -5,6 +5,8 @@ No! We are not indexing the content of the pages.
 This is a simple component which will crawl through a web site (example: www.cnn.com), find sub-links and in turn crawl those pages . 
 Only links which fall the under the domain of the parent site are accepted. 
 
+---
+
 # Implementation overview
 The accompanying code produces a command line application. The results are written directly to the console.
 ![overview-flow](docs/images/overview-flow.png)
@@ -27,6 +29,7 @@ https://www.cnn.com/www.cnnpartners.com
 https://www.cnn.com/youtube.com/user/CNN
 Found 663 sites in the Url:'https://www.cnn.com', after searching a maximum of 30 sites
 ```
+---
 
 # What kind of hyperlinks are we processing?
 Only links with references to pages on the same domain as the specified URL are extracted. 
@@ -56,6 +59,7 @@ The current version has been build on **Visual Studio 2019** and **.NET Core 3.1
 ```dotnetcli
 WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30
 ```
+---
 
 # Sample outputs
 Here are some examples of the output produced by the web site crawler
@@ -78,8 +82,70 @@ WebsiteCrawler.exe --maxsites 10 --url https://www.premierleague.com
 ```
 ![image](docs/images/example_output_premierleague.png)
 
+---
+
 # How are we parsing the HTML?
 The component **HtmlAgilityPack** is being used for parsing the links out of a HTML fragment. Refer class `HtmlAgilityParser.cs`
+
+---
+
+
+# Separation of concerns via interfaces and Dependency injecton
+One of the key principles of SOLID mandates that we code around interfaces as opposed to concrete implementations. This significantly simplifies unit testing via mocking/faking
+![image](docs/images/class-diagram-websitecrawler.png)
+
+#### IHtmlParser
+```
+    public interface IHtmlParser
+    {
+        /// <summary>
+        /// Returns all hyper link URLs from the given HTML document
+        /// </summary>
+        /// <param name="html">The HTML content to scan</param>
+        /// <returns></returns>
+        List<string> GetLinks(string htmlContent);
+    }
+
+```
+I have provided a concrete implementation using the NUGET package **HtmlAgilityPack**. 
+
+
+#### ILogger<T>
+
+The command line executable uses **Log4net** for logging. 
+
+```dotnetcli
+        private static ServiceProvider ConfigureServices()
+        {
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddTransient<IWebSiteCrawler, SingleThreadedWebSiteCrawler>();
+            serviceCollection.AddTransient<IHtmlParser, HtmlAgilityParser>();
+            serviceCollection.AddTransient<HttpClient>();
+            serviceCollection.AddLogging(builder => builder.AddLog4Net("log4net.config"));
+
+            serviceCollection.AddTransient<ICrawlerResultsFormatter, CsvResultsFormatter>();
+            return serviceCollection.BuildServiceProvider();
+        }
+```
+
+If the crawler component were used by an ASP.NET Worker code, then you could imagine logging to **Azure Application Insights**
+
+```dotnetcli
+services.AddLogging(builder =>
+                {
+                    builder.AddApplicationInsights("<YourInstrumentationKey>");
+                });
+```
+
+---
+
+# How are we mocking HttpClient class?
+TODO fill this.
+TODO give link to sample code on mocking HttpClient.
+
+TODO show a delimiter between 2 H1 using -----
+
+---
 
 # How are command line arguments being processed?
 The component **CommandLineParser** is being used. This component uses the following model class to interpret the command line arguments:
@@ -95,6 +161,8 @@ The component **CommandLineParser** is being used. This component uses the follo
 
 ```
 Refer the [project site](https://github.com/commandlineparser/commandline) of this component for more information
+
+---
 
 # How are we logging?
 All C# code is written with the expection that `ILogger<T>` would be injected via **Dependency Injection**.
@@ -117,6 +185,7 @@ Logging to the output window of Visual Studio helps in examining the log outputs
             return serviceProvider.GetService<ILogger<T>>();
         }
 ```
+---
 
 # Scenarios that have not been tested
 
@@ -124,6 +193,8 @@ Logging to the output window of Visual Studio helps in examining the log outputs
 - Explore if we have covered all HTTP status code while doing a Polly retry. 
 - Better approach to recording errors. Currently being logged. Should have an errors collection and this should be unit tested
 - Better approach to ignored links. Currently being logged. Can be incorporated as another collection.
+
+---
 
 # Further improvements
 #### Making it multi-threaded
@@ -161,5 +232,6 @@ WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30 --output c:\temp\res
 - Results would be written back to a database.
 - Such a worker service could be made very resilient by managing state in an external data store. Example - Consider incrementally crawling a large web site over several hours.
 
+---
 
 
