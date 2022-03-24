@@ -47,7 +47,7 @@ Only links with references to pages on the same domain as the specified URL are 
 - if www.cnn.com was being crawled then `<a href='https://www.cnn.com/Careers'>Careers</a>` would be acceptable.
 
 # How to compile and run the code?
-The current version has been build on **Visual Studio 2019** and **.NET Core 3.1**
+The current version has been build on **Visual Studio 2019** and **.NET Core 3.1**. The crawler component itself is built on **.NET Standard 2.0**
 
 #### Solution structure
 ![image](docs/images/solution_explorer.png)
@@ -140,10 +140,39 @@ services.AddLogging(builder =>
 ---
 
 # How are we mocking HttpClient class?
-TODO fill this.
-TODO give link to sample code on mocking HttpClient.
+The class **HttpClient** lets you intercept the protected method **SendAsync**. I found [this article](https://dev.to/gautemeekolsen/how-to-test-httpclient-with-moq-in-c-2ldp) very helpful.
 
-TODO show a delimiter between 2 H1 using -----
+
+```dotnetcli
+internal static class Mocks
+{
+    internal static Mock<HttpMessageHandler> CreateHttpMessageHandlerMock(
+        string responseBody,
+        HttpStatusCode responseStatus,
+        string responseContentType)
+    {
+        var handlerMock = new Mock<HttpMessageHandler>();
+        var response = new HttpResponseMessage
+        {
+            StatusCode = responseStatus,
+            Content = new StringContent(responseBody),
+        };
+
+        response.Content.Headers.ContentType = new MediaTypeHeaderValue(responseContentType);
+
+        handlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(response);
+
+        return handlerMock;
+    }
+}
+
+```
 
 ---
 
@@ -165,7 +194,7 @@ Refer the [project site](https://github.com/commandlineparser/commandline) of th
 ---
 
 # How are we logging?
-All C# code is written with the expection that `ILogger<T>` would be injected via **Dependency Injection**.
+All C# code is written with the expection that a concrete implementation of `ILogger<T>` would be injected via **Dependency Injection**.
 
 #### Logging in the executable
 **log4net** is being used. In the current implementation, the logging output is displayed on the **Console**
@@ -189,10 +218,10 @@ Logging to the output window of Visual Studio helps in examining the log outputs
 
 # Scenarios that have not been tested
 
-- Intergration test on the executable
+- Intergration test on the executable. We should programmatically launch the executable with various combinations of command line arguments and test for expected output
 - Explore if we have covered all HTTP status code while doing a Polly retry. 
 - Better approach to recording errors. Currently being logged. Should have an errors collection and this should be unit tested
-- Better approach to ignored links. Currently being logged. Can be incorporated as another collection.
+- Better approach to ignored links. Currently being logged. Can be incorporated as another collection in the results object.
 
 ---
 
@@ -217,12 +246,25 @@ We could think of providing the ability to produce JSON format
 Example:
 ```
 WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30 --format csv
+WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30 --format json
 ```
 
-#### Specify the output file
+#### Specify the output file path
+We want to save the generated results to a file
 Example:
 ```
 WebsiteCrawler.exe  --url https://www.cnn.com --maxsites 30 --output c:\temp\results.csv
+```
+
+#### Capability to persiste current state and resume from last known state
+Imagine, if we are crawling a deeply nested web site like www.cnn.com. This could run into thousands of pages. Beginning from the top level migh not be a very efficient approach. Searching in smaller batches (say 100 sites) might be more practical.  To handle such a long running process, we could make the **SingleThreadedWebSiteCrawler** component stateful. Pass the last known state and resume from that point onwards.
+The **Queue** data structure should be returned along with the results and the entire results should be made serializable.
+
+```dotnetcli
+public interface IWebSiteCrawler
+{
+    Task<SearchResults> Run(SearchResults lastKnownResult,string url, int maxPagesToSearch);
+}
 ```
 
 #### Can we make a full blown web crawler?
