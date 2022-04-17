@@ -3,16 +3,28 @@ pipeline {
 
     stages {
         stage('Build') {
+            when{
+                changeset "jenkins-mono-repo/Project002/*.*"
+                beforeAgent true
+            }
             steps {
                 echo 'Building project 002..'
             }
         }
         stage('Test') {
+            when{
+                changeset "jenkins-mono-repo/Project002/*.*"
+                beforeAgent true
+            }
             steps {
                 echo 'Testing project 002..'
             }
         }
         stage('Deploy') {
+            when{
+                changeset "jenkins-mono-repo/Project002*.*"
+                beforeAgent true
+            }
             steps {
                 echo 'Deploying project 002....'
             }
