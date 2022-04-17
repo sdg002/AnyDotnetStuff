@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     stages {
-        stage('PreBuild') {
-            steps {
-                echo 'Pre-Building project 001..'
-            }
-        }
+        // stage('PreBuild') {
+        //     steps {
+        //         echo 'Pre-Building project 001..'
+        //     }
+        // }
         stage('Build') {
             when{
                 changeset "jenkins-mono-repo/Project001/**"
