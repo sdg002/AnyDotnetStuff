@@ -6,7 +6,8 @@ pipeline {
             when{
                 beforeAgent true
                 anyOf{
-                    triggeredBy user
+                    //triggeredBy user //this did not work to indentify user launched builds
+                    triggeredBy cause: 'UserIdCause'
                     changeset "**/jenkins-mono-repo/Project001/**"
                 }
             }
