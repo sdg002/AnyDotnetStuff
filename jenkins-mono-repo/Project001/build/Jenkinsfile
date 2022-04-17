@@ -2,9 +2,14 @@ pipeline {
     agent any
 
     stages {
+        stage('PreBuild') {
+            steps {
+                echo 'Pre-Building project 001..'
+            }
+        }
         stage('Build') {
             when{
-                changeset "jenkins-mono-repo/Project001/*.*"
+                changeset "jenkins-mono-repo/Project001/**"
                 beforeAgent true
             }
             steps {
@@ -13,7 +18,7 @@ pipeline {
         }
         stage('Test') {
             when{
-                changeset "jenkins-mono-repo/Project001/*.*"
+                changeset "jenkins-mono-repo/Project001/**"
                 beforeAgent true
             }
             steps {
@@ -22,7 +27,7 @@ pipeline {
         }
         stage('Deploy') {
             when{
-                changeset "jenkins-mono-repo/Project001/*.*"
+                changeset "jenkins-mono-repo/Project001/**"
                 beforeAgent true
             }
             steps {
