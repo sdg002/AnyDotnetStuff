@@ -4,8 +4,11 @@ pipeline {
     stages {
         stage('Build') {
             when{
-                changeset "**/jenkins-mono-repo/Project001/**"
                 beforeAgent true
+                anyOf{
+                    triggeredBy user
+                    changeset "**/jenkins-mono-repo/Project001/**"
+                }
             }
             steps {
                 echo 'Building project 001..'
