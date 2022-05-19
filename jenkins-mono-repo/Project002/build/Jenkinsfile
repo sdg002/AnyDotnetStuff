@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             when{
-                changeset "jenkins-mono-repo/Project002/**"
+                changeset "jenkins-mono-repo/Project002/*.*"
                 beforeAgent true
             }
             steps {
