@@ -22,8 +22,11 @@ pipeline {
         }
         stage('Deploy') {
             when{
-                changeset "**/jenkins-mono-repo/Project002/*.*"
                 beforeAgent true
+                anyOf{
+                    changeset "**/jenkins-mono-repo/Project002/*.*"
+                    triggeredBy cause: 'UserIdCause'
+                }                
             }
             steps {
                 echo 'Deploying project 002....'
