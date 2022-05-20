@@ -1,8 +1,7 @@
 pipeline {
     agent any
-
-    stages {
-        stage('Build') {
+    stages{
+        stage('This is Project001'){
             when{
                 beforeAgent true
                 anyOf{
@@ -11,26 +10,30 @@ pipeline {
                     changeset "**/jenkins-mono-repo/Project001/**"
                 }
             }
-            steps {
-                echo 'Building project 001..'
-            }
-        }
-        stage('Test') {
-            when{
-                changeset "**/jenkins-mono-repo/Project001/**"
-                beforeAgent true
-            }
-            steps {
-                echo 'Testing project 001..'
-            }
-        }
-        stage('Deploy') {
-            when{
-                changeset "**/jenkins-mono-repo/Project001/**"
-                beforeAgent true
-            }
-            steps {
-                echo 'Deploying project 001....'
+            stages {
+                stage('Build') {
+                    steps {
+                        echo 'Building project 001 with nested stages..'
+                    }
+                }
+                stage('Test') {
+                    when{
+                        changeset "**/jenkins-mono-repo/Project001/**"
+                        beforeAgent true
+                    }
+                    steps {
+                        echo 'Testing project 001..'
+                    }
+                }
+                stage('Deploy') {
+                    when{
+                        changeset "**/jenkins-mono-repo/Project001/**"
+                        beforeAgent true
+                    }
+                    steps {
+                        echo 'Deploying project 001....'
+                    }
+                }
             }
         }
     }
