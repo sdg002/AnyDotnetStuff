@@ -17,19 +17,23 @@ pipeline {
                     }
                 }
                 stage('Test') {
-                    when{
-                        changeset "**/jenkins-mono-repo/Project001/**"
-                        beforeAgent true
-                    }
+                    //Remember changeset only sees the last change in that branch
+                    //therefore the following will not get kicked off in consecutive manual builds
+                    // when{
+                    //     changeset "**/jenkins-mono-repo/Project001/**"
+                    //     beforeAgent true
+                    // }
                     steps {
                         echo 'Testing project 001..'
                     }
                 }
                 stage('Deploy') {
-                    when{
-                        changeset "**/jenkins-mono-repo/Project001/**"
-                        beforeAgent true
-                    }
+                    //Remember changeset only sees the last change in that branch
+                    //therefore the following will not get kicked off in consecutive manual builds
+                    // when{
+                    //     changeset "**/jenkins-mono-repo/Project001/**"
+                    //     beforeAgent true
+                    // }
                     steps {
                         echo 'Deploying project 001....'
                     }
