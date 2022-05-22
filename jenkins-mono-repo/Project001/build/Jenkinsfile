@@ -46,7 +46,11 @@
         // One or more steps need to be included within each condition's block.
         echo 'Inside post-success'
         //githubPRStatusPublisher buildMessage: message(failureMsg: githubPRMessage('Can\'t set status; build failed.'), successMsg: githubPRMessage('Can\'t set status; build succeeded.')), statusMsg: githubPRMessage('${GITHUB_PR_COND_REF} run ended'), unstableAs: 'SUCCESS'
-        githubPRStatusPublisher buildMessage: message(failureMsg: githubPRMessage('Can\'t set status; build failed.'), successMsg: githubPRMessage('Can\'t set status; build succeeded.')), errorHandler: statusOnPublisherError('UNSTABLE'), statusMsg: githubPRMessage('${GITHUB_PR_COND_REF} run ended'), statusVerifier: allowRunOnStatus('SUCCESS'), unstableAs: 'FAILURE'
+        //trying with the following
+        //githubPRStatusPublisher buildMessage: message(failureMsg: githubPRMessage('Can\'t set status; build failed.'), successMsg: githubPRMessage('Can\'t set status; build succeeded.')), errorHandler: statusOnPublisherError('UNSTABLE'), statusMsg: githubPRMessage('${GITHUB_PR_COND_REF} run ended'), statusVerifier: allowRunOnStatus('SUCCESS'), unstableAs: 'FAILURE'
+        //the above did not work ,java.lang.NullPointerException 
+    	//  at org.jenkinsci.plugins.github.pullrequest.publishers.impl.GitHubPRBuildStatusPublisher.perform(GitHubPRBuildStatusPublisher.java:95)
+
         }
     }
 
