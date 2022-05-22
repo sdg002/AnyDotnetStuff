@@ -1,4 +1,4 @@
-pipeline {
+    pipeline {
     agent any
     stages{
         stage('This is Project001'){
@@ -41,4 +41,12 @@ pipeline {
             }
         }
     }
+    post {
+    success {
+        // One or more steps need to be included within each condition's block.
+        echo 'Inside post-success'
+        githubPRStatusPublisher buildMessage: message(failureMsg: githubPRMessage('Can\'t set status; build failed.'), successMsg: githubPRMessage('Can\'t set status; build succeeded.')), statusMsg: githubPRMessage('${GITHUB_PR_COND_REF} run ended'), unstableAs: 'SUCCESS'
+        }
+    }
+
 }
