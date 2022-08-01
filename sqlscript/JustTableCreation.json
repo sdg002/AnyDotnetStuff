@@ -1,0 +1,17 @@
+{
+	"name": "JustTableCreation",
+	"properties": {
+		"content": {
+			"query": "IF EXISTS (SELECT * FROM SYS.OBJECTS WHERE [name]='Peoples' AND [TYPE]='U')\nBEGIN\n    DROP EXTERNAL TABLE Peoples\n    PRINT 'Table peoples was dropped'\nEND\nGO\nCREATE EXTERNAL TABLE Peoples (\n     id int,\n     --id nvarchar(20),\n     firstname nvarchar(50),\n     lastname nvarchar(50),\n) WITH (\n         LOCATION = '/peoples.csv',\n         DATA_SOURCE = peoplesdemo,\n         --FORMAT='csv'\n         FILE_FORMAT = CSVFORMAT\n);\nPRINT 'Table peoples was created'\nGO\nSELECT * FROM Peoples\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "myserverlessdb",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

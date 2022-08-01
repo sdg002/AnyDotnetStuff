@@ -1,0 +1,17 @@
+{
+	"name": "CreateUsers",
+	"properties": {
+		"content": {
+			"query": "USER MASTER\nGO\nCREATE LOGIN demologin WITH PASSWORD='Pass@word123'\nGO\nUSE MYSERVERLESSDB\nGO\nCREATE USER demouser FROM LOGIN demologin\nGO\n\nalter role db_datareader ADD MEMBER demouser\n GRANT REFERENCES ON DATABASE SCOPED CREDENTIAL::[MYCREDENTIAL] TO [demouser];\n\n\n/*\n EXEC sp_addrolemember 'db_datareader' ,'demouser' -- \n PROCEDURE 'sp_addrolemember' is not supported.\n\n*/\n\n\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "myserverlessdb",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

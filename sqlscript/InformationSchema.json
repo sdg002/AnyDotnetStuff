@@ -1,0 +1,17 @@
+{
+	"name": "InformationSchema",
+	"properties": {
+		"content": {
+			"query": "\nSELECT * FROM \nINFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='Peoples'\nGO\nSELECT * FROM \nINFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='Peoples' AND COLUMN_NAME='ID'",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "myserverlessdb",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

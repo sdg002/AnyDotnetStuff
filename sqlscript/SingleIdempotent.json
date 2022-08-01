@@ -1,0 +1,17 @@
+{
+	"name": "SingleIdempotent",
+	"properties": {
+		"content": {
+			"query": "\n\n--DROP TABLE\n\nIF EXISTS (SELECT * FROM SYS.OBJECTS WHERE [name]='Peoples' AND [TYPE]='U')\nBEGIN\n    DROP EXTERNAL TABLE Peoples\n    PRINT 'Table peoples was dropped'\nEND\nELSE\n    PRINT 'Table peoples was not found'\nGO\n\n-- DROP DATA SOURCE\nIF EXISTS (SELECT * FROM sys.external_data_sources WHERE [name]='peoplesdemo')\nBEGIN\n    print 'Dropping data source peoplesdemo'\n    DROP EXTERNAL DATA SOURCE peoplesdemo\n    PRINT  'Dropped data source peoplesdemo'\nEND\nELSE\n    PRINT 'External data source peoplesdemo was not found'\nGO\n\n\n-- DROP CREDENTIAL\nIF EXISTS (SELECT * FROM SYS.DATABASE_SCOPED_CREDENTIALS WHERE [name] = 'PEOPLESCREDENTIAL') \nBEGIN\n    DROP DATABASE SCOPED CREDENTIAL PEOPLESCREDENTIAL\n    PRINT  'Dropped credential PEOPLESCREDENTIAL'\nEND\nELSE\n    PRINT 'Credential PEOPLESCREDENTIAL was not found'\nGO\n\n\n-- CREATE CREDENTIAL\n\nCREATE DATABASE SCOPED CREDENTIAL PEOPLESCREDENTIAL\nWITH IDENTITY = 'Managed Identity';\nPRINT 'Created credential PEOPLESCREDENTIAL'\nGO\n-- CREATE DATA SOURCE\nCREATE EXTERNAL DATA SOURCE PEOPLESDEMO\nwith ( \n    -- location = 'https://csvstoragedemo001.blob.core.windows.net/' ,  --did not work\n    location = 'https://csvstoragedemo001.blob.core.windows.net/junk' ,\n    CREDENTIAL = PEOPLESCREDENTIAL \n    );\nGO\nPRINT 'Created external datasource PEOPLESDEMO'\nGO\n-- CREATE TABLE\nCREATE EXTERNAL TABLE Peoples (\n     id int,\n     firstname nvarchar(50),\n     lastname nvarchar(50),\n) WITH (\n         LOCATION = '/peoples.csv',\n         DATA_SOURCE = peoplesdemo,\n         FILE_FORMAT = CSVFORMAT\n);\nGO\nPRINT 'External table Peoples was created'\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "myserverlessdb",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

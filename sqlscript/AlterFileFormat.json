@@ -1,0 +1,17 @@
+{
+	"name": "AlterFileFormat",
+	"properties": {
+		"content": {
+			"query": "\n\n/*\nUnable to ALTER FILE FORMAT\nSee link https://docs.microsoft.com/en-us/answers/questions/38287/alter-external-file-format-question.html\nSupposed to be doable.\n\n\n*/\n\nCREATE EXTERNAL FILE FORMAT CSVFORMAT WITH \n    (  \n        FORMAT_TYPE = DELIMITEDTEXT,\n        FORMAT_OPTIONS \n            (\n                FIRST_ROW=2,\n                FIELD_TERMINATOR=',',\n                STRING_DELIMITER='\"'                \n            )\n    )\n\nALTER FILE FORMAT  CSVFORMAT \nALTER   FILE FORMAT CSVFORMAT WITH \n    (  \n        FORMAT_TYPE = DELIMITEDTEXT,\n        FORMAT_OPTIONS \n            (\n                FIRST_ROW=2,\n                FIELD_TERMINATOR=',',\n                STRING_DELIMITER='\"'                \n            )\n    )",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "myserverlessdb",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

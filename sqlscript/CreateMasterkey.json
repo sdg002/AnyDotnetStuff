@@ -1,0 +1,17 @@
+{
+	"name": "CreateMasterkey",
+	"properties": {
+		"content": {
+			"query": "USE MASTER\nIF EXISTS (SELECT * FROM SYS.KEY_ENCRYPTIONS ke WHERE ke.crypt_type = 'ESKM' )\nBEGIN\n    PRINT 'There is already a master key'\n    -- USE MASTER\n    -- DROP MASTER KEY\n    --  Changed database context to 'master'. Cannot drop master key because certificate '##MS_InstanceCertificate##' is encrypted by it.\n\nEND\nELSE\nBEGIN\n    PRINT 'No master key found'\n    CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Pass@word123'\nEND\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
