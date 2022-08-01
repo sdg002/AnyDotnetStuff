@@ -1,0 +1,331 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"type": "string",
+			"metadata": "Workspace name",
+			"defaultValue": "testsynapse-dev"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
+		"AzureDataLakeStorage1_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
+		},
+		"testsynapse-dev-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'testsynapse-dev-WorkspaceDefaultSqlServer'"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://demodgen2.dfs.core.windows.net/"
+		},
+		"testsynapse-dev-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://synasepstoragedev.dfs.core.windows.net"
+		}
+	},
+	"variables": {
+		"workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testsynapse-dev-WorkspaceDefaultSqlServer')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('testsynapse-dev-WorkspaceDefaultSqlServer_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/testsynapse-dev-WorkspaceDefaultStorage')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('testsynapse-dev-WorkspaceDefaultStorage_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
+			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "AutoResolve",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 0
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/WorkspaceSystemIdentity')]",
+			"type": "Microsoft.Synapse/workspaces/credentials",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"type": "ManagedIdentity",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AlterFileFormat')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "\n\n/*\nUnable to ALTER FILE FORMAT\nSee link https://docs.microsoft.com/en-us/answers/questions/38287/alter-external-file-format-question.html\nSupposed to be doable.\n\n\n*/\n\nCREATE EXTERNAL FILE FORMAT CSVFORMAT WITH \n    (  \n        FORMAT_TYPE = DELIMITEDTEXT,\n        FORMAT_OPTIONS \n            (\n                FIRST_ROW=2,\n                FIELD_TERMINATOR=',',\n                STRING_DELIMITER='\"'                \n            )\n    )\n\nALTER FILE FORMAT  CSVFORMAT \nALTER   FILE FORMAT CSVFORMAT WITH \n    (  \n        FORMAT_TYPE = DELIMITEDTEXT,\n        FORMAT_OPTIONS \n            (\n                FIRST_ROW=2,\n                FIELD_TERMINATOR=',',\n                STRING_DELIMITER='\"'                \n            )\n    )",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "myserverlessdb",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CreateMasterkey')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "USE MASTER\nIF EXISTS (SELECT * FROM SYS.KEY_ENCRYPTIONS ke WHERE ke.crypt_type = 'ESKM' )\nBEGIN\n    PRINT 'There is already a master key'\n    -- USE MASTER\n    -- DROP MASTER KEY\n    --  Changed database context to 'master'. Cannot drop master key because certificate '##MS_InstanceCertificate##' is encrypted by it.\n\nEND\nELSE\nBEGIN\n    PRINT 'No master key found'\n    CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Pass@word123'\nEND\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/CreateUsers')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "USER MASTER\nGO\nCREATE LOGIN demologin WITH PASSWORD='Pass@word123'\nGO\nUSE MYSERVERLESSDB\nGO\nCREATE USER demouser FROM LOGIN demologin\nGO\n\nalter role db_datareader ADD MEMBER demouser\n GRANT REFERENCES ON DATABASE SCOPED CREDENTIAL::[MYCREDENTIAL] TO [demouser];\n\n\n/*\n EXEC sp_addrolemember 'db_datareader' ,'demouser' -- \n PROCEDURE 'sp_addrolemember' is not supported.\n\n*/\n\n\n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "myserverlessdb",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DataSourceWithoutCredentials')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "trying data source with no explicit credentials",
+				"content": {
+					"query": "\n--SELECT * FROM SYS.DATABASES\n\nIF EXISTS (SELECT * FROM sys.external_data_sources WHERE [name]='peoplesdemo')\nBEGIN\n    print 'Dropping data source peoplesdemo'\n    DROP EXTERNAL DATA SOURCE peoplesdemo\nEND\n\n/*\ndid not work using \nhttps://docs.microsoft.com/en-us/azure/synapse-analytics/sql/develop-storage-files-storage-access-control?tabs=managed-identity\n\nCREATE CREDENTIAL [https://csvstoragedemo001.dfs.core.windows.net/junk]\nWITH IDENTITY='Managed Identity'\n*/\n\n/*\ndid nto work\nCREATE CREDENTIAL [https://csvstoragedemo001.blob.core.windows.net/junk]\nWITH IDENTITY='Managed Identity'\n*/\n\nIF EXISTS (SELECT * FROM SYS.DATABASE_SCOPED_CREDENTIALS WHERE [name] = 'PEOPLESCREDENTIAL') \nBEGIN\n    DROP DATABASE SCOPED CREDENTIAL PEOPLESCREDENTIAL\n    PRINT 'DROPPED THE CREDENTIAL'\nEND\nGO\nCREATE DATABASE SCOPED CREDENTIAL PEOPLESCREDENTIAL\nWITH IDENTITY = 'Managed Identity';\nPRINT 'Created managed identity'\n GO\n-- CREATE EXTERNAL DATA SOURCE mysample\n-- WITH (    LOCATION   = 'https://<storage_account>.dfs.core.windows.net/<container>/<path>',\n--           CREDENTIAL = SynapseIdentity\n--)\n\n\ncreate external data source peoplesdemo\nwith ( \n    location = 'https://csvstoragedemo001.blob.core.windows.net/junk', \n    CREDENTIAL = PEOPLESCREDENTIAL \n    )\n\n-- create external data source peoplesdemo\n-- with ( \n--     -- location = 'https://csvstoragedemo001.blob.core.windows.net/' ,  --did not work\n--     location = 'https://csvstoragedemo001.blob.core.windows.net/junk' ,\n--     CREDENTIAL = PEOPLESCREDENTIAL \n--     --TYPE = BLOB_STORAGE\n--     );\n\n--trying the following\n\nPRINT 'Created external data source'\n\n\n\nselect *\nfrom openrowset(\n        bulk '/peoples.csv',\n        data_source = 'peoplesdemo',\n        format = 'csv',\n        parser_version ='2.0'\n    ) as rows\n\n\n/*\nTrying to create datasource without credentials\nThis does not work!\nFile 'peoples.csv' cannot be opened because it does not exist or it is used by another process.\n\n*/\n-- \n\nselect *\nfrom openrowset(\n        bulk '/peoples.csv',\n        data_source = 'peoplesdemo',\n        format = 'csv',\n        parser_version ='2.0'\n    ) as rows\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "myserverlessdb",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/InformationSchema')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "\nSELECT * FROM \nINFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='Peoples'\nGO\nSELECT * FROM \nINFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='Peoples' AND COLUMN_NAME='ID'",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "myserverlessdb",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/JustTableCreation')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "IF EXISTS (SELECT * FROM SYS.OBJECTS WHERE [name]='Peoples' AND [TYPE]='U')\nBEGIN\n    DROP EXTERNAL TABLE Peoples\n    PRINT 'Table peoples was dropped'\nEND\nGO\nCREATE EXTERNAL TABLE Peoples (\n     id int,\n     --id nvarchar(20),\n     firstname nvarchar(50),\n     lastname nvarchar(50),\n) WITH (\n         LOCATION = '/peoples.csv',\n         DATA_SOURCE = peoplesdemo,\n         --FORMAT='csv'\n         FILE_FORMAT = CSVFORMAT\n);\nPRINT 'Table peoples was created'\nGO\nSELECT * FROM Peoples\n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "myserverlessdb",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Msdn')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "\n-- https://csvstoragedemo001.blob.core.windows.net/peoples/peoples.csv\n-- https://csvstoragedemo001.blob.core.windows.net/peoples\n\n-- How do you drop the master key\nIF EXISTS (SELECT * FROM SYS.KEY_ENCRYPTIONS ke WHERE ke.crypt_type = 'ESKM' )\nBEGIN\n    PRINT 'yes there is a master key'\n    -- USE MASTER\n    -- DROP MASTER KEY\n    --  Changed database context to 'master'. Cannot drop master key because certificate '##MS_InstanceCertificate##' is encrypted by it.\n\nEND\nELSE\nBEGIN\n    PRINT 'No master key found'\nEND\n\n-- some comments to test pull request\n\nIF NOT EXISTS (SELECT * FROM SYS.KEY_ENCRYPTIONS ke WHERE ke.crypt_type = 'ESKM' )\nBEGIN\n    PRINT 'No master key found'\nEND\n\nCREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Pass@word123'\n\n\n--did not work, you got to hard code\n-- DECLARE @sas AS NVARCHAR(200)\n-- SET @sas='sp=r&st=2022-06-13T21:07:28Z&se=2023-06-14T05:07:28Z&spr=https&sv=2021-06-08&sr=c&sig=8bf3McO3OMTPrFxBColIntUwuFp6UU6W1763FNkaBTU%3D'\n-- PRINT @sas\n\n-- 'sp=r&st=2022-04-26T21:31:27Z&se=2022-06-02T05:31:27Z&spr=https&sv=2020-08-04&sr=c&sig=nR9eVI0N5%2BZL5rL3NJGdreRKTpGrW3DN784zmJYKCz4%3D'\nIF EXISTS (SELECT * FROM SYS.DATABASE_SCOPED_CREDENTIALS WHERE [name] = 'PEOPLESCREDENTIAL') DROP DATABASE SCOPED CREDENTIAL PEOPLESCREDENTIAL\nCREATE DATABASE SCOPED CREDENTIAL PEOPLESCREDENTIAL\nWITH \n    IDENTITY = 'SHARED ACCESS SIGNATURE', \n    SECRET = 'sp=r&st=2022-06-13T21:07:28Z&se=2023-06-14T05:07:28Z&spr=https&sv=2021-06-08&sr=c&sig=8bf3McO3OMTPrFxBColIntUwuFp6UU6W1763FNkaBTU%3D'\n    \n    -- sp=r&st=2022-04-26T21:31:27Z&se=2022-06-02T05:31:27Z&spr=https&sv=2020-08-04&sr=c&sig=nR9eVI0N5%2BZL5rL3NJGdreRKTpGrW3DN784zmJYKCz4%3D\n\n\nIF EXISTS (SELECT * FROM sys.external_data_sources WHERE [name]='peoplesdemo')\nBEGIN\n    print 'Dropping data source peoplesdemo'\n    DROP EXTERNAL DATA SOURCE peoplesdemo\nEND\n\ncreate external data source peoplesdemo\nwith ( \n    -- location = 'https://csvstoragedemo001.blob.core.windows.net/' ,  --did not work\n    location = 'https://csvstoragedemo001.blob.core.windows.net/junk' ,\n    CREDENTIAL = PEOPLESCREDENTIAL \n    --TYPE = BLOB_STORAGE\n    );\n\n--\n\nselect *\nfrom openrowset(\n        bulk '/peoples.csv',\n        data_source = 'peoplesdemo',\n        format = 'csv',\n        parser_version ='2.0'\n    ) as rows\n\n\nIF EXISTS (SELECT * FROM SYS.OBJECTS WHERE [name]='Peoples' AND [TYPE]='U')\nBEGIN\n    DROP EXTERNAL TABLE Peoples\n    PRINT 'Table peoples was dropped'\nEND\nGO\nIF EXISTS (SELECT * FROM sys.external_file_formats WHERE [name]='CSVFORMAT') \nBEGIN\n    DROP EXTERNAL FILE FORMAT CSVFORMAT\n    PRINT 'external file format CSVFORMAT was dropped'\nEND\nGO\nCREATE EXTERNAL FILE FORMAT CSVFORMAT WITH \n    (  \n        FORMAT_TYPE = DELIMITEDTEXT,\n        FORMAT_OPTIONS \n            (\n                FIRST_ROW=2,\n                FIELD_TERMINATOR=',',\n                STRING_DELIMITER='\"'                \n            )\n    )\nPRINT 'external file format CSVFORMAT was created'\nGO\nIF EXISTS (SELECT * FROM SYS.OBJECTS WHERE [name]='Peoples' AND [TYPE]='U')\nBEGIN\n    DROP EXTERNAL TABLE Peoples\n    PRINT 'Table peoples was dropped'\nEND\nGO\nCREATE EXTERNAL TABLE Peoples (\n     --int,\n     id nvarchar(20),\n     firstname nvarchar(50),\n     lastname nvarchar(50),\n) WITH (\n         LOCATION = '/peoples.csv',\n         DATA_SOURCE = peoplesdemo,\n         --FORMAT='csv'\n         FILE_FORMAT = CSVFORMAT\n);\nPRINT 'Table peoples was created'\nGO\nSELECT * FROM Peoples\n\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "myserverlessdb",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT * FROM SYS.OBJECTS  WHERE [NAME] LIKE 'pe%'\n\nSELECT * FROM sys.external_file_formats\nSELECT * FROM SYS.OBJECTS  ORDER BY [NAME]\nSELECT * FROM SYS.DATABASE_SCOPED_CREDENTIALS\nSELECT * FROM SYS.SYMMETRIC_KEYS\nSELECT * FROM sys.key_encryptions\nSELECT * FROM sys.external_data_sources\n\nDROP EXTERNAL DATA SOURCE PeoplesdDataSource\nSELECT * FROM Address\nSELECT * FROM People\n\nselect *\nfrom openrowset(\n        bulk '/addresses.csv',\n        data_source = 'peoplesdemo',\n        format = 'csv',\n        parser_version ='2.0'\n    ) as rows\n\n\nCREATE EXTERNAL TABLE Junk (\n     personid INT,\n     city nvarchar(50),\n     [state] nvarchar(50),\n     postcode nvarchar(50),\n     [country] nvarchar(50)\n) WITH (\n         LOCATION = '/peoples.csv',\n         DATA_SOURCE = peoplesdemo,\n         --FORMAT='csv'\n         FILE_FORMAT = CSVFORMAT\n);\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "myserverlessdb",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SingleIdempotent')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "\n\n--DROP TABLE\n\nIF EXISTS (SELECT * FROM SYS.OBJECTS WHERE [name]='Peoples' AND [TYPE]='U')\nBEGIN\n    DROP EXTERNAL TABLE Peoples\n    PRINT 'Table peoples was dropped'\nEND\nELSE\n    PRINT 'Table peoples was not found'\nGO\n\n-- DROP DATA SOURCE\nIF EXISTS (SELECT * FROM sys.external_data_sources WHERE [name]='peoplesdemo')\nBEGIN\n    print 'Dropping data source peoplesdemo'\n    DROP EXTERNAL DATA SOURCE peoplesdemo\n    PRINT  'Dropped data source peoplesdemo'\nEND\nELSE\n    PRINT 'External data source peoplesdemo was not found'\nGO\n\n\n-- DROP CREDENTIAL\nIF EXISTS (SELECT * FROM SYS.DATABASE_SCOPED_CREDENTIALS WHERE [name] = 'PEOPLESCREDENTIAL') \nBEGIN\n    DROP DATABASE SCOPED CREDENTIAL PEOPLESCREDENTIAL\n    PRINT  'Dropped credential PEOPLESCREDENTIAL'\nEND\nELSE\n    PRINT 'Credential PEOPLESCREDENTIAL was not found'\nGO\n\n\n-- CREATE CREDENTIAL\n\nCREATE DATABASE SCOPED CREDENTIAL PEOPLESCREDENTIAL\nWITH IDENTITY = 'Managed Identity';\nPRINT 'Created credential PEOPLESCREDENTIAL'\nGO\n-- CREATE DATA SOURCE\nCREATE EXTERNAL DATA SOURCE PEOPLESDEMO\nwith ( \n    -- location = 'https://csvstoragedemo001.blob.core.windows.net/' ,  --did not work\n    location = 'https://csvstoragedemo001.blob.core.windows.net/junk' ,\n    CREDENTIAL = PEOPLESCREDENTIAL \n    );\nGO\nPRINT 'Created external datasource PEOPLESDEMO'\nGO\n-- CREATE TABLE\nCREATE EXTERNAL TABLE Peoples (\n     id int,\n     firstname nvarchar(50),\n     lastname nvarchar(50),\n) WITH (\n         LOCATION = '/peoples.csv',\n         DATA_SOURCE = peoplesdemo,\n         FILE_FORMAT = CSVFORMAT\n);\nGO\nPRINT 'External table Peoples was created'\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "myserverlessdb",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		}
+	]
+}
