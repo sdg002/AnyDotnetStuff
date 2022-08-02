@@ -167,6 +167,27 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Article')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Sample sql for the article",
+				"content": {
+					"query": "select *\nfrom openrowset(\n        bulk '/people.csv',\n        data_source = 'peopledatasource',\n        format = 'csv',\n        parser_version ='2.0',\n        FIRSTROW=1,\n        HEADER_ROW =TRUE\n    )  as ROWS\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "myserverlessdb",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/CreateMasterkey')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -293,7 +314,7 @@
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"content": {
-					"query": "SELECT * FROM SYS.OBJECTS  WHERE [NAME] LIKE 'pe%'\n\nSELECT * FROM sys.external_file_formats\nSELECT * FROM SYS.OBJECTS  ORDER BY [NAME]\nSELECT * FROM SYS.DATABASE_SCOPED_CREDENTIALS\nSELECT * FROM SYS.SYMMETRIC_KEYS\nSELECT * FROM sys.key_encryptions\nSELECT * FROM sys.external_data_sources\n\nDROP EXTERNAL DATA SOURCE PeoplesdDataSource\nSELECT * FROM Address\nSELECT * FROM People\n\nselect *\nfrom openrowset(\n        bulk '/addresses.csv',\n        data_source = 'peoplesdemo',\n        format = 'csv',\n        parser_version ='2.0'\n    ) as rows\n\n\nCREATE EXTERNAL TABLE Junk (\n     personid INT,\n     city nvarchar(50),\n     [state] nvarchar(50),\n     postcode nvarchar(50),\n     [country] nvarchar(50)\n) WITH (\n         LOCATION = '/peoples.csv',\n         DATA_SOURCE = peoplesdemo,\n         --FORMAT='csv'\n         FILE_FORMAT = CSVFORMAT\n);\n",
+					"query": "SELECT * FROM SYS.OBJECTS  WHERE [NAME] LIKE 'pe%'\n\nSELECT * FROM sys.external_file_formats\nSELECT * FROM SYS.OBJECTS  ORDER BY [NAME]\nSELECT * FROM SYS.DATABASE_SCOPED_CREDENTIALS\nSELECT * FROM SYS.SYMMETRIC_KEYS\nSELECT * FROM sys.key_encryptions\nSELECT * FROM sys.external_data_sources\n\nDROP EXTERNAL DATA SOURCE PeoplesdDataSource\nSELECT * FROM Address\nSELECT * FROM People\n\n--This works but includes the header row in the data rows\nselect *\nfrom openrowset(\n        bulk '/people.csv',\n        data_source = 'peopledatasource',\n        format = 'csv',\n        parser_version ='2.0'\n    ) as rows\n\n--This works and treats the header row as a header row\nselect *\nfrom openrowset(\n        bulk '/people.csv',\n        data_source = 'peopledatasource',\n        format = 'csv',\n        parser_version ='2.0',\n        FIRSTROW=1,\n        HEADER_ROW =TRUE\n    ) as rows\n\n\nCREATE EXTERNAL TABLE Junk (\n     personid INT,\n     city nvarchar(50),\n     [state] nvarchar(50),\n     postcode nvarchar(50),\n     [country] nvarchar(50)\n) WITH (\n         LOCATION = '/peoples.csv',\n         DATA_SOURCE = peoplesdemo,\n         --FORMAT='csv'\n         FILE_FORMAT = CSVFORMAT\n);\n",
 					"metadata": {
 						"language": "sql"
 					},
