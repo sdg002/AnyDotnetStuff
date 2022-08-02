@@ -1,0 +1,18 @@
+{
+	"name": "Article",
+	"properties": {
+		"description": "Sample sql for the article",
+		"content": {
+			"query": "select *\nfrom openrowset(\n        bulk '/people.csv',\n        data_source = 'peopledatasource',\n        format = 'csv',\n        parser_version ='2.0',\n        FIRSTROW=1,\n        HEADER_ROW =TRUE\n    )  as ROWS\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "myserverlessdb",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
