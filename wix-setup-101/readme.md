@@ -11,6 +11,9 @@ I downloaded the binaries because of the possiblity of adding to GIT
 - Landing page https://wixtoolset.org/docs/wix3/
 - Github Releases https://github.com/wixtoolset/wix3/releases/tag/wix3112rtm
 
+# Tutorials
+- https://www.add-in-express.com/creating-addins-blog/2014/04/08/creating-standard-install-package-wix-designer/
+
 
 # Where was I ?
 - Create a skeletal setup project using Wix3 project template
