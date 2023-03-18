@@ -13,9 +13,14 @@ I downloaded the binaries because of the possiblity of adding to GIT
 
 # Tutorials
 - https://www.add-in-express.com/creating-addins-blog/2014/04/08/creating-standard-install-package-wix-designer/
-
+- [Old and very good CodeProject article](https://www.codeproject.com/Tips/105638/A-quick-introduction-Create-an-MSI-installer-with)
 
 # Where was I ?
 - Create a skeletal setup project using Wix3 project template
 - Pressed Build. Error - Severity	Code	Description	Project	File	Line	Suppression State
 Error		The WiX Toolset v3.11 build tools must be installed to build this project. To download the WiX Toolset, see https://wixtoolset.org/releases/v3.11/stable	SetupProject1	C:\Users\saurabhd\AppData\Local\Temp\VsTempFiles\s4m3mdbh.q1c\Temp\SetupProject1.wixproj	27	
+- Following the CodeProject step by step article
+
+# What did I learn ?
+- Use `candle.exe` on the *Product.WXS** file. This produces **Product.wixobj**
+- Use `light.exe` on the **Product.wixobj** to produce **Product.msi**
