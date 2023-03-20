@@ -5,12 +5,15 @@ VisualStudioVersion = 17.5.33502.453
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DA9316FC-2988-4910-9549-8CCA1C12F6D0}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		..\readme.md = ..\readme.md
 	EndProjectSection
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "SetupProject1", "SetupProject1\SetupProject1.wixproj", "{703F8137-487C-4A5F-AB88-67A43352D9D9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleDocs", "SampleDocs\SampleDocs.csproj", "{D55A4CC2-23E8-445C-BFD7-A78F55FA3427}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "VsSetupProjectUsingWizard001", "VsSetupProjectUsingWizard001\VsSetupProjectUsingWizard001.vdproj", "{B1CD15B0-588C-4963-B32B-7DB1FF497E7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +38,10 @@ Global
 		{D55A4CC2-23E8-445C-BFD7-A78F55FA3427}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D55A4CC2-23E8-445C-BFD7-A78F55FA3427}.Release|x86.ActiveCfg = Release|Any CPU
 		{D55A4CC2-23E8-445C-BFD7-A78F55FA3427}.Release|x86.Build.0 = Release|Any CPU
+		{B1CD15B0-588C-4963-B32B-7DB1FF497E7E}.Debug|Any CPU.ActiveCfg = Debug
+		{B1CD15B0-588C-4963-B32B-7DB1FF497E7E}.Debug|x86.ActiveCfg = Debug
+		{B1CD15B0-588C-4963-B32B-7DB1FF497E7E}.Release|Any CPU.ActiveCfg = Release
+		{B1CD15B0-588C-4963-B32B-7DB1FF497E7E}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
