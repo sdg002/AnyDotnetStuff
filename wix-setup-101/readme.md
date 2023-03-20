@@ -37,4 +37,12 @@ Error		The WiX Toolset v3.11 build tools must be installed to build this project
 
 # Visual Studio 2022 Setup project
 - You were reading this https://learn.microsoft.com/en-us/visualstudio/deployment/installer-projects-net-core?view=vs-2022
-- 
+- I had to install the VS 2022 Setup Project from the extensions menu
+- I created a VS Setup project
+- I add the file readme.txt from the SampleDocs project. Right click on the Setup project and click Add File.
+
+## How does a relative file path look like?
+```
+            "SourcePath" = "8:..\\SampleDocs\\readme.txt"
+            "TargetName" = "8:readme.txt"
+```
