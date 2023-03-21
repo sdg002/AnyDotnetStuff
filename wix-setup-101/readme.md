@@ -46,3 +46,25 @@ Error		The WiX Toolset v3.11 build tools must be installed to build this project
             "SourcePath" = "8:..\\SampleDocs\\readme.txt"
             "TargetName" = "8:readme.txt"
 ```
+---
+
+# 100 - Using the Wizard
+
+## What are the output files?
+![100_output_files.png](docs/images/100_output_files.png)
+
+## How does the installed package appear on the Control Panel ?
+![100_control_panel.png](docs/images/100_control_panel.png)
+
+## Installation path dialog
+
+### First dialog
+![100_first_installation_dialog.png
+](docs/images/100_first_installation_dialog.png)
+
+### Second dialog
+![100_second_installation_dialog.png
+](docs/images/100_second_installation_dialog.png)
+
+## Uninstallation prompt
+![100_uninstall_propmt.png](docs/images/100_uninstall_propmt.png)
