@@ -17,6 +17,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "VsSetupProject002", "VsSetu
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "WixSetupProject1", "WixSetupProject1\WixSetupProject1.wixproj", "{703F8137-487C-4A5F-AB88-67A43352D9D9}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "VsSetupProject003", "VsSetupProject003\VsSetupProject003.vdproj", "{CC2CEA27-154F-4F3F-B888-967C15DBE516}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{703F8137-487C-4A5F-AB88-67A43352D9D9}.Release|Any CPU.Build.0 = Release|x86
 		{703F8137-487C-4A5F-AB88-67A43352D9D9}.Release|x86.ActiveCfg = Release|x86
 		{703F8137-487C-4A5F-AB88-67A43352D9D9}.Release|x86.Build.0 = Release|x86
+		{CC2CEA27-154F-4F3F-B888-967C15DBE516}.Debug|Any CPU.ActiveCfg = Debug
+		{CC2CEA27-154F-4F3F-B888-967C15DBE516}.Debug|x86.ActiveCfg = Debug
+		{CC2CEA27-154F-4F3F-B888-967C15DBE516}.Release|Any CPU.ActiveCfg = Release
+		{CC2CEA27-154F-4F3F-B888-967C15DBE516}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
