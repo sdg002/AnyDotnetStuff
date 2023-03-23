@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleDocs", "SampleDocs\Sa
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "VsSetupProjectUsingWizard001", "VsSetupProjectUsingWizard001\VsSetupProjectUsingWizard001.vdproj", "{B1CD15B0-588C-4963-B32B-7DB1FF497E7E}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "VsSetupProject002", "VsSetupProject002\VsSetupProject002.vdproj", "{42D97BF1-94F7-40DA-91E9-3EE5EB4BCC18}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,10 @@ Global
 		{B1CD15B0-588C-4963-B32B-7DB1FF497E7E}.Debug|x86.ActiveCfg = Debug
 		{B1CD15B0-588C-4963-B32B-7DB1FF497E7E}.Release|Any CPU.ActiveCfg = Release
 		{B1CD15B0-588C-4963-B32B-7DB1FF497E7E}.Release|x86.ActiveCfg = Release
+		{42D97BF1-94F7-40DA-91E9-3EE5EB4BCC18}.Debug|Any CPU.ActiveCfg = Debug
+		{42D97BF1-94F7-40DA-91E9-3EE5EB4BCC18}.Debug|x86.ActiveCfg = Debug
+		{42D97BF1-94F7-40DA-91E9-3EE5EB4BCC18}.Release|Any CPU.ActiveCfg = Release
+		{42D97BF1-94F7-40DA-91E9-3EE5EB4BCC18}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -68,3 +68,20 @@ Error		The WiX Toolset v3.11 build tools must be installed to build this project
 
 ## Uninstallation prompt
 ![100_uninstall_propmt.png](docs/images/100_uninstall_propmt.png)
+
+---
+
+# 200 - Without the wizard
+
+## Adding a deployment file to the setup project
+![200_add_static_file_diff.png](docs/images/200_add_static_file_diff.png)
+
+## Change manufacturer properties
+![200_change_manufacturer_properties.png
+](docs/images/200_change_manufacturer_properties.png)
+
+
+## Good tutorial on UI customization
+https://www.c-sharpcorner.com/article/deployment-customizing-your-net-deployment-projects/
+
+Just added a new dialog. Lots of stuff got added to the VDPROJ file
