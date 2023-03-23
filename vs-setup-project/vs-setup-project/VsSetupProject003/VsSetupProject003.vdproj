@@ -13,6 +13,12 @@
 "SccProvider" = "8:"
     "Hierarchy"
     {
+        "Entry"
+        {
+        "MsmKey" = "8:_F9D26729189B479ABB61781A75528252"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -68,6 +74,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F9D26729189B479ABB61781A75528252"
+            {
+            "SourcePath" = "8:..\\SampleDocs\\readme.txt"
+            "TargetName" = "8:readme.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_BACBCC57090A4853981F8A1B20AA1B2E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -147,7 +173,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:VsSetupProject003"
         "ProductCode" = "8:{6713D976-26CD-4FEB-9694-897EC7062861}"
-        "PackageCode" = "8:{BA847950-3D2B-4B33-AE05-8A6C8AB3894C}"
+        "PackageCode" = "8:{607F73BA-DD61-43E5-8013-AF842B074ED2}"
         "UpgradeCode" = "8:{3008E6CE-7D9C-4425-A20C-553805390B6E}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

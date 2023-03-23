@@ -81,7 +81,16 @@ Error		The WiX Toolset v3.11 build tools must be installed to build this project
 ](docs/images/200_change_manufacturer_properties.png)
 
 
-## Good tutorial on UI customization
+---
+300 - Without the wizard
+
+## Added the AppData folder and a sub-folder
+![300_appdata_subfolder.png](docs/images/300_appdata_subfolder.png)
+
+![300_appdata_subfolde_proj_file.png](docs/images/300_appdata_subfolde_proj_file.png)
+
+# Good tutorial on UI customization
 https://www.c-sharpcorner.com/article/deployment-customizing-your-net-deployment-projects/
 
 Just added a new dialog. Lots of stuff got added to the VDPROJ file
+
