@@ -20,8 +20,9 @@ variables:
     #the following does not work 
     # - name: blahname3
     #   value: {{ $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r) }}
-    - name: blahname3
-      value: {{ blahname3value }}
+    #the following did not work
+    # - name: blahname3
+    #   value: {{ blahname3value }}
     #this works
     - name: isMain
       value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
