@@ -6,6 +6,10 @@ trigger:
     include: 
     - /ci-cd-stages-demo/*
 
+
+#good article on how to concatenate
+#https://learn.microsoft.com/en-us/answers/questions/1230052/azure-pipeline-concatenate-date-with-a-string-and
+
 variables:
     - name: MajorVersion
       value: 1
@@ -18,7 +22,7 @@ variables:
     - name: blahname2
       value: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
     - name: blahname3
-      value: {{ variables['MajorVersion'].variables['MinorVersion'].variables['PatchNumber']-prerelease }}
+      value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.${{ Rev:r }}"
     - name: isMain
       value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
     - name: BuildName
@@ -28,6 +32,10 @@ variables:
         value: ${{ variables.blahname2 }}
     - name: BuildName2
       value: another build name 2
+
+    # this does not work. Expected mapping end
+    # - name: blahname3
+    #   value: {{ variables['MajorVersion'].variables['MinorVersion'].variables['PatchNumber']-prerelease }}
 
     # the following did not work /cicd.yml: Expected mapping end
     # - name: blahname3
