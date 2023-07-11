@@ -14,19 +14,26 @@ variables:
     - name: PatchNumber
       value: 1
     - name: blahname1
-      value: {{ $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r) }}
+      value: $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r)
     - name: blahname2
-      value: {{ $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r) }}
+      value: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
     - name: isMain
       value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
     - name: BuildName
-      value: {{ variables.blahname1}}
-      # ${{ if eq( variables.isMain, true) }}:
-      #   value: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
-      # ${{ if eq( variables.isMain, false) }}:
-      #   value: $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r)
+      value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
+      
+    # - name: BuildName
+    #   value: {{ variables.blahname1}}
+    #   ${{ if eq( variables.isMain, true) }}:
+    #     value: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
+    #   # ${{ if eq( variables.isMain, false) }}:
+    #   #   value: $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r)
 
-name: BuildName
+${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+  name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
+${{ else }}:
+  name: $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r)
+
 #use a condnition to name the release, if not master then 'prerelease'
 
 #CONDITIONAL BUILD NAME
