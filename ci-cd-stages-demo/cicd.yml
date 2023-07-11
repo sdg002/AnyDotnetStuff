@@ -17,6 +17,9 @@ variables:
       value: $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r)
     - name: blahname2
       value: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
+    - name: blahname3
+      value: {{ $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r) }}
+
     - name: isMain
       value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
     - name: BuildName
@@ -28,8 +31,6 @@ variables:
       value: another build name 2
 
     #the following does not work 
-    # - name: blahname3
-    #   value: {{ $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r) }}
     #the following did not work
     # - name: blahname3
     #   value: {{ blahname3value }}
