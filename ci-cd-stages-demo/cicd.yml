@@ -1,0 +1,10 @@
+
+
+name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
+#use a condnition to name the release, if not master then 'prerelease'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- bash: echo "Hello world"
