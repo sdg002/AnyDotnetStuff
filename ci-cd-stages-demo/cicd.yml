@@ -22,7 +22,7 @@ variables:
     - name: blahname2
       value: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
     - name: blahname3
-      value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.${{ Rev:r }}"
+      value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.$(Rev:r)"
     - name: isMain
       value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
     - name: BuildName
@@ -32,6 +32,10 @@ variables:
         value: ${{ variables.blahname2 }}
     - name: BuildName2
       value: another build name 2
+
+    # this did not work
+    # - name: blahname3
+    #   value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.${{ Rev:r }}"
 
     # this does not work. Expected mapping end
     # - name: blahname3
