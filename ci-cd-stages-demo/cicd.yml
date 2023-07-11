@@ -13,19 +13,21 @@ variables:
       value: 0
     - name: PatchNumber
       value: 1
+    - blahname1:
+      value: $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r)
+    - blahname2:
+      value: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
     - name: isMain
       value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
     - name: BuildName
-      ${{ if eq( variables['isMain'], true) }}:
+      ${{ if eq( variables.isMain, true) }}:
         value: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
-      ${{ if eq( variables['isMain'], false) }}:
+      ${{ if eq( variables.isMain, false) }}:
         value: $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r)
 
 name: BuildName
 #use a condnition to name the release, if not master then 'prerelease'
 
-#TEST THE BASIC STAGES
-#DEPENDS
 #CONDITIONAL BUILD NAME
 #TEMPLATE FOR BUILD
 #TEPLATE FOR DEPLOY
