@@ -89,6 +89,19 @@ Error		The WiX Toolset v3.11 build tools must be installed to build this project
 
 ![300_appdata_subfolde_proj_file.png](docs/images/300_appdata_subfolde_proj_file.png)
 
+## Skip Administrative install
+???
+
+
+## Alter Installation folder
+???
+
+## Uninstall older versions
+???
+
+
+---
+
 # Good tutorial on UI customization
 https://www.c-sharpcorner.com/article/deployment-customizing-your-net-deployment-projects/
 
