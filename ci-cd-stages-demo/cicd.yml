@@ -17,12 +17,14 @@ variables:
       value: 0
     - name: PatchNumber
       value: 1
-    - name: blahname1
+    - name: RevNumber
+      value: 1
+    - name: $(Rev:r)
       value: $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r)
     - name: blahname2
       value: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
     - name: blahname3
-      value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.$(Rev:r)"
+      value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.${{variables.RevNumber}}"
     - name: isMain
       value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
     - name: BuildName
