@@ -1,10 +1,48 @@
+trigger: 
+  branches:
+    include:
+    - master 
+  paths:
+    include: 
+    - /ci-cd-stages-demo/*
+
+variables:
+    MajorVersion: 1
+    MinorVersion: 0
+    PatchNumber: 1
 
 
 name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
 #use a condnition to name the release, if not master then 'prerelease'
 
+#TEST THE BASIC STAGES
+#DEPENDS
+#CONDITIONAL BUILD NAME
+#TEMPLATE FOR BUILD
+#TEPLATE FOR DEPLOY
+#PASS SOME VARIABLES
+#POWERSHELL TO DSISPLAY SECRET
+
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-- bash: echo "Hello world"
+
+stages:
+- stage: BUILD_STAGE
+  jobs:
+  - job: BUILD_STAGE_JOB
+    steps:
+    - bash: echo "Hello world in build stage"
+
+
+- stage: DEPLOY_DEV
+  jobs:
+  - job: DEPLOY_DEV_JOB
+    steps:
+    - bash: echo "Hello world in build stage"
+
+- stage: DEPLOY_PROD
+  jobs:
+  - job: DEPLOY_PROD_JOB
+    steps:
+    - bash: echo "Hello world in build stage"
