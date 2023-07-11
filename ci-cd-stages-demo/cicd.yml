@@ -22,7 +22,6 @@ variables:
     #   value: {{ $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r) }}
     - name: blahname3
       value: {{ $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev) }}
-
     #this works
     - name: isMain
       value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
