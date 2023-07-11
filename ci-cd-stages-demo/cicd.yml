@@ -42,6 +42,7 @@ stages:
   - job: BUILD_STAGE_JOB
     steps:
     - bash: echo "Hello world in build stage"
+    - bash: set
 
 
 - stage: DEPLOY_DEV
