@@ -53,7 +53,7 @@ stages:
 
 - stage: DEPLOY_PROD
   dependsOn: DEPLOY_DEV
-  condnition: eq(variables['build.sourceBranch'], 'refs/heads/main')
+  condition: eq(variables['build.sourceBranch'], 'refs/heads/main')
   jobs:
   - job: DEPLOY_PROD_JOB
     steps:
