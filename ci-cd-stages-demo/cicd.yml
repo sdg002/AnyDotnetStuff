@@ -22,16 +22,16 @@ variables:
     - name: $(Rev:r)
       value: $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r)
     - name: blahname2
-      value: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
+      value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.${{ variables.RevNumber }}"
     - name: blahname3
-      value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.${{variables.RevNumber}}"
+      value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.${{ variables.RevNumber }}"
     - name: isMain
       value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/main') }}
     - name: BuildName
       ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-        value: ${{ variables.blahname1 }}
-      ${{else}}:
         value: ${{ variables.blahname2 }}
+      ${{else}}:
+        value: ${{ variables.blahname3 }}
     - name: BuildName2
       value: another build name 2
 
@@ -81,6 +81,7 @@ variables:
 pool:
   vmImage: 'ubuntu-latest'
 
+name: $(BuildName)
 
 stages:
 - stage: BUILD_STAGE
