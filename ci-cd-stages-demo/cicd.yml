@@ -18,7 +18,7 @@ variables:
     - name: PatchNumber
       value: 1
     - name: RevNumber
-      value: $(Rev:r)
+      value: "$(Rev:r)"
     - name: blahname2
       value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.${{ variables.RevNumber }}"
     - name: blahname3
@@ -32,6 +32,11 @@ variables:
         value: ${{ variables.blahname3 }}
     - name: BuildName2
       value: another build name 2
+
+    #this did not work, this produced literal Rev:r
+    # - name: RevNumber
+    #   value: $(Rev:r)
+
 
     # this did not work
     # - name: blahname3
