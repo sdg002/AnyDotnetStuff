@@ -18,9 +18,7 @@ variables:
     - name: PatchNumber
       value: 1
     - name: RevNumber
-      value: 1
-    - name: $(Rev:r)
-      value: $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r)
+      value: $(Rev:r)
     - name: blahname2
       value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.${{ variables.RevNumber }}"
     - name: blahname3
