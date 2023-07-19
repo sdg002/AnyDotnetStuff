@@ -12,6 +12,11 @@ trigger:
 
 #try other variables BuildId, Date-Minute
 #https://learn.microsoft.com/en-us/azure/devops/pipelines/process/run-number?view=azure-devops&tabs=yaml
+
+#Lesson learnt
+# the date tags are only usefule in Build
+# https://learn.microsoft.com/en-us/azure/devops/pipelines/process/run-number?view=azure-devops&tabs=yaml
+
 variables:
     - name: MajorVersion
       value: 1
@@ -28,19 +33,21 @@ variables:
     - name: Hours2
       value: "$(Hours)"  #did not work
     - name: Hours3
-      value: "{{ $(Hours) }}"  #trying this
+      value: "{{ $(Hours) }}"  #did not work
     - name: Minutes1
       value: $(Minutes)  #did not work
     - name: Minutes2
       value: "$(Minutes)"  #did not work
     - name: Minutes3
-      value: "{{ $(Minutes) }}"  #trying this
+      value: "{{ $(Minutes) }}"  #did not work
     - name: Seconds1
       value: $(Seconds)  #did not work
     - name: Seconds2
       value: "$(Seconds)"  #did not work
     - name: Seconds3
-      value: "{{ $(Seconds) }}"  #trying this
+      value: "{{ $(Seconds) }}"  #did not work
+    - name: BuildId1
+      value: "{{ $(Build.BuildId) }}"  #trying this
     - name: MinorVersion
       value: 0
     - name: PatchNumber
