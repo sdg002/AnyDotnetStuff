@@ -22,19 +22,29 @@ variables:
     - name: Date2
       value: $(Date:yyyy-MM-dd) #did not work
     - name: Date3
-      value: "$(Date:yyyy-MM-dd)" #trying this??
+      value: "$(Date:yyyy-MM-dd)" #did not work
     - name: Hours1
-      value: $(Hours)  #trying this
+      value: $(Hours)  #did not work
     - name: Hours2
-      value: "$(Hours)"  #trying this
+      value: "$(Hours)"  #did not work
+    - name: Hours3
+      value: {{ $(Hours) }}  #trying this
     - name: Minutes1
-      value: $(Minutes)  #trying this
+      value: $(Minutes)  #did not work
     - name: Minutes2
-      value: "$(Minutes)"  #trying this
+      value: "$(Minutes)"  #did not work
+    - name: Minutes3
+      value: {{ $(Minutes) }}  #trying this
+    - name: Minutes4
+      value: {{ variables.Minutes) }}  #trying this
     - name: Seconds1
-      value: $(Seconds)  #trying this
+      value: $(Seconds)  #did not work
     - name: Seconds2
-      value: "$(Seconds)"  #trying this
+      value: "$(Seconds)"  #did not work
+    - name: Seconds3
+      value: {{ $(Seconds) }}  #trying this
+    - name: Seconds4
+      value: {{ variables.Seconds) }}  #trying this
     - name: MinorVersion
       value: 0
     - name: PatchNumber
