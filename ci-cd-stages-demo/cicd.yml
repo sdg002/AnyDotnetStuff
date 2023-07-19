@@ -15,6 +15,10 @@ variables:
       value: 1
     - name: MajorVersion2
       value: $(MajorVersion)
+    - name: Date1
+      value: $(Date:yyyyMMdd)
+    - name: Date2
+      value: $(Date:yyyy-MM-dd)
     - name: MinorVersion
       value: 0
     - name: PatchNumber
