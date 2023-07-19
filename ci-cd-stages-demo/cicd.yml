@@ -58,17 +58,17 @@ variables:
       value: "$(Rev:r)"  #this produced '$(Rev:r)'
     - name: RevNumberNoquote
       value: $(Rev:r)  #this produced '$(Rev:r)'
-    - name: blahname2
+    - name: BuildNameMasterBranch
       value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.${{ variables.BuildId3 }}"
-    - name: blahname3
+    - name: BuildNameNonMasterBranch
       value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.${{ variables.BuildId3 }}"
     - name: isMain
       value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/master') }} #ISMAIN=True when master branch , False othewise
     - name: BuildName
       ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
-        value: ${{ variables.blahname2 }}
+        value: ${{ variables.BuildNameMasterBranch }}
       ${{else}}:
-        value: ${{ variables.blahname3 }}
+        value: ${{ variables.BuildNameNonMasterBranch }}
     - name: BuildName2
       value: another build name 2
 
