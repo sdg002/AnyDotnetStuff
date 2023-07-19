@@ -28,7 +28,7 @@ variables:
     - name: Hours2
       value: "$(Hours)"  #did not work
     - name: Hours3
-      value: {{ $(Hours) }}  #trying this
+      value: "{{ $(Hours) }}"  #trying this
     - name: Minutes1
       value: $(Minutes)  #did not work
     - name: Minutes2
