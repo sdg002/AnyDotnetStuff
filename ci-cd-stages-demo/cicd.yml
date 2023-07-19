@@ -47,15 +47,21 @@ variables:
     - name: Seconds3
       value: "{{ $(Seconds) }}"  #did not work
     - name: BuildId1
-      value: "{{ $(Build.BuildId) }}"  #trying this
+      value: "{{ $(Build.BuildId) }}"  #produced {{ 232 }}, sort of worked
+    - name: BuildId2
+      value: "${{ $(Build.BuildId) }}"  #trying this
+    - name: BuildId3
+      value: $(Build.BuildId)  #trying this
     - name: MinorVersion
       value: 0
     - name: PatchNumber
       value: 1
     - name: RevNumber
-      value: "$(Rev:r)"
+      value: "$(Rev:r)"  #this produced '$(Rev:r)'
+    - name: RevNumberCurly
+      value: "${{ $(Rev:r) }}"  #trying this
     - name: RevNumberNoquote
-      value: $(Rev:r)
+      value: $(Rev:r)  #this produced '$(Rev:r)'
     - name: blahname2
       value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.${{ variables.RevNumber }}"
     - name: blahname3
