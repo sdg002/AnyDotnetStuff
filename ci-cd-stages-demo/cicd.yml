@@ -48,8 +48,6 @@ variables:
       value: "{{ $(Seconds) }}"  #did not work
     - name: BuildId1
       value: "{{ $(Build.BuildId) }}"  #produced {{ 232 }}, sort of worked
-    - name: BuildId2
-      value: "${{ $(Build.BuildId) }}"  #trying this
     - name: BuildId3
       value: $(Build.BuildId)  #trying this
     - name: MinorVersion
@@ -58,8 +56,6 @@ variables:
       value: 1
     - name: RevNumber
       value: "$(Rev:r)"  #this produced '$(Rev:r)'
-    - name: RevNumberCurly
-      value: "${{ $(Rev:r) }}"  #trying this
     - name: RevNumberNoquote
       value: $(Rev:r)  #this produced '$(Rev:r)'
     - name: blahname2
@@ -80,6 +76,13 @@ variables:
     # - name: RevNumber
     #   value: $(Rev:r)
 
+    #this did not work
+    # - name: BuildId2
+    #   value: "${{ $(Build.BuildId) }}"  #Unrecognized value: '$'. Located at position 1 within expression: $(Build.BuildId). For more help, refer to https://go.microsoft.com/fwlink/?linkid=842996 233
+
+    #this did not work
+    # - name: RevNumberCurly
+    #   value: "${{ $(Rev:r) }}"  # error message is  Unrecognized value: '$'. Located at position 1 within expression: $(Rev:r). For more help, refer to https://go.microsoft.com/fwlink/?linkid=842996 233
 
     # this did not work
     # - name: blahname3
