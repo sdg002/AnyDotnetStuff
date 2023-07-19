@@ -40,7 +40,7 @@ variables:
     - name: Seconds2
       value: "$(Seconds)"  #did not work
     - name: Seconds3
-      value: "{{ $(Seconds) }}  #trying this
+      value: "{{ $(Seconds) }}"  #trying this
     - name: MinorVersion
       value: 0
     - name: PatchNumber
