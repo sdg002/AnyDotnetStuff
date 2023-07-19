@@ -19,6 +19,8 @@ variables:
       value: 1
     - name: RevNumber
       value: "$(Rev:r)"
+    - name: RevNumberNoquote
+      value: $(Rev:r)
     - name: blahname2
       value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.${{ variables.RevNumber }}"
     - name: blahname3
