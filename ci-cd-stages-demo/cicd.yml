@@ -53,7 +53,7 @@ variables:
     - name: MinorVersion
       value: 0
     - name: PatchNumber
-      value: 1
+      value: 999
     - name: RevNumber
       value: "$(Rev:r)"  #this produced '$(Rev:r)'
     - name: RevNumberNoquote
@@ -130,7 +130,10 @@ variables:
 pool:
   vmImage: 'ubuntu-latest'
 
-name: $(BuildName)
+#name: $(BuildName) #this produced 1.0.1-prerelease.$(Build.BuildId) , Very strange
+# the Build.BuildId was replaced as it is
+
+name: "${{ variables.BUILDNAME }}"
 
 stages:
 - stage: BUILD_STAGE
