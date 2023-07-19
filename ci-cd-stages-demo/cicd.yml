@@ -13,6 +13,8 @@ trigger:
 variables:
     - name: MajorVersion
       value: 1
+    - name: MajorVersion2
+      value: $(MajorVersion)
     - name: MinorVersion
       value: 0
     - name: PatchNumber
