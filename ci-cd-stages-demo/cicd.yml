@@ -34,17 +34,13 @@ variables:
     - name: Minutes2
       value: "$(Minutes)"  #did not work
     - name: Minutes3
-      value: {{ $(Minutes) }}  #trying this
-    - name: Minutes4
-      value: {{ variables.Minutes }}  #trying this
+      value: "{{ $(Minutes) }}"  #trying this
     - name: Seconds1
       value: $(Seconds)  #did not work
     - name: Seconds2
       value: "$(Seconds)"  #did not work
     - name: Seconds3
-      value: {{ $(Seconds) }}  #trying this
-    - name: Seconds4
-      value: {{ variables.Seconds }}  #trying this
+      value: "{{ $(Seconds) }}  #trying this
     - name: MinorVersion
       value: 0
     - name: PatchNumber
