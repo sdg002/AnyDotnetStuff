@@ -16,3 +16,8 @@ My experiments with producing a Devop variables and expressions and producing a 
 Can we stick to out of box and not use a 3 rd party solution like Git version
 
 
+# Things to do
+1. Change from `blah`
+1. TEMPLATE FOR BUILD
+1. TEPLATE FOR DEPLOY
+1. POWERSHELL TO DSISPLAY SECRET

@@ -121,11 +121,6 @@ variables:
 
 #use a condnition to name the release, if not master then 'prerelease'
 
-#CONDITIONAL BUILD NAME
-#TEMPLATE FOR BUILD
-#TEPLATE FOR DEPLOY
-#PASS SOME VARIABLES
-#POWERSHELL TO DSISPLAY SECRET
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -163,7 +158,7 @@ stages:
 
 - stage: DEPLOY_PROD
   dependsOn: DEPLOY_DEV
-  condition: eq(variables['build.sourceBranch'], 'refs/heads/main')
+  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
   jobs:
   - job: DEPLOY_PROD_JOB
     steps:
