@@ -10,15 +10,31 @@ trigger:
 #good article on how to concatenate
 #https://learn.microsoft.com/en-us/answers/questions/1230052/azure-pipeline-concatenate-date-with-a-string-and
 
+#try other variables BuildId, Date-Minute
+#https://learn.microsoft.com/en-us/azure/devops/pipelines/process/run-number?view=azure-devops&tabs=yaml
 variables:
     - name: MajorVersion
       value: 1
     - name: MajorVersion2
       value: $(MajorVersion)
     - name: Date1
-      value: $(Date:yyyyMMdd)
+      value: $(Date:yyyyMMdd) #did not work
     - name: Date2
-      value: $(Date:yyyy-MM-dd)
+      value: $(Date:yyyy-MM-dd) #did not work
+    - name: Date3
+      value: "$(Date:yyyy-MM-dd)" #trying this??
+    - name: Hours1
+      value: $(Hours)  #trying this
+    - name: Hours2
+      value: "$(Hours)"  #trying this
+    - name: Minutes1
+      value: $(Minutes)  #trying this
+    - name: Minutes2
+      value: "$(Minutes)"  #trying this
+    - name: Seconds1
+      value: $(Seconds)  #trying this
+    - name: Seconds2
+      value: "$(Seconds)"  #trying this
     - name: MinorVersion
       value: 0
     - name: PatchNumber
