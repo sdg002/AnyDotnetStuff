@@ -36,7 +36,7 @@ variables:
     - name: Minutes3
       value: {{ $(Minutes) }}  #trying this
     - name: Minutes4
-      value: {{ variables.Minutes) }}  #trying this
+      value: {{ variables.Minutes }}  #trying this
     - name: Seconds1
       value: $(Seconds)  #did not work
     - name: Seconds2
@@ -44,7 +44,7 @@ variables:
     - name: Seconds3
       value: {{ $(Seconds) }}  #trying this
     - name: Seconds4
-      value: {{ variables.Seconds) }}  #trying this
+      value: {{ variables.Seconds }}  #trying this
     - name: MinorVersion
       value: 0
     - name: PatchNumber
