@@ -134,20 +134,8 @@ stages:
 - stage: BUILD_STAGE
   jobs:
   - job: BUILD_STAGE_JOB
-    steps:
-    - bash: echo "Hello world in build stage"
-
-    - task: Bash@3
-      displayName: 'Display build number'
-      inputs:
-        targetType: 'inline'
-        script: echo '$(Build.BuildNumber)'
-
-    - task: Bash@3
-      displayName: 'Display variables'
-      inputs:
-        targetType: 'inline'
-        script: set
+  steps:
+  - template: ci-cd-stages-demo/devops/build.yml
 
 - stage: DEPLOY_DEV
   dependsOn: BUILD_STAGE
