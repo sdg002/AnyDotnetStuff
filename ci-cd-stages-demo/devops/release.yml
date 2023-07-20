@@ -1,8 +1,7 @@
 steps:
-- bash: echo "Hello world in build stage"
 
 - task: Bash@3
-  displayName: 'Display build number from template'
+  displayName: 'Display build number from template, DEPLOY stage'
   inputs:
     targetType: 'inline'
     script: echo '$(Build.BuildNumber)'

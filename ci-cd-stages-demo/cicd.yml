@@ -142,11 +142,8 @@ stages:
   jobs:
   - job: DEPLOY_DEV_JOB
     steps:
-    - task: Bash@3
-      displayName: 'Ad hoc task in DEV DEPLOY stage'
-      inputs:
-        targetType: 'inline'
-        script: echo Deploy stage, the  Build.BuildNumber='$(Build.BuildNumber)'
+    - template: ./devops/release.yml
+
 
 - stage: DEPLOY_PROD
   dependsOn: DEPLOY_DEV
@@ -154,8 +151,4 @@ stages:
   jobs:
   - job: DEPLOY_PROD_JOB
     steps:
-    - task: Bash@3
-      displayName: 'Ad hoc task in PROD DEPLOY stage'
-      inputs:
-        targetType: 'inline'
-        script: echo Deploy stage, the  Build.BuildNumber='$(Build.BuildNumber)'
+    - template: ./devops/release.yml
