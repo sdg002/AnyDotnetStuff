@@ -135,7 +135,7 @@ stages:
   jobs:
   - job: BUILD_STAGE_JOB
     steps:
-    - template: devops/build.yml
+    - template: ./devops/build.yml
 
 - stage: DEPLOY_DEV
   dependsOn: BUILD_STAGE
