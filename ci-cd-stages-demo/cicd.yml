@@ -134,8 +134,8 @@ stages:
 - stage: BUILD_STAGE
   jobs:
   - job: BUILD_STAGE_JOB
-  steps:
-  - template: ci-cd-stages-demo/devops/build.yml
+    steps:
+    - template: ci-cd-stages-demo/devops/build.yml
 
 - stage: DEPLOY_DEV
   dependsOn: BUILD_STAGE
