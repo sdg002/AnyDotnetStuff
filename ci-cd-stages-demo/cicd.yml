@@ -143,6 +143,8 @@ stages:
   - job: DEPLOY_DEV_JOB
     steps:
     - template: ./devops/release.yml
+    parameters:
+      environment: DEV
 
 
 - stage: DEPLOY_PROD
@@ -152,3 +154,5 @@ stages:
   - job: DEPLOY_PROD_JOB
     steps:
     - template: ./devops/release.yml
+    parameters:
+      environment: UAT
