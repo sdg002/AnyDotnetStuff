@@ -21,3 +21,8 @@ Can we stick to out of box and not use a 3 rd party solution like Git version
 1. TEMPLATE FOR BUILD
 1. TEPLATE FOR DEPLOY
 1. POWERSHELL TO DSISPLAY SECRET
+
+# Some more things to do
+1. C# project
+1. Dotnet build, with build number
+1. Python project and 
