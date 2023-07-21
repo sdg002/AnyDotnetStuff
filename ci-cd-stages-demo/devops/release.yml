@@ -3,7 +3,10 @@ parameters:
   type: string # data type of the parameter; required
 
 steps:
-- download: current
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifact: 
+    path: $(Build.Workspace)/ci-cd-stages-demo/artifacts
 #you were looking at this, 
 #https://learn.microsoft.com/en-us/azure/devops/pipelines/process/resources?view=azure-devops&tabs=schema#define-a-builds-resource
 - task: Bash@3
@@ -18,8 +21,15 @@ steps:
     targetType: 'inline'
     script: set
 
+- task: ExtractFiles@1
+  displayName: 'Extract archive ZIP'
+  inputs:
+    destinationFolder: $(Pipeline.Workspace)/ci-cd-stages-demo/extract/
+    overwriteExistingFiles: true
+
 - task: Bash@3
   displayName: 'show dir contents'
   inputs:
     targetType: 'inline'
     script: ls -R $(Pipeline.Workspace)
+
