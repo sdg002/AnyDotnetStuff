@@ -28,6 +28,19 @@ steps:
     zipAfterPublish: false
     modifyOutputPath: false
 
+- task: ArchiveFiles@2
+  displayName: 'Archive csharpdemoproject'
+  inputs:
+    rootFolderOrFile: '$(Pipeline.Workspace)/csharpdemoproject'
+    includeRootFolder: false
+    archiveFile: '$(Build.ArtifactStagingDirectory)/csharpdemoproject-$(Build.BuildNumber).zip'
+
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish Pipeline csharpdemoproject'
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)/csharpdemoproject-$(Build.BuildNumber).zip'
+    artifact: 'csharpdemoproject-$(Build.BuildNumber).zip'
+
 #Add publish command Pipeline.Workspace
 #Create archive
 #Publish archive
