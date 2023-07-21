@@ -25,10 +25,18 @@ Can we stick to out of box and not use a 3 rd party solution like Git version
 # Some more things to do
 1. C# project
 1. Dotnet build, with build number  
+1. archive and publish
 1. Python project and 
 
 
 # Notes
+
+## Build
 ```
 dotnet build MyDemoCSharp101.sln /p:version=1.2.3-betaaaa.4
 ```
+
+## Publish
+```dotnetcli
+dotnet publish src\MyDemoCSharp101\MyDemoCSharp101.sln /p:version=1.2.3.4 --configuration Release
+``````

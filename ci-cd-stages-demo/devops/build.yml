@@ -18,3 +18,16 @@ steps:
   inputs:
     command: restore
     projects: '**/*.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet publish'
+  inputs:
+    command: publish
+    arguments: '/p:version=$(Build.BuildNumber) --configuration=Release --output $(Pipeline.Workspace)/csharpdemoproject'
+    projects: 'ci-cd-stages-demo/src/MyDemoCSharp101/MyDemoConsoleApp1/MyDemoConsoleApp1.csproj'
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+#Add publish command Pipeline.Workspace
+#Create archive
+#Publish archive
