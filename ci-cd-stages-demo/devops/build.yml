@@ -17,7 +17,7 @@ steps:
   displayName: 'dotnet restore'
   inputs:
     command: restore
-    projects: '**/*.csproj'
+    projects: 'ci-cd-stages-demo/src/**/*.csproj'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet publish'
