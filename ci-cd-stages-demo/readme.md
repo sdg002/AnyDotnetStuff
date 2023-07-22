@@ -57,21 +57,29 @@ What are we showing here ?
 - 1 master YAML
 - Split into stages (BUILD and DEV_DEPLOY)
 - Using Build and Deploy templates
-- Specify 
+- Specify the name=major.minor.path.build.buildid
 
-## Step 1.3-Condition on PROD_DEPLOY stage
+## Step 1.2-Semantic versioning of the Build
+- Specify Build.BuildId
+- Set the Build.Buildnumber 
+- Use a condition to specifi `prerelease`
+- Demonstrate the semantic version when main branch
+- Simple `if` condition to set the Build.Buildnumber based on branch
+- When feature branch, then semantic tag should have `1.1.1-prerelease.2`
+- When feature branch, then semantic tag should have `1.1.1.3`
+
+
+## Step 2-Add a PROD_DEPLOY stage and add condition on PROD_DEPLOY stage
 What are we showing here?
 - Add a PROD_DEPLOY stage
 - Add a condition for branch==main
-
-## Step 1.5-Semantic versioning
-What are we showing here?
-- Simple `if` condition to set the Build.Buildnumber based on branch
-
-## Step 2-Pass parameters to the Deploy stage
 - 1 parameter in the Release template (name=environment)
-- DEV stage
-- PROD stage
+- Pring the `environment` value in the tempalte via Bash script
+- We end up with the following stages:
+- BUILD stage
+- DEV_DEPLOY stage
+- PROD_DEPLOY stage
+ 
 
 ## Step 3-Pass variables from variable group
 What are we showing here ?
@@ -81,3 +89,15 @@ What are we showing here ?
 - Pass the dev_cnstring as a a
 - dev cn string
 - prod cn string
+- Examine the secret using PowerShell
+
+## Step 4-Simple CSHARP project
+- dotnet restore step
+- dotnet build step
+
+## Step 5-Publish build artifacts and consume in DEPLOY
+- create zip using archive step
+- publish the archive
+- access the current resource and extract the zip
+- Demonstrate via `ls` the contents
+- 
