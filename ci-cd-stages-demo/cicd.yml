@@ -7,126 +7,38 @@ trigger:
     - /ci-cd-stages-demo/*
 
 
-#good article on how to concatenate
-#https://learn.microsoft.com/en-us/answers/questions/1230052/azure-pipeline-concatenate-date-with-a-string-and
-
-#try other variables BuildId, Date-Minute
-#https://learn.microsoft.com/en-us/azure/devops/pipelines/process/run-number?view=azure-devops&tabs=yaml
-
-#Lesson learnt
-# the date tags are only usefule in Build
-# https://learn.microsoft.com/en-us/azure/devops/pipelines/process/run-number?view=azure-devops&tabs=yaml
 
 variables:
     - name: MajorVersion
       value: 1
     - name: MajorVersion2
       value: $(MajorVersion)
-    - name: Date1
-      value: $(Date:yyyyMMdd) #did not work
-    - name: Date2
-      value: $(Date:yyyy-MM-dd) #did not work
-    - name: Date3
-      value: "$(Date:yyyy-MM-dd)" #did not work
-    - name: Hours1
-      value: $(Hours)  #did not work
-    - name: Hours2
-      value: "$(Hours)"  #did not work
-    - name: Hours3
-      value: "{{ $(Hours) }}"  #did not work
-    - name: Minutes1
-      value: $(Minutes)  #did not work
-    - name: Minutes2
-      value: "$(Minutes)"  #did not work
-    - name: Minutes3
-      value: "{{ $(Minutes) }}"  #did not work
-    - name: Seconds1
-      value: $(Seconds)  #did not work
-    - name: Seconds2
-      value: "$(Seconds)"  #did not work
-    - name: Seconds3
-      value: "{{ $(Seconds) }}"  #did not work
-    - name: BuildId1
-      value: "{{ $(Build.BuildId) }}"  #produced {{ 232 }}, sort of worked
-    - name: BuildId3
+    - name: BuildId
       value: $(Build.BuildId)  #this worked, produced 233
     - name: MinorVersion
       value: 0
     - name: PatchNumber
       value: 999
-    - name: RevNumber
-      value: "$(Rev:r)"  #this produced '$(Rev:r)'
     - name: RevNumberNoquote
       value: $(Rev:r)  #this produced '$(Rev:r)'
-    - name: blahname2
-      value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.${{ variables.BuildId3 }}"
-    - name: blahname3
-      value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.${{ variables.BuildId3 }}"
+    - name: BuildNameMasterBranch
+      value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.${{ variables.BuildId }}"
+    - name: BuildNameNonMasterBranch
+      value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.${{ variables.BuildId }}"
     - name: isMain
       value: ${{ eq(variables['Build.SourceBranch'], 'refs/heads/master') }} #ISMAIN=True when master branch , False othewise
     - name: BuildName
       ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
-        value: ${{ variables.blahname2 }}
+        value: ${{ variables.BuildNameMasterBranch }}
       ${{else}}:
-        value: ${{ variables.blahname3 }}
-    - name: BuildName2
-      value: another build name 2
+        value: ${{ variables.BuildNameNonMasterBranch }}
 
-    #this did not work, this produced literal Rev:r
-    # - name: RevNumber
-    #   value: $(Rev:r)
 
-    #this did not work
-    # - name: BuildId2
-    #   value: "${{ $(Build.BuildId) }}"  #Unrecognized value: '$'. Located at position 1 within expression: $(Build.BuildId). For more help, refer to https://go.microsoft.com/fwlink/?linkid=842996 233
-
-    #this did not work
-    # - name: RevNumberCurly
-    #   value: "${{ $(Rev:r) }}"  # error message is  Unrecognized value: '$'. Located at position 1 within expression: $(Rev:r). For more help, refer to https://go.microsoft.com/fwlink/?linkid=842996 233
-
-    # this did not work
-    # - name: blahname3
-    #   value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.${{ Rev:r }}"
-
-    # this does not work. Expected mapping end
-    # - name: blahname3
-    #   value: {{ variables['MajorVersion'].variables['MinorVersion'].variables['PatchNumber']-prerelease }}
-
-    # the following did not work /cicd.yml: Expected mapping end
-    # - name: blahname3
-    #   value: {{ $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease }}
-
-    # this did not work, could be the :
-    # - name: blahname3
-    #   value: {{ $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r) }}
-
-    #the following does not work 
-    #the following did not work
-    # - name: blahname3
-    #   value: {{ blahname3value }}
-    #this works
-
-    # - name: BuildName
-    #   value: {{ variables.blahname1}}
-    #   ${{ if eq( variables.isMain, true) }}:
-    #     value: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
-    #   # ${{ if eq( variables.isMain, false) }}:
-    #   #   value: $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r)
-
-#this is not allowed in this context
-# ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-#   name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
-# ${{ else }}:
-#   name: $(MajorVersion).$(MinorVersion).$(PatchNumber)-prerelease.$(Rev:r)
-
-#use a condnition to name the release, if not master then 'prerelease'
 
 
 pool:
   vmImage: 'ubuntu-latest'
 
-#name: $(BuildName) #this produced 1.0.1-prerelease.$(Build.BuildId) , Very strange
-# the Build.BuildId was replaced as it is
 
 name: "${{ variables.BUILDNAME }}"
 
@@ -135,26 +47,17 @@ stages:
   jobs:
   - job: BUILD_STAGE_JOB
     steps:
-    - bash: echo "Hello world in build stage"
-
-    - task: Bash@3
-      displayName: 'Display build number'
-      inputs:
-        targetType: 'inline'
-        script: echo '$(Build.BuildNumber)'
-
-    - task: Bash@3
-      displayName: 'Display variables'
-      inputs:
-        targetType: 'inline'
-        script: set
+    - template: ./devops/build.yml
 
 - stage: DEPLOY_DEV
   dependsOn: BUILD_STAGE
   jobs:
   - job: DEPLOY_DEV_JOB
     steps:
-    - bash: echo "Hello world in build stage"
+    - template: ./devops/release.yml
+      parameters: #something wrong here /ci-cd-stages-demo/cicd.yml (Line: 146, Col: 5): Unexpected value 'parameters'
+        environment: DEV
+
 
 - stage: DEPLOY_PROD
   dependsOn: DEPLOY_DEV
@@ -162,4 +65,6 @@ stages:
   jobs:
   - job: DEPLOY_PROD_JOB
     steps:
-    - bash: echo "Hello world in build stage"
+    - template: ./devops/release.yml
+      parameters:
+        environment: UAT

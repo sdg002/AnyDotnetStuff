@@ -1,0 +1,36 @@
+parameters:
+- name: environment # name of the parameter; required
+  type: string # data type of the parameter; required
+
+steps:
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifact: 
+    path: $(Build.Workspace)/ci-cd-stages-demo/artifacts
+#you were looking at this, 
+#https://learn.microsoft.com/en-us/azure/devops/pipelines/process/resources?view=azure-devops&tabs=schema#define-a-builds-resource
+- task: Bash@3
+  displayName: 'Display build number from template, DEPLOY stage ,${{ parameters.environment }}'
+  inputs:
+    targetType: 'inline'
+    script: echo '$(Build.BuildNumber)'
+
+- task: Bash@3
+  displayName: 'Display variables'
+  inputs:
+    targetType: 'inline'
+    script: set
+
+- task: ExtractFiles@1
+  displayName: 'Extract archive ZIP'
+  inputs:
+    destinationFolder: $(Pipeline.Workspace)/ci-cd-stages-demo/extract/
+    overwriteExistingFiles: true
+
+- task: Bash@3
+  displayName: 'show dir contents'
+  inputs:
+    targetType: 'inline'
+    script: ls -R $(Pipeline.Workspace)
+# you got the ExtractFiles to work
+
