@@ -40,3 +40,44 @@ dotnet build MyDemoCSharp101.sln /p:version=1.2.3-betaaaa.4
 ```dotnetcli
 dotnet publish src\MyDemoCSharp101\MyDemoCSharp101.sln /p:version=1.2.3.4 --configuration Release
 ``````
+
+# References
+
+## Good article on Template Parameters
+https://damienaicheh.github.io/azure/devops/2021/02/10/variable-templates-azure-devops-en.html
+
+
+----
+
+# Restructuring plan
+
+## Step 1-Simple skeletal CI/CD YAML with 1 BUILD and 1 DEV_DEPLOY stages
+to be done
+What are we showing here ?
+- 1 master YAML
+- Split into stages (BUILD and DEV_DEPLOY)
+- Using Build and Deploy templates
+- Specify 
+
+## Step 1.3-Condition on PROD_DEPLOY stage
+What are we showing here?
+- Add a PROD_DEPLOY stage
+- Add a condition for branch==main
+
+## Step 1.5-Semantic versioning
+What are we showing here?
+- Simple `if` condition to set the Build.Buildnumber based on branch
+
+## Step 2-Pass parameters to the Deploy stage
+- 1 parameter in the Release template (name=environment)
+- DEV stage
+- PROD stage
+
+## Step 3-Pass variables from variable group
+What are we showing here ?
+- We are passing another variable besides the 'environment'
+- 1 Devops variable group
+- 2 variables (dev_cnstring, prod_cnstring)
+- Pass the dev_cnstring as a a
+- dev cn string
+- prod cn string
