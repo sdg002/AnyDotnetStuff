@@ -2,9 +2,15 @@
 Azure Devopso YAML is powerful, but quirky. Keep it simple.
 Demonstrate 
 
-# Github
+# Source code and pipeline
 
+## Link to Repo
 https://github.com/sdg002/AnyDotnetStuff/activity?ref=master
+
+
+## Link to Devops pipeline
+https://dev.azure.com/docxreview/devops001/_build?definitionId=8
+
 
 
 # References and articles
