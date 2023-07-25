@@ -14,7 +14,7 @@ variables:
     - name: MinorVersion
       value: 0
     - name: PatchNumber
-      value: 9
+      value: 19
 
 
 
