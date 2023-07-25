@@ -4,7 +4,7 @@ trigger:
     - master 
   paths:
     include: 
-    - /ci-cd-stages-demo/step100/*
+    - '/ci-cd-stages-demo/step100/*''
 
 
 
