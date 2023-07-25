@@ -55,7 +55,7 @@ stages:
   - job: DEPLOY_DEV_JOB
     steps:
     - template: ./devops/release.yml
-      parameters: #something wrong here /ci-cd-stages-demo/cicd.yml (Line: 146, Col: 5): Unexpected value 'parameters'
+      parameters:
         environment: DEV
 
 
