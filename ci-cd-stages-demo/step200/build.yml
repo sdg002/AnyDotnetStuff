@@ -1,7 +1,8 @@
-
 steps:
+- bash: echo "Hello world in build stage"
+
 - task: Bash@3
-  displayName: 'Display build number from template, DEPLOY stage 
+  displayName: 'Display build number from template'
   inputs:
     targetType: 'inline'
     script: echo '$(Build.BuildNumber)'
@@ -11,3 +12,4 @@ steps:
   inputs:
     targetType: 'inline'
     script: set
+

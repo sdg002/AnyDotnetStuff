@@ -1,0 +1,53 @@
+trigger: 
+  branches:
+    include:
+    - master 
+  paths:
+    include: 
+    - /ci-cd-stages-demo/step200*
+
+
+
+variables:
+    - name: MajorVersion
+      value: 1
+    - name: MinorVersion
+      value: 0
+    - name: PatchNumber
+      value: 9
+
+
+
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+
+name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
+
+stages:
+- stage: BUILD_STAGE
+  jobs:
+  - job: BUILD_STAGE_JOB
+    steps:
+    - template: ./build.yml
+
+- stage: DEPLOY_DEV
+  dependsOn: BUILD_STAGE
+  jobs:
+  - job: DEPLOY_DEV_JOB
+    steps:
+    - template: ./release.yml
+      parameters:
+        environment: DEV
+
+
+- stage: DEPLOY_PROD
+  dependsOn: DEPLOY_DEV
+  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
+  jobs:
+  - job: DEPLOY_PROD_JOB
+    steps:
+    - template: ./release.yml
+      parameters:
+        environment: PROD

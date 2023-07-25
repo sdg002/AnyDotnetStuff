@@ -21,16 +21,13 @@ https://dev.azure.com/docxreview/devops001/_build?definitionId=8
 ## What do we want to achieve ?
 
 - 1 master YAML which is the foundation for the one and only 1 build and release pipeline
-- Split into stages (BUILD and DEV_DEPLOY)
-- Using Build and Deploy templates
-
+- Split into stages (BUILD, DEPLOY_DEV and DEPLOY_PROD )
+- Using 2 YAML templates. One for Build and the other for Deploy
 
 <!--
 Improvements needed in the picture.
 Indicate that we are using templates and each of the stages is impelemented by a template
 -->
-
-
 ![docs/ppt-images/](docs/ppt-images/cicd.png)
 
 
@@ -74,7 +71,7 @@ pool:
 
 
 name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
-
+#This becomes the Display on the Azure Devops portal, refer variable Build.BuildNumber
 stages:
 - stage: BUILD_STAGE
   jobs:
@@ -106,6 +103,14 @@ Show a picture of Azure Devops with Buld number
 
 
 ![Alt text](docs/images/step100-devops-view.png)
+---
+
+# Step 200-Passing parameters to the various stages
+
+## What do we want to achieve?
+Imagine a deployment to DEV and PROD environments and we want to pass some context to the IaC (Infrastructure as code) so that the code can execute in the right environment. Lets do this by passing a parameter to the **DEPLOY_DEV** and **DEPLOY_PROD** stages
+
+
 ---
 
 # References and articles
