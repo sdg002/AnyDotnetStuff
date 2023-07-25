@@ -18,18 +18,94 @@ https://dev.azure.com/docxreview/devops001/_build?definitionId=8
 ---
 # Step 100-Simple skeletal CI/CD YAML with 1 BUILD and 1 DEV_DEPLOY stages
 
-What are we showing here ?
+## What do we want to achieve ?
 
-- 1 master YAML
+- 1 master YAML which is the foundation for the one and only 1 build and release pipeline
 - Split into stages (BUILD and DEV_DEPLOY)
 - Using Build and Deploy templates
-- Specify the name=major.minor.path.build.buildid
 
 
-[[SHOW A PICTURE OF THE YAML, BUILD AND RELEASE TEMPLATE]]
+<!--
+Improvements needed in the picture.
+Indicate that we are using templates and each of the stages is impelemented by a template
+-->
+
 
 ![docs/ppt-images/](docs/ppt-images/cicd.png)
 
+
+## YAML structure
+
+```
+    CICD.YML
+        |
+        |----BUILD ------------ BUILD.YAML
+        |
+        |
+        |----DEV_RELEASE ------ RELEASE.YAML
+        |
+        |
+        |----PROD_RELEASE ----- RELEASE.YAML
+        |
+        |
+```
+
+## YAML contents
+
+```yml
+trigger: 
+  branches:
+    include:
+    - master 
+  paths:
+    include: 
+    - /ci-cd-stages-demo/step100*
+
+variables:
+    - name: MajorVersion
+      value: 1
+    - name: MinorVersion
+      value: 0
+    - name: PatchNumber
+      value: 9
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+
+name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
+
+stages:
+- stage: BUILD_STAGE
+  jobs:
+  - job: BUILD_STAGE_JOB
+    steps:
+    - template: ./build.yml
+
+- stage: DEPLOY_DEV
+  dependsOn: BUILD_STAGE
+  jobs:
+  - job: DEPLOY_DEV_JOB
+    steps:
+    - template: ./release.yml
+
+- stage: DEPLOY_PROD
+  dependsOn: DEPLOY_DEV
+  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
+  jobs:
+  - job: DEPLOY_PROD_JOB
+    steps:
+    - template: ./release.yml
+
+
+```
+
+## Build output
+
+Show a picture of Azure Devops with Buld number
+
+
+![Alt text](docs/images/step100-devops-view.png)
 ---
 
 # References and articles
