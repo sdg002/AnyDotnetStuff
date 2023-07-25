@@ -1,6 +1,6 @@
 parameters:
-- name: environment # name of the parameter; required
-  type: string # data type of the parameter; required
+- name: environment
+  type: string
 
 steps:
 - task: Bash@3
