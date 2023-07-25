@@ -103,6 +103,7 @@ Show a picture of Azure Devops with Buld number
 
 
 ![Alt text](docs/images/step100-devops-view.png)
+
 ---
 
 # Step 200-Passing parameters to the various stages
@@ -110,6 +111,46 @@ Show a picture of Azure Devops with Buld number
 ## What do we want to achieve?
 Imagine a deployment to DEV and PROD environments and we want to pass some context to the IaC (Infrastructure as code) so that the code can execute in the right environment. Lets do this by passing a parameter to the **DEPLOY_DEV** and **DEPLOY_PROD** stages
 
+## How to access a parameter inside the child YAML ?
+
+**Step 1** - Define the parameter with the template
+```yml
+parameters:
+- name: environment # name of the parameter; required
+  type: string # data type of the parameter; required
+
+```
+
+**Step 2** - Access the parameter value
+```yml
+steps:
+- task: Bash@3
+  displayName: 'Display build number from template, DEPLOY stage ,${{ parameters.environment }}'
+  inputs:
+    targetType: 'inline'
+    script: echo '$(Build.BuildNumber)'
+```
+
+
+## How to pass a parameter from the parent YAML to the template YAML?
+
+The following snippet demonstrates how to access the parameter value
+
+```yml
+- stage: DEPLOY_DEV
+  dependsOn: BUILD_STAGE
+  jobs:
+  - job: DEPLOY_DEV_JOB
+    steps:
+    - template: ./release.yml
+      parameters:
+        environment: DEV
+
+```
+
+## Results
+
+![Alt text](docs/ppt-images/parameter-expansion.png)
 
 ---
 
