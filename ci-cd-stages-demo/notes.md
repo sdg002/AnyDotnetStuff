@@ -8,17 +8,18 @@ Azure Devops in 2023 has gained wide popularity in the developer community. Azur
 
 # Source code and pipeline
 
-## Link to Repo
+#### Link to Repo
 https://github.com/sdg002/AnyDotnetStuff/activity?ref=master
 
 
-## Link to Devops pipeline
+#### Link to Devops pipeline
 https://dev.azure.com/docxreview/devops001/_build?definitionId=8
 
 ---
+
 # Step 100-Simple skeletal CI/CD YAML with 1 BUILD and 1 DEV_DEPLOY stages
 
-## What do we want to achieve ?
+#### What do we want to achieve ?
 
 - 1 master YAML which is the foundation for the one and only 1 build and release pipeline
 - Split into stages (BUILD, DEPLOY_DEV and DEPLOY_PROD )
@@ -31,7 +32,7 @@ Indicate that we are using templates and each of the stages is impelemented by a
 ![docs/ppt-images/](docs/ppt-images/cicd.png)
 
 
-## YAML structure
+#### YAML structure
 
 ```
     CICD.YML
@@ -47,7 +48,7 @@ Indicate that we are using templates and each of the stages is impelemented by a
         |
 ```
 
-## YAML contents
+#### YAML contents
 
 ```yml
 trigger: 
@@ -97,7 +98,7 @@ stages:
 
 ```
 
-## Build output
+#### Build output
 
 Show a picture of Azure Devops with Buld number
 
@@ -108,10 +109,10 @@ Show a picture of Azure Devops with Buld number
 
 # Step 200-Passing parameters to the various stages
 
-## What do we want to achieve?
+#### What do we want to achieve?
 Imagine a deployment to DEV and PROD environments and we want to pass some context to the IaC (Infrastructure as code) so that the code can execute in the right environment. Lets do this by passing a parameter to the **DEPLOY_DEV** and **DEPLOY_PROD** stages
 
-## How to access a parameter inside the child YAML ?
+#### How to access a parameter inside the child YAML ?
 
 **Step 1** - Define the parameter with the template
 ```yml
@@ -132,7 +133,7 @@ steps:
 ```
 
 
-## How to pass a parameter from the parent YAML to the template YAML?
+#### How to pass a parameter from the parent YAML to the template YAML?
 
 The following snippet demonstrates how to access the parameter value
 
@@ -148,7 +149,7 @@ The following snippet demonstrates how to access the parameter value
 
 ```
 
-## Results
+#### Results
 
 ![Alt text](docs/ppt-images/parameter-expansion.png)
 
@@ -156,13 +157,13 @@ The following snippet demonstrates how to access the parameter value
 
 # References and articles
 
-## Templates usage reference
+#### Templates usage reference
 https://learn.microsoft.com/en-us/azure/devops/pipelines/process/templates?view=azure-devops&pivots=templates-includes
 
-## How to use parameters ?
+#### How to use parameters ?
 https://damienaicheh.github.io/azure/devops/2021/02/10/variable-templates-azure-devops-en.html
 
-## Publish and download pipeline Artifacts
+#### Publish and download pipeline Artifacts
 https://learn.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts?view=azure-devops&tabs=yaml
 
 ---
