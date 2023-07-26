@@ -6,6 +6,10 @@ trigger:
     include: 
     - '/ci-cd-stages-demo/step200/*'
 
+pr: 
+  paths: 
+    include: 
+    - '/ci-cd-stages-demo/step200/*'
 
 
 variables:
