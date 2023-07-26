@@ -1,5 +1,5 @@
 steps:
-- bash: echo "Hello world in build stage"
+- bash: echo "Hello world from build template"
 
 - task: Bash@3
   displayName: 'Display build number from template'
