@@ -155,6 +155,31 @@ The following snippet demonstrates how to access the parameter value
 
 ---
 
+# Step 300-Semantic build name7
+
+## Problem
+We want to generate a semantic build name. (Refer here for semver ???). Any release from a non-master branch should be:
+```
+1.2.3-prerelease.100
+```
+A release from master branch would look:
+```
+1.2.3.100
+```
+One of the ways to do this is to use the GitVersion Devops Task (??? add link). This is a sophisticated tool that looks into your entire repo history and generates a semantic version.
+
+## Not using the 3rd party Gitversion
+
+We will use out of box YAML expressions to dynamically generate a semantic build name
+
+## Snippet
+You were here
+
+
+
+
+---
+
 # References and articles
 
 #### Templates usage reference
