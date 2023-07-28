@@ -4,16 +4,16 @@ trigger:
     - master 
   paths:
     include: 
-    - '/ci-cd-stages-demo/step100/*'
+    - /ci-cd-stages-demo/step100/*
     exclude:
-    - '/ci-cd-stages-demo/docs/*'
+    - /ci-cd-stages-demo/docs/*
 
 pr:
   paths: 
     include: 
-    - '/ci-cd-stages-demo/step100/*'
+    - /ci-cd-stages-demo/step100/*
     exclude:
-    - '/ci-cd-stages-demo/docs/*'
+    - /ci-cd-stages-demo/docs/*
 
 
 variables:

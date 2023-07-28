@@ -11,9 +11,9 @@ trigger:
 pr: 
   paths: 
     include: 
-    - '/ci-cd-stages-demo/step300/*'
+    - /ci-cd-stages-demo/step300/*
     exclude:
-    - '/ci-cd-stages-demo/docs/*'
+    - /ci-cd-stages-demo/docs/*
 
 
 variables:
