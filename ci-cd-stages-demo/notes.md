@@ -173,8 +173,24 @@ One of the ways to do this is to use the GitVersion Devops Task (??? add link). 
 We will use out of box YAML expressions to dynamically generate a semantic build name
 
 ## Snippet
-You were here
 
+In the following example we are setting the `name` of the Build to a conditional custom variable `BuildName`
+```yml
+    - name: BuildName
+      ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+        value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.$(Build.BuildId)"
+      ${{else}}:
+        value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.$(Build.BuildId)"
+
+
+name: "${{ variables.BUILDNAME }}"
+
+```
+
+
+
+## Evidence
+![Alt text](docs/images/step300-image.png)
 
 
 
