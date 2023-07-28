@@ -32,7 +32,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 
-name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
+name: "${{ variables.BUILDNAME }}"
 
 stages:
 - stage: BUILD_STAGE
