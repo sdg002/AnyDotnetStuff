@@ -158,7 +158,7 @@ The following snippet demonstrates how to access the parameter value
 # Step 300-Semantic build name
 
 ## Problem
-We want to generate a semantic build name. (Refer here for semver ???). Any release from a non-master branch should be:
+We want to generate a [semantic build name](https://semver.org/).  Any release from a non-master branch should be as follows:
 ```
 1.2.3-prerelease.100
 ```
