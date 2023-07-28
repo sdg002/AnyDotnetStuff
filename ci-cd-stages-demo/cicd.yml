@@ -6,6 +6,10 @@ trigger:
     include: 
     - /ci-cd-stages-demo/*
 
+pr:
+  paths: 
+    include: 
+    - /ci-cd-stages-demo/*
 
 
 variables:

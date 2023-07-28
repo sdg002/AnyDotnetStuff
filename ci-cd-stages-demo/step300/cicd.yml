@@ -4,14 +4,14 @@ trigger:
     - master 
   paths:
     include: 
-    - /ci-cd-stages-demo/step100/*
+    - '/ci-cd-stages-demo/step300/*'
     exclude:
-    - /ci-cd-stages-demo/docs/*
+    - '/ci-cd-stages-demo/docs/*'
 
-pr:
+pr: 
   paths: 
     include: 
-    - /ci-cd-stages-demo/step100/*
+    - /ci-cd-stages-demo/step300/*
     exclude:
     - /ci-cd-stages-demo/docs/*
 
@@ -22,7 +22,12 @@ variables:
     - name: MinorVersion
       value: 0
     - name: PatchNumber
-      value: 9
+      value: 19
+    - name: BuildName
+      ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+        value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.$(Build.BuildId)"
+      ${{else}}:
+        value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.$(Build.BuildId)"
 
 
 
@@ -31,7 +36,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 
-name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
+name: "${{ variables.BUILDNAME }}"
 
 stages:
 - stage: BUILD_STAGE
@@ -46,6 +51,8 @@ stages:
   - job: DEPLOY_DEV_JOB
     steps:
     - template: ./release.yml
+      parameters:
+        environment: DEV
 
 
 - stage: DEPLOY_PROD
@@ -55,3 +62,5 @@ stages:
   - job: DEPLOY_PROD_JOB
     steps:
     - template: ./release.yml
+      parameters:
+        environment: PROD

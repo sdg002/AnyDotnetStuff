@@ -155,6 +155,46 @@ The following snippet demonstrates how to access the parameter value
 
 ---
 
+# Step 300-Semantic build name
+
+## Problem
+We want to generate a [semantic build name](https://semver.org/).  Any release from a non-master branch should be as follows:
+```
+1.2.3-prerelease.100
+```
+A release from master branch would look:
+```
+1.2.3.100
+```
+
+## Not using the 3rd party Gitversion
+
+One of the ways to do this is to use the [GitVersion Devops Task](https://github.com/GitTools/GitVersion). This is a sophisticated 3rd party tool that looks into your entire repository history and generates a incrementing semantic version. For this exercise, we will use out of box YAML expressions to dynamically generate a simple and unique semantic build name using just a couple of lines of YAML.
+
+## Snippet
+
+In the following example we are setting the `name` of the Build to a conditional custom variable `BuildName`
+```yml
+    - name: BuildName
+      ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+        value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.$(Build.BuildId)"
+      ${{else}}:
+        value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.$(Build.BuildId)"
+
+
+name: "${{ variables.BUILDNAME }}"
+
+```
+
+
+
+## Evidence
+![Alt text](docs/images/step300-image.png)
+
+
+
+---
+
 # References and articles
 
 #### Templates usage reference
