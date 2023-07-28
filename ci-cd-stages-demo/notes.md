@@ -191,7 +191,31 @@ name: "${{ variables.BUILDNAME }}"
 ## Evidence
 ![Alt text](docs/images/step300-image.png)
 
+---
 
+# Step 400-Paramterizing the Deploy stages
+
+## Problem
+
+- We are passing another variable besides the 'environment'
+- 1 Devops variable group
+- 2 variables (dev_cnstring, prod_cnstring)
+- Pass the dev_cnstring as a a
+- dev cn string
+- prod cn string
+- Examine the secret using PowerShell
+you were here
+
+<!--
+What are we showing here ?
+- We are passing another variable besides the 'environment'
+- 1 Devops variable group
+- 2 variables (dev_cnstring, prod_cnstring)
+- Pass the dev_cnstring as a a
+- dev cn string
+- prod cn string
+- Examine the secret using PowerShell
+-->
 
 ---
 
