@@ -5,11 +5,15 @@ trigger:
   paths:
     include: 
     - '/ci-cd-stages-demo/step200/*'
+    exclude:
+    - 'ci-cd-stages-demo/docs/*'
 
 pr: 
   paths: 
     include: 
     - '/ci-cd-stages-demo/step200/*'
+    exclude:
+    - 'ci-cd-stages-demo/docs/*'
 
 
 variables:
