@@ -15,7 +15,9 @@ steps:
   displayName: 'Display api key'
   inputs:
     targetType: 'inline'
-    script: ${{ parameters.apikey}}.ToCharArray()
+    script: |
+      $x="${{ parameters.apikey}}"
+      $x.ToCharArray()
 
 - task: Bash@3
   displayName: 'Display variables'
