@@ -217,6 +217,14 @@ What are we showing here ?
 - Examine the secret using PowerShell
 -->
 
+## Azure Devops Variable Group
+![Alt text](docs/images/step400-variable-group.png)
+---
+
+## Access the secret variable in the deployment pipeline
+![Alt text](docs/images/step400-secret-variable-char-array.png)
+
+
 ---
 
 # References and articles
