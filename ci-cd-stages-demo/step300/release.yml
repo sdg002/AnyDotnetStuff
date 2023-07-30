@@ -1,6 +1,8 @@
 parameters:
 - name: environment
   type: string
+- name: apikey
+  type: string
 
 steps:
 - task: Bash@3
@@ -8,6 +10,12 @@ steps:
   inputs:
     targetType: 'inline'
     script: echo '$(Build.BuildNumber)'
+
+- task: PowerShell@2
+  displayName: 'Display api key'
+  inputs:
+    targetType: 'inline'
+    script: ${{ parameters.apikey}}.ToCharArray()
 
 - task: Bash@3
   displayName: 'Display variables'
