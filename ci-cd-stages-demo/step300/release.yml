@@ -11,16 +11,6 @@ steps:
     targetType: 'inline'
     script: echo '$(Build.BuildNumber)'
 
-- task: PowerShell@2
-  displayName: 'Display api key'
-  inputs:
-    targetType: 'inline'
-    script: |
-      $x="${{ parameters.apikey}}"
-      Write-Host "displaying the key as it is"
-      Write-Host $x
-      Write-Host "displaying the key as a string of characters"
-      $x.ToCharArray()
 
 - task: Bash@3
   displayName: 'Display variables'

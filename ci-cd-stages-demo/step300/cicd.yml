@@ -53,7 +53,6 @@ stages:
     - template: ./release.yml
       parameters:
         environment: DEV
-        apikey: $(dev_contosoapikey)
 
 - stage: DEPLOY_PROD
   dependsOn: DEPLOY_DEV
@@ -64,4 +63,3 @@ stages:
     - template: ./release.yml
       parameters:
         environment: PROD
-        apikey: $(prod_contosoapikey)
