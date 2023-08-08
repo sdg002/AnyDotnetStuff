@@ -188,30 +188,24 @@ name: "${{ variables.BUILDNAME }}"
 
 
 
-## Evidence
+## Results
 ![Alt text](docs/images/step300-image.png)
 
 ---
 
 # Step 400-Paramterizing the Deploy stages and passing secrets
 
-You were here.
-- Talk about purpose of passing an API key
-- Picture of Variable group (link to MS resource)
-- Show a snippet how to access a variable group?
-- Passing a secure variable to a deployment stage
-- Displaying the value of a secure variable (for the purpose of a troubleshooting)
-
 ## What do we want to achieve ?
 
-- We want to pass a secret variable to the DEV and PROD deployment stages Example - think of this as an api key that would have been used by a Web application to interact with an extenal REST data feed.
+- Think of deploying a Web application which interacts with an external RESTful end point. This end point requires a secret API key. We want to pass this secret value to the DEV and PROD deployment stages
 - We want 2 separate api keys.  One for DEV and another for PROD.
 
 ## Solution
 - We will create an Azure Devops variable group
 - 2 variables (dev_contosoapikey, prod_contosoapikey)
-- Pass the `dev_contosoapikey` to the DEV stage of the deployment. Do the same with `prod_contosoapikey`
-- Examine the secret using PowerShell (this is just for the purpose of initial verification. Should be removed later on)
+- Extend the **parameters** section of the `release.yml` to accept a new parameter **apikey**
+- Pass the `dev_contosoapikey` to the DEV stage of the deployment as a parameter. Do the same with `prod_contosoapikey`
+- Examine the secret value using PowerShell (this is just for the purpose of initial verification only. Should be removed later on)
 
 
 
@@ -220,6 +214,7 @@ You were here.
 
 
 ## Step-2-Reference the variable group in the master YAML pipeline
+The value of the **group** parameter must match the Variable group on the Azure Devops portal
 
 ```yml
 
@@ -235,7 +230,7 @@ variables:
 ```
 ## Step-3-Access the secret variable in the deployment pipeline
 
-Azure Devops is very protective about secrets. You will not be able to display any secret on the log files using conventional means
+Azure Devops is very protective about secrets. You will not be able to display any secret on the log files using conventional means. However, for the purpose of verification you could use the `ToCharArray` approach below.
 
 ```yml
 - task: PowerShell@2
@@ -268,4 +263,8 @@ https://damienaicheh.github.io/azure/devops/2021/02/10/variable-templates-azure-
 #### Publish and download pipeline Artifacts
 https://learn.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts?view=azure-devops&tabs=yaml
 
+#### Azure Devops variable groups
+https://learn.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml
+
 ---
+
