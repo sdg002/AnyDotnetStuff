@@ -1,8 +1,6 @@
 parameters:
 - name: environment
   type: string
-- name: apikey
-  type: string
 
 steps:
 - task: Bash@3
