@@ -193,35 +193,65 @@ name: "${{ variables.BUILDNAME }}"
 
 ---
 
-# Step 400-Paramterizing the Deploy stages
+# Step 400-Paramterizing the Deploy stages and passing secrets
 
-## Problem
+You were here.
+- Talk about purpose of passing an API key
+- Picture of Variable group (link to MS resource)
+- Show a snippet how to access a variable group?
+- Passing a secure variable to a deployment stage
+- Displaying the value of a secure variable (for the purpose of a troubleshooting)
 
-- We are passing another variable besides the 'environment'
-- 1 Devops variable group
-- 2 variables (dev_cnstring, prod_cnstring)
-- Pass the dev_cnstring as a a
-- dev cn string
-- prod cn string
-- Examine the secret using PowerShell
-you were here
+## What do we want to achieve ?
 
-<!--
-What are we showing here ?
-- We are passing another variable besides the 'environment'
-- 1 Devops variable group
-- 2 variables (dev_cnstring, prod_cnstring)
-- Pass the dev_cnstring as a a
-- dev cn string
-- prod cn string
-- Examine the secret using PowerShell
--->
+- We want to pass a secret variable to the DEV and PROD deployment stages Example - think of this as an api key that would have been used by a Web application to interact with an extenal REST data feed.
+- We want 2 separate api keys.  One for DEV and another for PROD.
 
-## Azure Devops Variable Group
+## Solution
+- We will create an Azure Devops variable group
+- 2 variables (dev_contosoapikey, prod_contosoapikey)
+- Pass the `dev_contosoapikey` to the DEV stage of the deployment. Do the same with `prod_contosoapikey`
+- Examine the secret using PowerShell (this is just for the purpose of initial verification. Should be removed later on)
+
+
+
+## Step-1-Create a new Azure Devops Variable Group
 ![Alt text](docs/images/step400-variable-group.png)
----
 
-## Access the secret variable in the deployment pipeline
+
+## Step-2-Reference the variable group in the master YAML pipeline
+
+```yml
+
+variables:
+    - name: MajorVersion
+      value: 1
+    - name: MinorVersion
+      value: 0
+    - name: PatchNumber
+      value: 19
+    - group: ci-cd-stages-demo
+
+```
+## Step-3-Access the secret variable in the deployment pipeline
+
+Azure Devops is very protective about secrets. You will not be able to display any secret on the log files using conventional means
+
+```yml
+- task: PowerShell@2
+  displayName: 'Display api key'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $x="${{ parameters.apikey}}"
+      Write-Host "displaying the key as it is - will not work!"
+      Write-Host $x
+      Write-Host "displaying the key as a string of characters - this works!"
+      $x.ToCharArray()
+
+
+```
+
 ![Alt text](docs/images/step400-secret-variable-char-array.png)
 
 
