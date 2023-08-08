@@ -1,0 +1,15 @@
+steps:
+- bash: echo "Hello world from build template"
+
+- task: Bash@3
+  displayName: 'Display build number from template'
+  inputs:
+    targetType: 'inline'
+    script: echo '$(Build.BuildNumber)'
+
+- task: Bash@3
+  displayName: 'Display variables'
+  inputs:
+    targetType: 'inline'
+    script: set
+
