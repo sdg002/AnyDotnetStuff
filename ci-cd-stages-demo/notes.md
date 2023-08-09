@@ -201,7 +201,7 @@ name: "${{ variables.BUILDNAME }}"
 - We want 2 separate api keys.  One for DEV and another for PROD.
 
 ## Solution
-- We will create an Azure Devops variable group
+- We will create an Azure Devops **Variable group**
 - 2 variables (dev_contosoapikey, prod_contosoapikey)
 - Extend the **parameters** section of the `release.yml` to accept a new parameter **apikey**
 - Pass the `dev_contosoapikey` to the DEV stage of the deployment as a parameter. Do the same with `prod_contosoapikey`
@@ -214,7 +214,7 @@ name: "${{ variables.BUILDNAME }}"
 
 
 ## Step-2-Reference the variable group in the master YAML pipeline
-The value of the **group** parameter must match the Variable group on the Azure Devops portal
+The value of the **group** parameter must match the name of the **Variable group** on the Azure Devops portal
 
 ```yml
 
@@ -241,7 +241,7 @@ Azure Devops is very protective about secrets. You will not be able to display a
       $x="${{ parameters.apikey}}"
       Write-Host "displaying the key as it is - will not work!"
       Write-Host $x
-      Write-Host "displaying the key as a string of characters - this works!"
+      Write-Host "displaying the key as a string of characters - this works! (Use this for troubleshooting only)"
       $x.ToCharArray()
 
 
