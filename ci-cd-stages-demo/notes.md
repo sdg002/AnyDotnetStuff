@@ -249,6 +249,24 @@ Azure Devops is very protective about secrets. You will not be able to display a
 
 ![Alt text](docs/images/step400-secret-variable-char-array.png)
 
+---
+
+# Step 500
+
+## Problem
+Work in progress. We want to compile a CSPROJ , run the unit tests and then do some 'mock' deployment
+
+## Step-1-Add a C# executable
+to be done
+
+## Step-2-Add Build and Unit test Tasks
+to be done
+
+## Step-3-Publish the artifact in the Build stage
+??
+
+## Step-4-Download the artificat in the Release stage
+??Explain rationale of possible steps. Example - Make a setup package. Even though we are not doing it.
 
 ---
 
