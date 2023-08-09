@@ -4,14 +4,14 @@ trigger:
     - master 
   paths:
     include: 
-    - '/ci-cd-stages-demo/step300/*'
+    - '/ci-cd-stages-demo/step400/*'
     exclude:
     - '/ci-cd-stages-demo/docs/*'
 
 pr: 
   paths: 
     include: 
-    - /ci-cd-stages-demo/step300/*
+    - /ci-cd-stages-demo/step400/*
     exclude:
     - /ci-cd-stages-demo/docs/*
 
@@ -53,6 +53,7 @@ stages:
     - template: ./release.yml
       parameters:
         environment: DEV
+        apikey: $(dev_contosoapikey)
 
 - stage: DEPLOY_PROD
   dependsOn: DEPLOY_DEV
@@ -63,3 +64,4 @@ stages:
     - template: ./release.yml
       parameters:
         environment: PROD
+        apikey: $(prod_contosoapikey)

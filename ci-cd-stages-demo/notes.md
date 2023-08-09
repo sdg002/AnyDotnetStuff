@@ -188,9 +188,66 @@ name: "${{ variables.BUILDNAME }}"
 
 
 
-## Evidence
+## Results
 ![Alt text](docs/images/step300-image.png)
 
+---
+
+# Step 400-Paramterizing the Deploy stages and passing secrets
+
+## What do we want to achieve ?
+
+- Think of deploying a Web application which interacts with an external RESTful end point. This end point requires a secret API key. We want to pass this secret value to the DEV and PROD deployment stages
+- We want 2 separate api keys.  One for DEV and another for PROD.
+
+## Solution
+- We will create an Azure Devops **Variable group**
+- 2 variables (dev_contosoapikey, prod_contosoapikey)
+- Extend the **parameters** section of the `release.yml` to accept a new parameter **apikey**
+- Pass the `dev_contosoapikey` to the DEV stage of the deployment as a parameter. Do the same with `prod_contosoapikey`
+- Examine the secret value using PowerShell (this is just for the purpose of initial verification only. Should be removed later on)
+
+
+
+## Step-1-Create a new Azure Devops Variable Group
+![Alt text](docs/images/step400-variable-group.png)
+
+
+## Step-2-Reference the variable group in the master YAML pipeline
+The value of the **group** parameter must match the name of the **Variable group** on the Azure Devops portal
+
+```yml
+
+variables:
+    - name: MajorVersion
+      value: 1
+    - name: MinorVersion
+      value: 0
+    - name: PatchNumber
+      value: 19
+    - group: ci-cd-stages-demo
+
+```
+## Step-3-Access the secret variable in the deployment pipeline
+
+Azure Devops is very protective about secrets. You will not be able to display any secret on the log files using conventional means. However, for the purpose of verification you could use the `ToCharArray` approach below.
+
+```yml
+- task: PowerShell@2
+  displayName: 'Display api key'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $x="${{ parameters.apikey}}"
+      Write-Host "displaying the key as it is - will not work!"
+      Write-Host $x
+      Write-Host "displaying the key as a string of characters - this works! (Use this for troubleshooting only)"
+      $x.ToCharArray()
+
+
+```
+
+![Alt text](docs/images/step400-secret-variable-char-array.png)
 
 
 ---
@@ -206,4 +263,9 @@ https://damienaicheh.github.io/azure/devops/2021/02/10/variable-templates-azure-
 #### Publish and download pipeline Artifacts
 https://learn.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-artifacts?view=azure-devops&tabs=yaml
 
+#### Azure Devops variable groups
+https://learn.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml
+
 ---
+
+#
