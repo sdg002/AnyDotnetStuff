@@ -35,3 +35,9 @@ steps:
     rootFolderOrFile: '$(Pipeline.Workspace)/csharpdemoproject'
     includeRootFolder: false
     archiveFile: '$(Build.ArtifactStagingDirectory)/csharpdemoproject-$(Build.BuildNumber).zip'
+
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish Pipeline csharpdemoproject'
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)/csharpdemoproject-$(Build.BuildNumber).zip'
+    artifact: 'csharpdemoproject-$(Build.BuildNumber).zip'

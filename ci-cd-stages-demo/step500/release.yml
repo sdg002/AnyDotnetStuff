@@ -5,25 +5,25 @@ parameters:
   type: string
 
 steps:
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifact: 
+    path: $(Build.Workspace)/ci-cd-stages-demo/artifacts
+
 - task: Bash@3
   displayName: 'Display build number from template, DEPLOY stage ,${{ parameters.environment }}'
   inputs:
     targetType: 'inline'
     script: echo '$(Build.BuildNumber)'
 
-- task: PowerShell@2
-  displayName: 'Display api key'
+- task: ExtractFiles@1
+  displayName: 'Extract archive ZIP'
   inputs:
-    targetType: 'inline'
-    script: |
-      $x="${{ parameters.apikey}}"
-      Write-Host "displaying the key as it is"
-      Write-Host $x
-      Write-Host "displaying the key as a string of characters"
-      $x.ToCharArray()
+    destinationFolder: $(Pipeline.Workspace)/ci-cd-stages-demo/extract/
+    overwriteExistingFiles: true
 
 - task: Bash@3
-  displayName: 'Display variables'
+  displayName: 'show dir contents'
   inputs:
     targetType: 'inline'
-    script: set
+    script: ls -R $(Pipeline.Workspace)
