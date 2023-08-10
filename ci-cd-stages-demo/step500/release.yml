@@ -19,10 +19,10 @@ steps:
 - task: ExtractFiles@1
   displayName: 'Extract archive ZIP'
   inputs:
-    archiveFilePatterns: $(Build.Workspace)/ci-cd-stages-demo/artifacts/csharpdemoproject*.zip
+    archiveFilePatterns: $(Build.Workspace)/ci-cd-stages-demo/artifacts/csharpdemoproject/*.zip
     destinationFolder: $(Pipeline.Workspace)/ci-cd-stages-demo/extract/csharpdemoproject
     overwriteExistingFiles: true  #what is the source archive  ---think??
-
+#pattern not found
 - task: Bash@3
   displayName: 'show dir contents'
   inputs:
