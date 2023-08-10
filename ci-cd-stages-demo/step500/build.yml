@@ -20,6 +20,13 @@ steps:
     projects: 'ci-cd-stages-demo/src/**/*.csproj'
 
 - task: DotNetCoreCLI@2
+  displayName: 'dotnet test'
+  inputs:
+    command: test
+    projects: 'ci-cd-stages-demo/src/**/*Unittest*/*.csproj'
+
+
+- task: DotNetCoreCLI@2
   displayName: 'dotnet publish'
   inputs:
     command: publish
@@ -41,3 +48,5 @@ steps:
   inputs:
     targetPath: '$(Build.ArtifactStagingDirectory)/csharpdemoproject-$(Build.BuildNumber).zip'
     artifact: 'csharpdemoproject'
+
+

@@ -27,4 +27,5 @@ steps:
   displayName: 'show dir contents'
   inputs:
     targetType: 'inline'
-    script: ls -R $(Pipeline.Workspace)
+    script: find
+    #script: ls -R $(Pipeline.Workspace)  #shows just the file names in each directory recursively
