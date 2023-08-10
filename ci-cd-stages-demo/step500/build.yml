@@ -40,4 +40,4 @@ steps:
   displayName: 'Publish Pipeline csharpdemoproject'
   inputs:
     targetPath: '$(Build.ArtifactStagingDirectory)/csharpdemoproject-$(Build.BuildNumber).zip'
-    artifact: 'csharpdemoproject-$(Build.BuildNumber).zip'
+    artifact: 'csharpdemoproject'
