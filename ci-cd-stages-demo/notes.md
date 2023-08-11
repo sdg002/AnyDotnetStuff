@@ -254,18 +254,62 @@ Azure Devops is very protective about secrets. You will not be able to display a
 # Step 500
 
 ## Problem
-Work in progress. We want to compile a CSPROJ , run the unit tests and then do some 'mock' deployment
+Imagine a simple C# executable project. We want to:
+- Restore the NUGET packages
+- Build and publish the binaires
+- Export the binaries out of the Build step as an artifact
+- Consume the artifact in the Deployment stage
+
 
 ## Step-1-Add a C# executable
 to be done
 
-## Step-2-Add Build and Unit test Tasks
+## Step-2-Add Restore,Build and Unit test Tasks
 to be done
 
-## Step-3-Publish the artifact in the Build stage
-??
+## Step-3-Create a ZIP of the DLLs
+The following snippet will create a ZIP of the output from the `dotnet publish` command
 
-## Step-4-Download the artificat in the Release stage
+```yml
+- task: ArchiveFiles@2
+  displayName: 'Archive csharpdemoproject'
+  inputs:
+    rootFolderOrFile: '$(Pipeline.Workspace)/csharpdemoproject'
+    includeRootFolder: false
+    archiveFile: '$(Build.ArtifactStagingDirectory)/csharpdemoproject-$(Build.BuildNumber).zip'
+
+```
+
+## Step-4-Publish the artifact in the Build stage
+The following snippet will publish this as a pipeline artifact
+
+```yml
+
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish Pipeline csharpdemoproject'
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)/csharpdemoproject-$(Build.BuildNumber).zip'
+    artifact: 'csharpdemoproject'
+```
+
+
+![published-artifact](docs/ppt-images/published-artifact.png)
+
+## Step-5-Download the artifiact in the Release stage
+
+Why do we need to download the artifact - it should be already there ? Yes - it is present on the disk of the Devops container. However, the physical files on the disk are ephemeral and cannot be relied upon. The artifact(s) published in the **Build** stage are persisted for months.
+
+The following snippet instructs Azure Devops to download all artifacts that are published by the current pipeline.
+
+```yml
+
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifact: 
+    path: $(Build.Workspace)/ci-cd-stages-demo/artifacts
+
+```
+
 ??Explain rationale of possible steps. Example - Make a setup package. Even though we are not doing it.
 
 ---
