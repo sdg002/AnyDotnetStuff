@@ -310,7 +310,30 @@ The following snippet instructs Azure Devops to download all artifacts that are 
 
 ```
 
-??Explain rationale of possible steps. Example - Make a setup package. Even though we are not doing it.
+# Step-6-What do we with the pipeline artifacts?
+
+You have the artifacts produced by the **Build** stage. What are the possible ways we might consume these artifacts in the Release stage ?
+
+
+## Example 1 - Copy over the binaries to a network share
+This would be a simple PowerShell task or a Script task that would XCOPY the binaries to a network file share. Example - An Excel addin that (.XLL) file.
+
+## Example 2 - Make a setup.exe for your executable
+
+You could use Visual Studio Installer or [Wix Toolset](https://wixtoolset.org/) to create an intsallation package and then copy over the MSI/SETUP.EXE to a network share
+
+## Example 3 - Deploy to an Azure Web App
+If using Azure App Services, then deployment could be done using the following:
+```
+az webapp deploy --name devmycrmwebapp --resource-group rg-dev-crm-apps --type zip --restart true
+```
+
+The above assumes the prior presence of an [Azure App Service Plan](https://learn.microsoft.com/en-us/azure/app-service/overview-hosting-plans) and Azure App Service.
+
+## Example 3 - Create a Docker image
+If deploying to a Cloud infrastructure, this might be the most likely scenario YOU WERE HEE
+
+
 
 ---
 
