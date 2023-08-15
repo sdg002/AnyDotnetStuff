@@ -322,16 +322,25 @@ This would be a simple PowerShell task or a Script task that would XCOPY the bin
 
 You could use Visual Studio Installer or [Wix Toolset](https://wixtoolset.org/) to create an intsallation package and then copy over the MSI/SETUP.EXE to a network share
 
-## Example 3 - Deploy to an Azure Web App
+## Example 3 - Deploy to an Azure Web App or Azure Functions
 If using Azure App Services, then deployment could be done using the following:
 ```
 az webapp deploy --name devmycrmwebapp --resource-group rg-dev-crm-apps --type zip --restart true
 ```
 
+
+
 The above assumes the prior presence of an [Azure App Service Plan](https://learn.microsoft.com/en-us/azure/app-service/overview-hosting-plans) and Azure App Service.
 
 ## Example 3 - Create a Docker image
-If deploying to a Cloud infrastructure, this might be the most likely scenario YOU WERE HEE
+If deploying to a Cloud infrastructure, this might be the most likely scenario
+
+Example:
+
+```
+az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile --image  mcr.microsoft.com/dotnet/aspnet:5.0 --target mycrm-dev-$(Build.BuildNumber)
+
+```
 
 
 
@@ -350,6 +359,12 @@ https://learn.microsoft.com/en-us/azure/devops/pipelines/artifacts/pipeline-arti
 
 #### Azure Devops variable groups
 https://learn.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=yaml
+
+#### Build your ASP.NET Core application outside of the Docker container
+https://bartwullems.blogspot.com/2021/05/build-your-aspnet-core-application.html
+
+#### Azure Container Registry for building a docker image
+https://learn.microsoft.com/en-us/cli/azure/acr?view=azure-cli-latest#az-acr-build
 
 ---
 
