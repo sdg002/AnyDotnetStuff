@@ -17,18 +17,14 @@ https://dev.azure.com/docxreview/devops001/_build?definitionId=8
 
 ---
 
-# Step 100-Simple skeletal CI/CD YAML with 1 BUILD and 1 DEV_DEPLOY stages
+# Step 100-Simple skeletal CI/CD YAML split into Build and Deployment stages
 
 #### What do we want to achieve ?
 
-- 1 master YAML which is the foundation for the one and only 1 build and release pipeline
-- Split into stages (BUILD, DEPLOY_DEV and DEPLOY_PROD )
-- Using 2 YAML templates. One for Build and the other for Deploy
+- One **main YAML** which is the foundation for the one and only 1 CI/CD pipeline which implements both Build and Deploy roles
+- Split into stages. One stage for **Build** and 2 subsequent stages for  **DEV Deployment** and **PROD Deployment** )
+- Using 2 YAML templates. One for **Build** and the other for **Deploy**
 
-<!--
-Improvements needed in the picture.
-Indicate that we are using templates and each of the stages is impelemented by a template
--->
 ![docs/ppt-images/](docs/ppt-images/cicd.png)
 
 
@@ -37,13 +33,13 @@ Indicate that we are using templates and each of the stages is impelemented by a
 ```
     CICD.YML
         |
-        |----BUILD ------------ BUILD.YAML
+        |----BUILD ------------> BUILD.YAML
         |
         |
-        |----DEV_RELEASE ------ RELEASE.YAML
+        |----DEV_RELEASE ------> RELEASE.YAML
         |
         |
-        |----PROD_RELEASE ----- RELEASE.YAML
+        |----PROD_RELEASE -----> RELEASE.YAML
         |
         |
 ```
@@ -59,20 +55,8 @@ trigger:
     include: 
     - /ci-cd-stages-demo/step100*
 
-variables:
-    - name: MajorVersion
-      value: 1
-    - name: MinorVersion
-      value: 0
-    - name: PatchNumber
-      value: 9
-
-pool:
-  vmImage: 'ubuntu-latest'
 
 
-name: $(MajorVersion).$(MinorVersion).$(PatchNumber).$(Rev:r)
-#This becomes the Display on the Azure Devops portal, refer variable Build.BuildNumber
 stages:
 - stage: BUILD_STAGE
   jobs:
@@ -89,7 +73,7 @@ stages:
 
 - stage: DEPLOY_PROD
   dependsOn: DEPLOY_DEV
-  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
+  condition: eq(variables['build.sourceBranch'], 'refs/heads/master') #Deploy on PROD only when master branch
   jobs:
   - job: DEPLOY_PROD_JOB
     steps:
@@ -175,6 +159,8 @@ One of the ways to do this is to use the [GitVersion Devops Task](https://github
 
 In the following example we are setting the `name` of the Build to a conditional custom variable `BuildName`
 ```yml
+
+variables:
     - name: BuildName
       ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
         value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.$(Build.BuildId)"
@@ -193,7 +179,7 @@ name: "${{ variables.BUILDNAME }}"
 
 ---
 
-# Step 400-Paramterizing the Deploy stages and passing secrets
+# Step 400-Passing secret parameters to the Deploy stage
 
 ## What do we want to achieve ?
 
@@ -251,7 +237,7 @@ Azure Devops is very protective about secrets. You will not be able to display a
 
 ---
 
-# Step 500
+# Step 500-Publish Build artifacts and consume them in Release stage
 
 ## Problem
 Imagine a simple C# executable project. We want to:
@@ -310,7 +296,7 @@ The following snippet instructs Azure Devops to download all artifacts that are 
 
 ```
 
-# Step-6-What do we with the pipeline artifacts?
+# What do we with the pipeline artifacts?
 
 You have the artifacts produced by the **Build** stage. What are the possible ways we might consume these artifacts in the Release stage ?
 
