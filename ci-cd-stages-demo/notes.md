@@ -3,7 +3,7 @@
 # Objective
 Azure Devops in 2023 has gained wide popularity in the developer community. Azure Devops is a complete suite of tools to manage your software development lifecyle.  The self-service CI/CD features of Azure Devops is a very powerful automation tool that should not be ignored. You could be deploying web apps/services to the Cloud or publishing desktop applications or an in house data science team which wants to deploy its Python files to a job server .   YAML based pipelines of Azure Devops is a powerful CI/CD orchestration tool. However, it would be an understatement to conclude that this is an easy tool. I have found that authoring YAML based Azure Devops CI/CD pipelines can be time consuming and hard to troubleshoot at times. The lesson that I have learnt - keep the CI/CD simple and linear!  What do I mean by linear? Build stage, followed by a Dev deployment and then an Uat deployment and finally ending in a Prod deployment.
 
-In this article I have demonstrated how to make the simplest build pipeline and progressively add more steps to it.  **Remember** - CI/CD is a means to an end - not an end by iteself. The real goal is to deliver software which solves end user problems.
+In this article I have demonstrated how to make the simplest build pipeline and progressively add more steps to it.  **Remember** - CI/CD is a means to an end - not an end by iteself. The end goal is to deliver software which solves end user problems.
 
 ---
 
@@ -22,7 +22,7 @@ https://dev.azure.com/docxreview/devops001/_build?definitionId=8
 
 #### What do we want to achieve ?
 
-- One **main YAML** which is the foundation for the one and only 1 CI/CD pipeline which implements both Build and Deploy roles
+- One **main YAML** which is the foundation for the one and only one CI/CD pipeline which implements both Build and Deploy roles
 - Split into stages. One stage for **Build** and 2 subsequent stages for  **DEV Deployment** and **PROD Deployment** )
 - Using 2 YAML templates. One for **Build** and the other for **Deploy**
 
@@ -34,13 +34,13 @@ https://dev.azure.com/docxreview/devops001/_build?definitionId=8
 ```
     CICD.YML
         |
-        |----BUILD ------------> BUILD.YAML
+        |----BUILD ------------> template=>BUILD.YAML
         |
         |
-        |----DEV_RELEASE ------> RELEASE.YAML
+        |----DEV_RELEASE ------> template=>RELEASE.YAML
         |
         |
-        |----PROD_RELEASE -----> RELEASE.YAML
+        |----PROD_RELEASE -----> template=>RELEASE.YAML
         |
         |
 ```
@@ -84,7 +84,7 @@ stages:
 ```
 
 #### Build output
-
+In the following illustration we can see the 3 stages. The **Build** and **DEV Deploy** are indicated in green. Whereas the **PROD Deploy** has not yet started because we have applied a condition on the branch being **master**.
 
 ![Alt text](docs/images/step100-devops-view.png)
 
