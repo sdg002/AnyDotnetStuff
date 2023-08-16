@@ -93,11 +93,13 @@ In the following illustration we can see the 3 stages. The **Build** and **DEV D
 # Step 200-Passing parameters to the various stages
 
 #### What do we want to achieve?
-Imagine a deployment to DEV and PROD environments and we want to pass some context to the IaC (Infrastructure as code) so that the code can execute in the right environment. Lets do this by passing a parameter to the **DEPLOY_DEV** and **DEPLOY_PROD** stages
+Imagine a deployment pipeline which has a DEV and a PROD environment and we want to pass some context to the IaC (Infrastructure as code) so that the code can execute in the right environment.  Example: We want each envrionment to pick the environment specific SQL Server and execute the SQL scripts.
+
+Lets do this by passing a parameter named **environment** to the **DEPLOY_DEV** and **DEPLOY_PROD** stages
 
 #### How to access a parameter inside the child YAML ?
 
-**Step 1** - Define the parameter with the template
+**Step 1** - Define the parameter within the template
 ```yml
 parameters:
 - name: environment # name of the parameter; required
@@ -105,7 +107,8 @@ parameters:
 
 ```
 
-**Step 2** - Access the parameter value
+**Step 2** - Access the parameter value within the template
+
 ```yml
 steps:
 - task: Bash@3
@@ -133,6 +136,7 @@ The following snippet demonstrates how to access the parameter value
 ```
 
 #### Results
+
 
 ![Alt text](docs/ppt-images/parameter-expansion.png)
 
