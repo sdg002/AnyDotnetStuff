@@ -154,13 +154,21 @@ A release from master branch would look:
 1.2.3.100
 ```
 
+## How does a semantic name help ?
+
+Examples:
+1. A Python PIP package or a .NET nuget package expects to be named using a semantic version when pushed to an Artifacts repository
+1. A Docker image inside a Container Registry follows a semantic tagging scheme 
+1. DLLs can be versioned by passing on the semantic tag to `dotnet build/publish` commands. This significantly helps in associating the C# code with the pipeline build number
+
 ## Not using the 3rd party Gitversion
 
 One of the ways to do this is to use the [GitVersion Devops Task](https://github.com/GitTools/GitVersion). This is a sophisticated 3rd party tool that looks into your entire repository history and generates a incrementing semantic version. For this exercise, we will use out of box YAML expressions to dynamically generate a simple and unique semantic build name using just a couple of lines of YAML.
 
 ## Snippet
 
-In the following example we are setting the `name` of the Build to a conditional custom variable `BuildName`
+In the following example we are setting the **name** of the Build  to a conditional custom variable **BuildName**. The Devops variable **Build.BuildId** gives us an unique and auto-incrementing number.
+
 ```yml
 
 variables:
@@ -178,6 +186,9 @@ name: "${{ variables.BUILDNAME }}"
 
 
 ## Results
+
+Notice the build name **1.0.19-prerelease.319** for non-master branch. 
+
 ![Alt text](docs/images/step300-image.png)
 
 ---
