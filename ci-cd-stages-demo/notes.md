@@ -144,7 +144,7 @@ The following snippet demonstrates how to access the parameter value
 
 # Step 300-Semantic build name
 
-## Problem
+#### Problem
 We want to generate a [semantic build name](https://semver.org/).  Any release from a non-master branch should be as follows:
 ```
 1.2.3-prerelease.100
@@ -154,18 +154,18 @@ A release from master branch would look:
 1.2.3.100
 ```
 
-## How does a semantic name help ?
+#### How does a semantic name help ?
 
 Examples:
 1. A Python PIP package or a .NET nuget package expects to be named using a semantic version when pushed to an Artifacts repository
 1. A Docker image inside a Container Registry follows a semantic tagging scheme 
 1. DLLs can be versioned by passing on the semantic tag to `dotnet build/publish` commands. This significantly helps in associating the C# code with the pipeline build number
 
-## Not using the 3rd party Gitversion
+#### Not using the 3rd party Gitversion
 
 One of the ways to do this is to use the [GitVersion Devops Task](https://github.com/GitTools/GitVersion). This is a sophisticated 3rd party tool that looks into your entire repository history and generates a incrementing semantic version. For this exercise, we will use out of box YAML expressions to dynamically generate a simple and unique semantic build name using just a couple of lines of YAML.
 
-## Snippet
+#### Snippet
 
 In the following example we are setting the **name** of the Build  to a conditional custom variable **BuildName**. The Devops variable **Build.BuildId** gives us an unique and auto-incrementing number.
 
@@ -185,7 +185,7 @@ name: "${{ variables.BUILDNAME }}"
 
 
 
-## Results
+#### Results
 
 Notice the build name **1.0.19-prerelease.319** for non-master branch. 
 
@@ -195,12 +195,12 @@ Notice the build name **1.0.19-prerelease.319** for non-master branch.
 
 # Step 400-Passing secret parameters to the Deploy stage
 
-## What do we want to achieve ?
+#### What do we want to achieve ?
 
 - Think of deploying a Web application which interacts with an external RESTful end point. This end point requires a secret API key. We want to pass this secret value to the DEV and PROD deployment stages
 - We want 2 separate api keys.  One for DEV and another for PROD.
 
-## Solution
+#### Solution
 - We will create an Azure Devops **Variable group**
 - 2 variables (dev_contosoapikey, prod_contosoapikey)
 - Extend the **parameters** section of the `release.yml` to accept a new parameter **apikey**
@@ -209,11 +209,11 @@ Notice the build name **1.0.19-prerelease.319** for non-master branch.
 
 
 
-## Step-1-Create a new Azure Devops Variable Group
+#### Step-1-Create a new Azure Devops Variable Group
 ![Alt text](docs/images/step400-variable-group.png)
 
 
-## Step-2-Reference the variable group in the master YAML pipeline
+#### Step-2-Reference the variable group in the master YAML pipeline
 The value of the **group** parameter must match the name of the **Variable group** on the Azure Devops portal
 
 ```yml
@@ -228,7 +228,7 @@ variables:
     - group: ci-cd-stages-demo
 
 ```
-## Step-3-Access the secret variable in the deployment pipeline
+#### Step-3-Access the secret variable in the deployment pipeline
 
 Azure Devops is very protective about secrets. You will not be able to display any secret on the log files using conventional means. However, for the purpose of verification you could use the `ToCharArray` approach below.
 
@@ -253,7 +253,7 @@ Azure Devops is very protective about secrets. You will not be able to display a
 
 # Step 500-Publish Build artifacts and consume them in Release stage
 
-## Problem
+#### Problem
 Imagine a simple C# executable project. We want to:
 - Restore the NUGET packages
 - Build and publish the binaires
@@ -261,13 +261,13 @@ Imagine a simple C# executable project. We want to:
 - Consume the artifact in the Deployment stage
 
 
-## Step-1-Add a C# executable
+#### Step-1-Add a C# executable
 to be done
 
-## Step-2-Add Restore,Build and Unit test Tasks
+#### Step-2-Add Restore,Build and Unit test Tasks
 to be done
 
-## Step-3-Create a ZIP of the DLLs
+#### Step-3-Create a ZIP of the DLLs
 The following snippet will create a ZIP of the output from the `dotnet publish` command
 
 ```yml
@@ -280,7 +280,7 @@ The following snippet will create a ZIP of the output from the `dotnet publish` 
 
 ```
 
-## Step-4-Publish the artifact in the Build stage
+#### Step-4-Publish the artifact in the Build stage
 The following snippet will publish this as a pipeline artifact
 
 ```yml
@@ -295,7 +295,7 @@ The following snippet will publish this as a pipeline artifact
 
 ![published-artifact](docs/ppt-images/published-artifact.png)
 
-## Step-5-Download the artifiact in the Release stage
+#### Step-5-Download the artifiact in the Release stage
 
 Why do we need to download the artifact - it should be already there ? Yes - it is present on the disk of the Devops container. However, the physical files on the disk are ephemeral and cannot be relied upon. The artifact(s) published in the **Build** stage are persisted for months.
 
@@ -315,14 +315,14 @@ The following snippet instructs Azure Devops to download all artifacts that are 
 You have the artifacts produced by the **Build** stage. What are the possible ways we might consume these artifacts in the Release stage ?
 
 
-## Example 1 - Copy over the binaries to a network share
+#### Example 1 - Copy over the binaries to a network share
 This would be a simple PowerShell task or a Script task that would XCOPY the binaries to a network file share. Example - An Excel addin that (.XLL) file.
 
-## Example 2 - Make a setup.exe for your executable
+#### Example 2 - Make a setup.exe for your executable
 
 You could use Visual Studio Installer or [Wix Toolset](https://wixtoolset.org/) to create an intsallation package and then copy over the MSI/SETUP.EXE to a network share
 
-## Example 3 - Deploy to an Azure Web App or Azure Functions
+#### Example 3 - Deploy to an Azure Web App or Azure Functions
 If using Azure App Services, then deployment could be done using the following:
 ```
 az webapp deploy --name devmycrmwebapp --resource-group rg-dev-crm-apps --type zip --restart true
@@ -332,7 +332,7 @@ az webapp deploy --name devmycrmwebapp --resource-group rg-dev-crm-apps --type z
 
 The above assumes the prior presence of an [Azure App Service Plan](https://learn.microsoft.com/en-us/azure/app-service/overview-hosting-plans) and Azure App Service.
 
-## Example 3 - Create a Docker image
+#### Example 3 - Create a Docker image
 If deploying to a Cloud infrastructure, this might be the most likely scenario
 
 Example:
@@ -368,4 +368,3 @@ https://learn.microsoft.com/en-us/cli/azure/acr?view=azure-cli-latest#az-acr-bui
 
 ---
 
-#
