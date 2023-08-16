@@ -199,6 +199,10 @@ Notice the build name **1.0.19-prerelease.319** for non-master branch.
 
 - Think of deploying a Web application which interacts with an external RESTful end point. This end point requires a secret API key. We want to pass this secret value to the DEV and PROD deployment stages
 - We want 2 separate api keys.  One for DEV and another for PROD.
+- If you are having difficulty imagining api keys, then consider to be akin to database connection strings
+- If this were a Docker image then these keys would be configured as environment variables
+- If this were an Azure Web App or Azure Function then these keys would be passed to the application settings
+
 
 #### Solution
 - We will create an Azure Devops **Variable group**
@@ -210,10 +214,43 @@ Notice the build name **1.0.19-prerelease.319** for non-master branch.
 
 
 #### Step-1-Create a new Azure Devops Variable Group
+In the following example we have created 2 secret variables **dev_contosoapikey** and **prod_contosoapikey** .
+
 ![Alt text](docs/images/step400-variable-group.png)
 
 
-#### Step-2-Reference the variable group in the master YAML pipeline
+#### Step-2-Define a new parameter inside the deployment template
+A new parameter **apikey** is declared 
+
+```yaml
+
+parameters:
+- name: environment
+  type: string
+- name: apikey
+  type: string
+
+```
+
+#### Step-3-Pass the secret to the deployment template
+The value of the **apikey** is passed from the parent YML to the deployment YML
+
+```yaml
+
+- stage: DEPLOY_PROD
+  dependsOn: DEPLOY_DEV
+  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
+  jobs:
+  - job: DEPLOY_PROD_JOB
+    steps:
+    - template: ./release.yml
+      parameters:
+        environment: PROD
+        apikey: $(prod_contosoapikey)
+
+```
+
+#### Step-4-Reference the variable group in the master YAML pipeline
 The value of the **group** parameter must match the name of the **Variable group** on the Azure Devops portal
 
 ```yml
