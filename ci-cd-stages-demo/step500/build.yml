@@ -32,7 +32,7 @@ steps:
     command: publish
     publishWebProjects: false
     arguments: '/p:version=$(Build.BuildNumber) --configuration=Release --output $(Pipeline.Workspace)/csharpdemoproject'
-    projects: ci-cd-stages-demo/src/MyDemoCSharp101/MyDemoConsoleApp1/MyDemoConsoleApp1.csproj
+    projects: ci-cd-stages-demo/src-csharp/MyDemoCSharp101/MyDemoConsoleApp1/MyDemoConsoleApp1.csproj
     zipAfterPublish: false
     modifyOutputPath: false
 
