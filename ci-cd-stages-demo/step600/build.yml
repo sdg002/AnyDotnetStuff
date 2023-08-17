@@ -1,4 +1,4 @@
-
+steps:
 - task: Bash@3
   displayName: 'Display build number from template'
   inputs:
