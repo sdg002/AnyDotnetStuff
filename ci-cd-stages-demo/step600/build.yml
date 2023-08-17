@@ -38,7 +38,12 @@ steps:
 #   workingDirectory: /ci-cd-stages-demo/src-python/
 #   displayName: 'Run python tests'
 
-- bash: |
+- script: |
+   echo "Displaying contents"
+   dir /s /b
+  displayName: 'Bash Script display contents'
+
+- script: |
    echo "Displaying Python version"
    python --version
    echo "Displaying current folder"
@@ -49,7 +54,7 @@ steps:
    pip install pytest
    pip install -r requirements.txt
    pytest
-  workingDirectory: $(Pipeline.Workspace)/ci-cd-stages-demo/src-python/
+  workingDirectory: $(Build.SourcesDirectory)/ci-cd-stages-demo/src-python/
   displayName: 'Bash Script-pytest'
 
 
