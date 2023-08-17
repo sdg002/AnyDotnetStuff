@@ -25,6 +25,8 @@ steps:
 - powershell: |
    Write-Host "Displaying Python version"
    python --version
+   Write-Host "Displaying current folder"
+   Get-Location
    python -m venv myenv
    Write-Host "Activating environment"
    myenv/Scripts/Activate.ps1
@@ -32,6 +34,7 @@ steps:
    pip install pytest
    pip install -r requirements.txt
    pytest
+  workingDirectory: ci-cd-stages-demo/src-python/
   displayName: 'Run python tests'
 
 - task: Bash@3
