@@ -40,7 +40,7 @@ steps:
 
 - script: |
    echo "Displaying contents"
-   dir /s /b
+   find
   displayName: 'Bash Script display contents'
 
 - script: |
