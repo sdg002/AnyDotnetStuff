@@ -1,0 +1,65 @@
+trigger: 
+  branches:
+    include:
+    - master 
+  paths:
+    include: 
+    - '/ci-cd-stages-demo/step300/*'
+    exclude:
+    - '/ci-cd-stages-demo/docs/*'
+
+pr: 
+  paths: 
+    include: 
+    - /ci-cd-stages-demo/step300/*
+    exclude:
+    - /ci-cd-stages-demo/docs/*
+
+
+variables:
+    - name: MajorVersion
+      value: 1
+    - name: MinorVersion
+      value: 0
+    - name: PatchNumber
+      value: 19
+    - name: BuildName
+      ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+        value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}.$(Build.BuildId)"
+      ${{else}}:
+        value: "${{ variables.MajorVersion }}.${{ variables.MinorVersion}}.${{ variables.PatchNumber }}-prerelease.$(Build.BuildId)"
+    - group: ci-cd-stages-demo
+
+
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+
+name: "${{ variables.BUILDNAME }}"
+
+stages:
+- stage: BUILD_STAGE
+  jobs:
+  - job: BUILD_STAGE_JOB
+    steps:
+    - template: ./build.yml
+
+- stage: DEPLOY_DEV
+  dependsOn: BUILD_STAGE
+  jobs:
+  - job: DEPLOY_DEV_JOB
+    steps:
+    - template: ./release.yml
+      parameters:
+        environment: DEV
+
+- stage: DEPLOY_PROD
+  dependsOn: DEPLOY_DEV
+  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
+  jobs:
+  - job: DEPLOY_PROD_JOB
+    steps:
+    - template: ./release.yml
+      parameters:
+        environment: PROD

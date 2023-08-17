@@ -1,0 +1,17 @@
+parameters:
+- name: environment
+  type: string
+
+steps:
+- task: Bash@3
+  displayName: 'Display build number from template, DEPLOY stage ,${{ parameters.environment }}'
+  inputs:
+    targetType: 'inline'
+    script: echo '$(Build.BuildNumber)'
+
+
+- task: Bash@3
+  displayName: 'Display variables'
+  inputs:
+    targetType: 'inline'
+    script: set
