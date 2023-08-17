@@ -301,7 +301,18 @@ Imagine a simple C# executable project. We want to:
 #### Step-1-Add a C# executable
 We have created a simple C# class library project under the **src** folder of this Git repo.
 
-#### Step-2-Add a Test task
+#### Step-2-Add a task to restore all referenced NUGET packages
+
+```
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet restore'
+  inputs:
+    command: restore
+    projects: 'ci-cd-stages-demo/src/**/*.csproj'
+
+```
+
+#### Step-3-Add a Test task
 This will run all the unit tests in the specified projects.
 
 ```yml
@@ -314,7 +325,7 @@ This will run all the unit tests in the specified projects.
 
 
 ```
-#### Step-3-Add Publish task
+#### Step-4-Add Publish task
 This will build the specified CSPROJ and produce the binaries in the specified output folder
 
 ```yml
@@ -329,7 +340,7 @@ This will build the specified CSPROJ and produce the binaries in the specified o
     modifyOutputPath: false
 
 ```
-#### Step-4-Create a ZIP of the DLLs
+#### Step-5-Create a ZIP of the DLLs
 The following snippet will create a ZIP of the output from the `dotnet publish` command
 
 ```yml
@@ -342,7 +353,7 @@ The following snippet will create a ZIP of the output from the `dotnet publish` 
 
 ```
 
-#### Step-5-Publish the artifact in the Build stage
+#### Step-6-Publish the artifact in the Build stage
 We have the binaries we want. But, what we want to export these out of the Build stage and retain them for future deployment. We need to publish the artifacts. 
 
 We could be publishing more than one artifact. Example - We could be producing a compiled documentation as another build artifact
@@ -360,7 +371,7 @@ We could be publishing more than one artifact. Example - We could be producing a
 
 ![published-artifact](docs/ppt-images/published-artifact.png)
 
-#### Step-6-Download the artifiact in the Release stage
+#### Step-7-Download the artifiact in the Release stage
 
 Why do we need to download the artifact - it should be already there ? Yes - it is present on the disk of the Devops container. However, the physical files on the disk are ephemeral and cannot be relied upon. The artifact(s) published in the **Build** stage are persisted for months.
 
