@@ -300,7 +300,7 @@ If the Build stage succeeds, then the published artifact(s) can be further proce
 
 
 #### Step-1-Add a C# executable
-We have created a simple C# class library project under the **src** folder of this Git repo.
+We have created a simple **C# Console EXE** project under the **src** folder of this Git repo.
 
 #### Step-2-Add a task to restore all referenced NUGET packages
 
