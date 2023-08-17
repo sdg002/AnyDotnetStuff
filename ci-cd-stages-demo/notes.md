@@ -299,12 +299,37 @@ Imagine a simple C# executable project. We want to:
 
 
 #### Step-1-Add a C# executable
-to be done
+We have created a simple C# class library project under the **src** folder of this Git repo.
 
-#### Step-2-Add Restore,Build and Unit test Tasks
-to be done
+#### Step-2-Add a Test task
+This will run all the unit tests in the specified projects.
 
-#### Step-3-Create a ZIP of the DLLs
+```yml
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test'
+  inputs:
+    command: test
+    projects: 'ci-cd-stages-demo/src/**/*Unittest*/*.csproj'
+
+
+```
+#### Step-3-Add Publish task
+This will build the specified CSPROJ and produce the binaries in the specified output folder
+
+```yml
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet publish'
+  inputs:
+    command: publish
+    publishWebProjects: false
+    arguments: '/p:version=$(Build.BuildNumber) --configuration=Release --output $(Pipeline.Workspace)/csharpdemoproject'
+    projects: ci-cd-stages-demo/src/MyDemoCSharp101/MyDemoConsoleApp1/MyDemoConsoleApp1.csproj
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+```
+#### Step-4-Create a ZIP of the DLLs
 The following snippet will create a ZIP of the output from the `dotnet publish` command
 
 ```yml
@@ -317,8 +342,11 @@ The following snippet will create a ZIP of the output from the `dotnet publish` 
 
 ```
 
-#### Step-4-Publish the artifact in the Build stage
-The following snippet will publish this as a pipeline artifact
+#### Step-5-Publish the artifact in the Build stage
+We have the binaries we want. But, what we want to export these out of the Build stage and retain them for future deployment. We need to publish the artifacts. 
+
+We could be publishing more than one artifact. Example - We could be producing a compiled documentation as another build artifact
+
 
 ```yml
 
@@ -332,7 +360,7 @@ The following snippet will publish this as a pipeline artifact
 
 ![published-artifact](docs/ppt-images/published-artifact.png)
 
-#### Step-5-Download the artifiact in the Release stage
+#### Step-6-Download the artifiact in the Release stage
 
 Why do we need to download the artifact - it should be already there ? Yes - it is present on the disk of the Devops container. However, the physical files on the disk are ephemeral and cannot be relied upon. The artifact(s) published in the **Build** stage are persisted for months.
 
