@@ -291,11 +291,12 @@ Azure Devops is very protective about secrets. You will not be able to display a
 # Step 500-Publish Build artifacts and consume them in Release stage
 
 #### Problem
-Imagine a simple C# executable project. We want to:
+Imagine a simple C# executable project. We want a Build stage that does the following:
 - Restore the NUGET packages
 - Build and publish the binaires
 - Export the binaries out of the Build step as an artifact
-- Consume the artifact in the Deployment stage
+
+If the Build stage succeeds, then the published artifact(s) can be further processed in the subsequent Deployment stages.
 
 
 #### Step-1-Add a C# executable
