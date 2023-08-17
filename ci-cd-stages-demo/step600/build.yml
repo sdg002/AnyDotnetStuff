@@ -28,11 +28,13 @@ steps:
    Write-Host "Displaying Python version"
    python --version
    python -m venv myenv
-   scripts/myenv/activate.ps1
-   Write-Host "Activate environment"
+   Write-Host "Activating environment"
+   myenv/scripts/activate.ps1
+   Write-Host "Activated environment"
    pip install pytest
-   pip install -r requirements.txt   
-  displayName: 'PowerShell Script'
+   pip install -r requirements.txt
+   pytest
+  displayName: 'Run python tests'
 
 - task: Bash@3
   displayName: 'Display variables'
