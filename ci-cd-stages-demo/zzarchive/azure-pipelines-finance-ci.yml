@@ -1,0 +1,93 @@
+trigger: none
+    
+resources:
+- repo: self
+
+variables:
+  APPLICATION_ROOT: 'Finance'
+  COVERAGE_THRESHOLD: '60'
+
+stages:
+- stage: Build
+  displayName: Build & Test
+  jobs:  
+  - job: Build
+    displayName: Build & Test
+    timeoutInMinutes: 45
+    pool:
+      vmImage: 'ubuntu-18.04'
+      name: 'Seamless AZ'
+    steps:
+      - task: UseDotNet@2
+        displayName: 'Download NET6 SDK'      
+        inputs:
+          packageType: 'sdk'
+          version: '6.x'
+      - script: |
+          curl https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_linux-x64_bin.tar.gz -o $(System.DefaultWorkingDirectory)/jdk17.tar.gz
+          mkdir $(Agent.BuildDirectory)/jdk -p
+      - task: JavaToolInstaller@0
+        inputs:
+          versionSpec: '17'
+          jdkArchitectureOption: 'x64'
+          jdkSourceOption: 'LocalDirectory'
+          jdkFile: '$(System.DefaultWorkingDirectory)/jdk17.tar.gz'
+          jdkDestinationDirectory: '$(Agent.BuildDirectory)/jdk'
+          cleanDestinationDirectory: false
+                    
+      - task: SonarQubePrepare@5
+        inputs:
+          SonarQube: 'Sonar 02'
+          scannerMode: 'MSBuild'
+          projectKey: 'myprojectkey'
+          projectName: 'Seamless-CPS'
+          extraProperties: |
+            # Additional properties that will be passed to the scanner, 
+            # Put one key=value per line, e.g. sonar.exclusions=**/GlobalSuppressions.cs
+            sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/*/coverage.opencover.xml
+            sonar.cs.vstest.reportsPaths=$(Agent.TempDirectory)/*.trx
+            sonar.qualitygate.wait=true
+            sonar.qualitygate.timeout=1800
+ 
+      - task: DotNetCoreCLI@2
+        displayName: 'Run tests'
+        inputs:
+          command: 'test'
+          testRunTitle: '$(APPLICATION_ROOT)'
+          projects: $(APPLICATION_ROOT)/tests/**/*.Tests.csproj
+          arguments: --collect:"XPlat Code Coverage" --settings ./$(APPLICATION_ROOT)/tests/coverlet.runsettings /p:Threshold=$(COVERAGE_THRESHOLD) /p:ThresholdType=method /p:ThresholdStat=total 
+          publishTestResults: true
+
+      - task: PublishCodeCoverageResults@1
+        displayName: 'Publish code coverage report'
+        condition: always() # always generate coverage reports as one of the failure reasons could be too low coverage and we want to see the details
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: '$(Agent.TempDirectory)/*/coverage.cobertura.xml'
+   
+      - task: SonarQubeAnalyze@5
+      - task: SonarQubePublish@5
+        inputs:
+          pollingTimeoutSec: '600'
+
+      - task: sonar-buildbreaker@8
+        displayName: Assert Sonar Quality Gates
+        inputs:
+          SonarQube: 'Sonar 02'
+
+      - script: | 
+          # Restore all packages
+          dotnet restore ./$(APPLICATION_ROOT)/src/Contoso.$(APPLICATION_ROOT).Application/Contoso.$(APPLICATION_ROOT).Application.csproj
+
+          # Search vulnerable packages and save its output
+          output=$(dotnet list ./$(APPLICATION_ROOT)/src/Contoso.$(APPLICATION_ROOT).Application/Contoso.$(APPLICATION_ROOT).Application.csproj package --vulnerable --include-transitive)
+
+          # Check if any of the issues found is marked as "Critical"
+          if echo "$output" | grep -q "Critical"; then
+              # If any vulnerabilities are found, list and exit with status code 1
+              echo "$output"
+              exit 1
+          fi
+        displayName: Assert Packages Security
+        continueOnError: true        
+
