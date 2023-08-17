@@ -1,0 +1,446 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - Finance/src/*
+    - Finance/deploy/manifests/*
+
+variables:
+  APPLICATION_ROOT: 'Finance'
+  APPLICATION_RELATIVE_PATH: 'Finance/src/Contoso.Finance.Application'
+  APPLICATION_PROJECTNAME: 'Contoso.Finance.Application.csproj'
+  AWS_REGION: eu-west-2
+  DOCKER_REGISTRY: 'registry.Contoso.com/'
+  REPOSITORY_TAGNAME: 'finance'
+  USERPROFILE:
+  DOCKER_COMPOSE_VER: '1.29.2'
+  DOCKER_VER: '20.10.12'
+  KUBECTL_VER: '1.26.4'
+ 
+pool:
+  vmImage: ubuntu-18.04
+  name: 'Seamless AZ'
+
+stages:
+- stage: Build
+  displayName: Build Source
+  jobs:  
+  - job: Build
+    displayName: Build
+    condition: eq(variables['CustomImageTag'], '')
+    timeoutInMinutes: 10
+    variables:
+    - name: IMAGE_TAG
+      value: $[ coalesce(variables['CustomImageTag'], variables['Build.BuildId'], 'NOT_SET') ]
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Download NET6 SDK'      
+      inputs:
+        packageType: 'sdk'
+        version: '6.x'
+    - task: DockerInstaller@0
+      displayName: Docker Installer
+      inputs:
+        dockerVersion: $(DOCKER_VER)
+
+    - script: |
+        sudo curl -L https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VER)/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+      displayName: Docker-Compose Installer
+
+    - task: VersionReaderTask@2
+      displayName: 'Generate Version Number'
+      inputs:
+        searchPattern: '$(APPLICATION_RELATIVE_PATH)/$(APPLICATION_PROJECTNAME)'
+        variablesPrefix: COMPUTED
+        buildPrefix: '.'
+
+    - task: VersionDotNetCoreAssemblies@2
+      inputs:
+        path: '$(APPLICATION_RELATIVE_PATH)'
+        versionNumber: '$(COMPUTED_VERSION_BUILD).$(Build.BuildId)'
+        injectversion: false
+        versionRegex: '\d+\.\d+\.\d+.\d+'
+        filenamePattern: '.csproj'
+        outputVersion: OutputedVersion
+        addDefault: true
+
+    - script: echo "##vso[build.updatebuildnumber]$(OutputedVersion)"
+      displayName: Update Build Number
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Contoso Airport Docker Registry'
+        command: 'login'
+
+    - task: Docker@2
+      enabled: true
+      displayName: 'Build docker image'
+      timeoutInMinutes: 10
+      inputs:
+        containerRegistry: 'Contoso Airport Docker Registry'
+        repository: 'seamless/cps/$(REPOSITORY_TAGNAME)'
+        command: 'buildAndPush'
+        Dockerfile: '$(APPLICATION_RELATIVE_PATH)/Dockerfile'
+        buildContext: '.'
+        tags: |
+          alpha
+          $(Build.BuildId)
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Contoso Airport Docker Registry'
+        command: 'logout'
+
+    - bash: echo Using following Image Tag '$(IMAGE_TAG)'
+      displayName: 'Display ImageTag'
+
+    - task: ReplaceTokens@1
+      displayName: 'Update ImageTag'
+      condition: and(succeeded(), ne(variables['IMAGE_TAG'], 'NOT_SET'))
+      inputs:
+        sourcePath: '$(APPLICATION_ROOT)/deploy/manifests'
+        filePattern: 'deployment.yml'
+        tokenRegex: '{{(\w+)}}'
+
+    - bash: echo Publishing from '$(System.DefaultWorkingDirectory)/$(APPLICATION_ROOT)/deploy/manifests'
+      displayName: 'Publishing Directory'
+
+    - publish: '$(APPLICATION_ROOT)/deploy/manifests'
+      artifact: manifests
+
+    - publish: '$(APPLICATION_RELATIVE_PATH)/$(APPLICATION_PROJECTNAME)'
+      artifact: versionedProject
+
+- stage: Smoke_Test
+  displayName: Smoke Test
+  dependsOn: Build
+  condition: and(succeeded(), ne(variables['SKIP_SMOKE_TEST'], true))
+  jobs:  
+  - job: Start_Services
+    displayName: Run all the services and integration test
+    timeoutInMinutes: 60
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Download NET6 SDK'     
+      inputs:
+        packageType: 'sdk'
+        version: '6.x'
+    - task: DockerInstaller@0
+      displayName: Docker Installer
+      inputs:
+        dockerVersion: $(DOCKER_VER)
+
+    - script: |
+        sudo curl -L https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VER)/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+        docker-compose version
+        docker version
+      displayName: Docker-Compose Installer
+      
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Contoso Airport Docker Registry'
+        command: 'login'
+
+    - task: Bash@3
+      displayName: Prepage docker image under test
+      inputs:
+        targetType: 'inline'
+        script: |
+          # Pull the alpha version (latest build but not tested yet by smoke test)        
+          docker pull registry.Contoso.com/seamless/cps/$(REPOSITORY_TAGNAME):alpha
+          # Tagging as latest but only locally for purposes of running all services for smoke test    
+          docker tag registry.Contoso.com/seamless/cps/$(REPOSITORY_TAGNAME):alpha registry.Contoso.com/seamless/cps/$(REPOSITORY_TAGNAME):latest        
+     
+    - task: Bash@3
+      displayName: Prepage all other docker images
+      inputs:
+        targetType: 'inline'
+        script: |
+          docker pull registry.Contoso.com/seamless/cps/compliance:alpha
+          docker pull registry.Contoso.com/seamless/cps/configuration:alpha
+          docker pull registry.Contoso.com/seamless/cps/documents:alpha
+          docker pull registry.Contoso.com/seamless/cps/motorregistry:alpha
+          docker pull registry.Contoso.com/seamless/cps/migration:alpha
+          docker pull registry.Contoso.com/seamless/cps/pricing:alpha
+          docker pull registry.Contoso.com/seamless/cps/sales:alpha
+          docker pull registry.Contoso.com/seamless/cps/tenancy:alpha
+          docker pull registry.Contoso.com/seamless/cps/underwriting:alpha
+          docker pull registry.Contoso.com/seamless/cps/users:alpha
+          docker tag registry.Contoso.com/seamless/cps/compliance:alpha registry.Contoso.com/seamless/cps/compliance:latest
+          docker tag registry.Contoso.com/seamless/cps/configuration:alpha registry.Contoso.com/seamless/cps/configuration:latest
+          docker tag registry.Contoso.com/seamless/cps/documents:alpha registry.Contoso.com/seamless/cps/documents:latest
+          docker tag registry.Contoso.com/seamless/cps/motorregistry:alpha registry.Contoso.com/seamless/cps/motorregistry:latest
+          docker tag registry.Contoso.com/seamless/cps/migration:alpha registry.Contoso.com/seamless/cps/migration:latest
+          docker tag registry.Contoso.com/seamless/cps/pricing:alpha registry.Contoso.com/seamless/cps/pricing:latest
+          docker tag registry.Contoso.com/seamless/cps/sales:alpha registry.Contoso.com/seamless/cps/sales:latest
+          docker tag registry.Contoso.com/seamless/cps/tenancy:alpha registry.Contoso.com/seamless/cps/tenancy:latest
+          docker tag registry.Contoso.com/seamless/cps/underwriting:alpha registry.Contoso.com/seamless/cps/underwriting:latest
+          docker tag registry.Contoso.com/seamless/cps/users:alpha registry.Contoso.com/seamless/cps/users:latest
+
+    - task: DockerCompose@0
+      displayName: Build IntegrationTests
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerRegistryEndpoint: 'Contoso Airport Docker Registry'
+        dockerComposeFile: 'docker-compose.yml'
+        additionalDockerComposeFiles: |
+          docker-compose.override.yml
+          docker-compose.test.yml
+        projectName: 'integrationtests'
+        action: 'Run a Docker Compose command'
+        dockerComposeCommand: 'build mocks integrationtests'
+        requireAdditionalDockerComposeFiles: true
+
+    - task: DockerCompose@0
+      displayName: Run Integration Tests with all services
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerRegistryEndpoint: 'Contoso Airport Docker Registry'
+        dockerComposeFile: 'docker-compose.yml'
+        additionalDockerComposeFiles: |
+          docker-compose.override.yml
+          docker-compose.test.yml
+          docker-compose.redis.yml
+        action: 'Run a Docker Compose command'
+        dockerComposeCommand: 'up --no-build --abort-on-container-exit --exit-code-from integrationtests postgres localstack users configuration sales pricing underwriting documents finance tenancy compliance motorregistry migration mocks integrationtests'
+        requireAdditionalDockerComposeFiles: true
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Contoso Airport Docker Registry'
+        command: 'logout'  
+
+  - job: Analysis
+    displayName: SonarQube analysis
+    condition: ne(variables['SKIP_ANALYSIS'], 'true')
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Download NET6 SDK'     
+      inputs:
+        packageType: 'sdk'
+        version: '6.x'
+    - script: |
+        curl https://download.java.net/java/GA/jdk17.0.1/2a2082e5a09d4267845be086888add4f/12/GPL/openjdk-17.0.1_linux-x64_bin.tar.gz -o $(System.DefaultWorkingDirectory)/jdk17.tar.gz
+        mkdir $(Agent.BuildDirectory)/jdk -p
+      displayName: 'Download JDK 17.0.1'
+    - task: JavaToolInstaller@0
+      inputs:
+        versionSpec: '17'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'LocalDirectory'
+        jdkFile: '$(System.DefaultWorkingDirectory)/jdk17.tar.gz'
+        jdkDestinationDirectory: '$(Agent.BuildDirectory)/jdk'
+        cleanDestinationDirectory: false
+
+    - task: SonarQubePrepare@5
+      inputs:
+        SonarQube: 'Sonar 02'
+        scannerMode: 'MSBuild'
+        projectKey: 'COSS_COSS_AYHeryAy1Z4QdltQDL76'
+        projectName: 'Seamless-CPS'
+
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'build'
+        projects: 'Contoso.sln'
+        arguments: '--configuration release'
+      displayName: 'dotnet build release'
+
+    - task: SonarQubeAnalyze@5
+    - task: SonarQubePublish@5
+      inputs:
+        pollingTimeoutSec: '300'
+
+    - task: sonar-buildbreaker@8
+      displayName: Assert Sonar Quality Gates
+      inputs:
+        SonarQube: 'Sonar 02'
+
+- stage: Deploy_To_Staging
+  displayName: Deploy to Staging
+  dependsOn: Smoke_Test
+  jobs:  
+  - deployment: Deploy
+    displayName: Deploy to staging
+    timeoutInMinutes: 20
+    variables:
+    - name: CLUSTER_NAME
+      value: 'seamless-backend-staging'
+    environment: 'Seamless New Staging'
+    strategy:
+      runOnce:
+       deploy:
+         steps:
+         - task: UseDotNet@2
+           displayName: 'Download NET6 SDK'     
+           inputs:
+             packageType: 'sdk'
+             version: '6.x'
+         - task: DockerInstaller@0
+           displayName: Docker Installer
+           inputs:
+             dockerVersion: $(DOCKER_VER)
+
+         - script: |
+             sudo curl -L https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VER)/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+             sudo chmod +x /usr/local/bin/docker-compose
+           displayName: Docker-Compose Installer
+                   
+         - task: KubectlInstaller@0
+           displayName: 'Install Kubectl'
+           inputs:
+             kubectlVersion: $(KUBECTL_VER)
+         - script: |
+             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+             sudo apt-get install unzip
+             unzip awscliv2.zip
+             sudo ./aws/install
+             aws --version
+           displayName: AWS CLI Installer
+
+         - task: AWSCLI@1
+           displayName: 'Configure Kubectl'
+           inputs:
+             awsCredentials: 'AWS Seamless Staging 666270406911'
+             regionName: '$(AWS_REGION)'
+             awsCommand: 'eks'
+             awsSubCommand: 'update-kubeconfig'
+             awsArguments: '--region $(AWS_REGION) --name $(CLUSTER_NAME)'
+
+         - task: AWSShellScript@1
+           displayName: 'Kubectl Apply'
+           enabled: true
+           condition: always()
+           inputs:
+             awsCredentials: 'AWS Seamless Staging 666270406911'
+             regionName: '$(AWS_REGION)'
+             scriptType: 'inline'
+             inlineScript: |
+               kubectl apply -f $(Pipeline.Workspace)/manifests/deployment.yml
+               kubectl annotate deployment/$(REPOSITORY_TAGNAME) kubernetes.io/change-cause="Release $(Build.BuildNumber) updated image tag to $(Build.BuildId)"
+
+         - task: AWSShellScript@1
+           displayName: 'Wait for rollout'
+           enabled: true
+           condition: always()
+           inputs:
+             awsCredentials: 'AWS Seamless Staging 666270406911'
+             regionName: '$(AWS_REGION)'
+             scriptType: 'inline'
+             inlineScript: 'kubectl rollout status deployment $(REPOSITORY_TAGNAME)'
+  - job: TAG_BETA
+    displayName: Promote to Beta
+    timeoutInMinutes: 10
+    dependsOn: Deploy
+    steps:
+ 
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Contoso Airport Docker Registry'
+        command: 'login'
+
+    # Pull this version of image to promote it to Beta
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: |
+          docker pull registry.Contoso.com/seamless/cps/$(REPOSITORY_TAGNAME):$(Build.BuildId)
+          docker tag registry.Contoso.com/seamless/cps/$(REPOSITORY_TAGNAME):$(Build.BuildId) registry.Contoso.com/seamless/cps/$(REPOSITORY_TAGNAME):beta
+          docker push registry.Contoso.com/seamless/cps/$(REPOSITORY_TAGNAME):beta
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Contoso Airport Docker Registry'
+        command: 'logout'
+
+- stage: Deploy_To_Prod
+  displayName: Deploy to Production
+  dependsOn: Deploy_To_Staging
+  jobs:  
+  - deployment: Deploy
+    displayName: Deploy to production
+    timeoutInMinutes: 20
+    variables:
+    - name: CLUSTER_NAME
+      value: 'seamless-backend-prod'
+    environment: 'Seamless New Production'
+    strategy:
+      runOnce:
+       deploy:
+         steps:
+         - task: UseDotNet@2
+           displayName: 'Download NET6 SDK'     
+           inputs:
+             packageType: 'sdk'
+             version: '6.x'     
+         - task: KubectlInstaller@0
+           displayName: 'Install Kubectl'
+           inputs:
+             kubectlVersion: $(KUBECTL_VER)
+         - script: |
+             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+             sudo apt-get install unzip
+             unzip awscliv2.zip
+             sudo ./aws/install
+             aws --version
+           displayName: AWS CLI Installer
+
+         - task: AWSCLI@1
+           displayName: 'Configure Kubectl'
+           inputs:
+             awsCredentials: 'AWS InsSaaS'
+             regionName: '$(AWS_REGION)'
+             awsCommand: 'eks'
+             awsSubCommand: 'update-kubeconfig'
+             awsArguments: '--region $(AWS_REGION) --name $(CLUSTER_NAME)'
+
+         - task: AWSShellScript@1
+           displayName: 'Kubectl Apply'
+           enabled: true
+           condition: always()
+           inputs:
+             awsCredentials: 'AWS InsSaaS'
+             regionName: '$(AWS_REGION)'
+             scriptType: 'inline'
+             inlineScript: |
+               kubectl apply -f $(Pipeline.Workspace)/manifests/deployment.yml
+               kubectl annotate deployment/$(REPOSITORY_TAGNAME) kubernetes.io/change-cause="Release $(Build.BuildNumber) updated image tag to $(Build.BuildId)"
+
+         - task: AWSShellScript@1
+           displayName: 'Wait for rollout'
+           enabled: true
+           condition: always()
+           inputs:
+             awsCredentials: 'AWS InsSaaS'
+             regionName: '$(AWS_REGION)'
+             scriptType: 'inline'
+             inlineScript: 'kubectl rollout status deployment $(REPOSITORY_TAGNAME)'
+  - job: TAG_LATEST
+    displayName: Promote to Latest
+    timeoutInMinutes: 10
+    dependsOn: Deploy
+    steps:
+ 
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Contoso Airport Docker Registry'
+        command: 'login'
+
+    # Pull this version of image to promote it to Latest
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: |
+          docker pull registry.Contoso.com/seamless/cps/$(REPOSITORY_TAGNAME):$(Build.BuildId)
+          docker tag registry.Contoso.com/seamless/cps/$(REPOSITORY_TAGNAME):$(Build.BuildId) registry.Contoso.com/seamless/cps/$(REPOSITORY_TAGNAME):latest
+          docker push registry.Contoso.com/seamless/cps/$(REPOSITORY_TAGNAME):latest
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Contoso Airport Docker Registry'
+        command: 'logout'
+   

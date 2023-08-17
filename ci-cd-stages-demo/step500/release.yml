@@ -1,0 +1,31 @@
+parameters:
+- name: environment
+  type: string
+- name: apikey
+  type: string
+
+steps:
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifact: 
+    path: $(Build.Workspace)/ci-cd-stages-demo/artifacts
+
+- task: Bash@3
+  displayName: 'Display build number from template, DEPLOY stage ,${{ parameters.environment }}'
+  inputs:
+    targetType: 'inline'
+    script: echo '$(Build.BuildNumber)'
+
+- task: ExtractFiles@1
+  displayName: 'Extract archive ZIP'
+  inputs:
+    archiveFilePatterns: $(Build.Workspace)/ci-cd-stages-demo/artifacts/csharpdemoproject/*.zip
+    destinationFolder: $(Pipeline.Workspace)/ci-cd-stages-demo/extract/csharpdemoproject
+    overwriteExistingFiles: true  #what is the source archive  ---think??
+
+- task: Bash@3
+  displayName: 'show dir contents'
+  inputs:
+    targetType: 'inline'
+    script: find $(Pipeline.Workspace)
+    #script: ls -R $(Pipeline.Workspace)  #shows just the file names in each directory recursively

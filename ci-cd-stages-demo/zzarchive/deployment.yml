@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finance
+  namespace: default
+  labels:
+    app: finance
+    team: cps
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: finance 
+  template:
+    metadata:
+      labels:
+        app: finance
+        team: cps
+    spec:
+      serviceAccountName: finance-svc
+      containers:
+      - name: finance
+        image: registry.contoso.com/seamless/cps/finance:{{IMAGE_TAG}}
+        envFrom:
+        - configMapRef:
+            name: cps-common
+        env:
+        - name: ServicePathBase
+          value: '/finance'
+        - name: MemoryLimitMb
+          value: '1000'
+        - name: Serilog__Filter__3__Args__expression
+          value: Exception like '%GetItemByNumber%not be null%'
+        - name: Serilog__Filter__3__Name
+          value: ByExcluding
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: finance-secret
+              key: connectionstrings__defaultconnection
+        - name: CachingService__Redis__Connection
+          valueFrom:
+            secretKeyRef:
+              name: redis-secret
+              key: connection
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sleep
+              - "30"
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 80
+          failureThreshold: 60
+          periodSeconds: 10
+          initialDelaySeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          timeoutSeconds: 5
+          failureThreshold: 3
+          periodSeconds: 60
+          initialDelaySeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 80
+          failureThreshold: 2
+          periodSeconds: 5
+          initialDelaySeconds: 30
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 500m
+            memory: "1Gi"
+          requests:
+            cpu: 100m
+            memory: "256Mi"
+      imagePullSecrets:
+      - name: registry-credentials
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"      
+      terminationGracePeriodSeconds: 120

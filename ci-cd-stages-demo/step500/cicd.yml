@@ -4,14 +4,14 @@ trigger:
     - master 
   paths:
     include: 
-    - '/ci-cd-stages-demo/step400/*'
+    - '/ci-cd-stages-demo/step500/*'
     exclude:
     - '/ci-cd-stages-demo/docs/*'
 
 pr: 
   paths: 
     include: 
-    - /ci-cd-stages-demo/step400/*
+    - /ci-cd-stages-demo/step500/*
     exclude:
     - /ci-cd-stages-demo/docs/*
 
@@ -53,7 +53,7 @@ stages:
     - template: ./release.yml
       parameters:
         environment: DEV
-        apikey: $(dev_contosoapikey) #the variable name must match the variable in the Devops Variable Group referenced in the Variables section of this YML
+        apikey: $(dev_contosoapikey)
 
 - stage: DEPLOY_PROD
   dependsOn: DEPLOY_DEV

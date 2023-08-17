@@ -1,5 +1,5 @@
 steps:
-- bash: echo "Hello world in build stage"
+- bash: echo "Hello world from build template"
 
 - task: Bash@3
   displayName: 'Display build number from template'
@@ -18,6 +18,13 @@ steps:
   inputs:
     command: restore
     projects: 'ci-cd-stages-demo/src/**/*.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test'
+  inputs:
+    command: test
+    projects: 'ci-cd-stages-demo/src/**/*Unittest*/*.csproj'
+
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet publish'
@@ -40,4 +47,6 @@ steps:
   displayName: 'Publish Pipeline csharpdemoproject'
   inputs:
     targetPath: '$(Build.ArtifactStagingDirectory)/csharpdemoproject-$(Build.BuildNumber).zip'
-    artifact: 'csharpdemoproject-$(Build.BuildNumber).zip'
+    artifact: 'csharpdemoproject'
+
+
