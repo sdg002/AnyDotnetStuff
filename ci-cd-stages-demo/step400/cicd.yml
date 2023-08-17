@@ -53,7 +53,7 @@ stages:
     - template: ./release.yml
       parameters:
         environment: DEV
-        apikey: $(dev_contosoapikey)
+        apikey: $(dev_contosoapikey) #the variable name must match the variable in the Devops Variable Group referenced in the Variables section of this YML
 
 - stage: DEPLOY_PROD
   dependsOn: DEPLOY_DEV

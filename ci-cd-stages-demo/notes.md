@@ -220,7 +220,7 @@ In the following example we have created 2 secret variables **dev_contosoapikey*
 
 
 #### Step-2-Define a new parameter inside the deployment template
-A new parameter **apikey** is declared 
+A new parameter **apikey** is declared under the parameters section of the deployment template.
 
 ```yaml
 
@@ -233,7 +233,7 @@ parameters:
 ```
 
 #### Step-3-Pass the secret to the deployment template
-The value of the **apikey** is passed from the parent YML to the deployment YML
+The value of the **apikey** is passed from the parent YML to the deployment YML template.
 
 ```yaml
 
