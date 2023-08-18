@@ -1,0 +1,30 @@
+parameters:
+- name: environment
+  type: string
+- name: DOCKER_VER
+  type: string
+  default: '20.10.12'
+
+steps:
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifact: 
+    path: $(Build.Workspace)/ci-cd-stages-demo/artifacts
+
+
+- task: Bash@3
+  displayName: 'Display variables'
+  inputs:
+    targetType: 'inline'
+    script: set
+
+- task: Bash@3
+  displayName: 'show dir contents'
+  inputs:
+    targetType: 'inline'
+    script: find $(Build.Workspace)
+
+- task: DockerInstaller@0
+  displayName: Docker Installer ${{ parameters.DOCKER_VER }}
+  inputs:
+    dockerVersion: ${{ parameters.DOCKER_VER }}

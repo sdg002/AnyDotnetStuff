@@ -1,0 +1,43 @@
+parameters:
+- name: pythonversion
+  default: 3.9
+  type: string
+
+steps:
+
+- task: Bash@3
+  displayName: 'Display variables'
+  inputs:
+    targetType: 'inline'
+    script: set
+
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: ${{ parameters.pythonversion}} # string. Required. Version spec. Default: 3.x.
+    addToPath: true # boolean. Add to PATH. Default: true.
+    architecture: 'x64' # 'x86' | 'x64'. Required. Architecture. Default: x64.
+  displayName: 'Use specific python version ${{ parameters.pythonversion}}'
+
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish Python source folder'
+  inputs:
+    targetPath: $(Build.SourcesDirectory)/ci-cd-stages-demo/src-python/  #You want the requirements.txt
+    artifact: 'pythonsource'
+
+
+
+- script: |
+   echo "Displaying Python version"
+   python --version
+   echo "Displaying current folder"
+   pwd
+   echo "Activating environment"
+   myenv/Scripts/activate
+   echo "Activated environment"
+   pip install pytest
+   pip install -r requirements.txt
+   pytest
+  workingDirectory: $(Build.SourcesDirectory)/ci-cd-stages-demo/src-python/
+  displayName: 'Bash Script-pytest'
+
+

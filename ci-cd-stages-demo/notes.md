@@ -10,7 +10,7 @@ In this article I have demonstrated how to make the simplest build pipeline and 
 # Source code and pipeline
 
 #### Link to Repo
-https://github.com/sdg002/AnyDotnetStuff/activity?ref=master
+https://github.com/sdg002/AnyDotnetStuff/tree/master/ci-cd-stages-demo
 
 
 #### Link to Devops pipeline
@@ -140,6 +140,21 @@ The following snippet demonstrates how to access the parameter value
 
 ![Alt text](docs/ppt-images/parameter-expansion.png)
 
+#### Caveats
+You cannot declare variables within a template. If you need a variable you could use a parameter with a default value.
+```yml
+
+#Not allowed
+variables:
+  SOME_VARIABLE: '20.10.12'
+
+#Allowed
+parameters:
+- name: SOME_VARIABLE
+  type: string
+  default: '20.10.12'
+
+``````
 ---
 
 # Step 300-Semantic build name
