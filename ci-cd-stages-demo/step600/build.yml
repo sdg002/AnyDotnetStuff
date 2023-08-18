@@ -1,4 +1,7 @@
-  
+parameters:
+- name: pythonversion
+  displayName: 3.9
+  type: string
 
 steps:
 - task: Bash@3
@@ -15,14 +18,14 @@ steps:
 
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: '3.9' # string. Required. Version spec. Default: 3.x.
+    versionSpec: {{ parameters.pythonversion}} # string. Required. Version spec. Default: 3.x.
     #disableDownloadFromRegistry: false # boolean. Disable downloading releases from the GitHub registry. Default: false.
     #allowUnstable: false # boolean. Optional. Use when disableDownloadFromRegistry = false. Allow downloading unstable releases. Default: false.
     #githubToken: # string. Optional. Use when disableDownloadFromRegistry = false. GitHub token for GitHub Actions python registry. 
     #addToPath: true # boolean. Add to PATH. Default: true.
   # Advanced
     architecture: 'x64' # 'x86' | 'x64'. Required. Architecture. Default: x64.
-  displayName: 'Use specific python version'
+  displayName: 'Use specific python version {{ parameters.pythonversion}}'
 
 
 
