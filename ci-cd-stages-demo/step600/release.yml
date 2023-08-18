@@ -18,6 +18,12 @@ steps:
     targetType: 'inline'
     script: set
 
+- task: Bash@3
+  displayName: 'show dir contents'
+  inputs:
+    targetType: 'inline'
+    script: find $(Build.Workspace)
+
 - task: DockerInstaller@0
   displayName: Docker Installer $(DOCKER_VER)
   inputs:
