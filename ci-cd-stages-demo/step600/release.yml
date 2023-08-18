@@ -2,6 +2,9 @@ parameters:
 - name: environment
   type: string
 
+variables:
+  DOCKER_VER: '20.10.12'
+
 steps:
 - task: DownloadPipelineArtifact@2
   inputs:
@@ -14,3 +17,8 @@ steps:
   inputs:
     targetType: 'inline'
     script: set
+
+- task: DockerInstaller@0
+  displayName: Docker Installer $(DOCKER_VER)
+  inputs:
+    dockerVersion: $(DOCKER_VER)
