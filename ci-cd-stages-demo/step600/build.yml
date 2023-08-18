@@ -1,3 +1,5 @@
+  
+
 steps:
 - task: Bash@3
   displayName: 'Display build number from template'
@@ -20,28 +22,9 @@ steps:
     #addToPath: true # boolean. Add to PATH. Default: true.
   # Advanced
     architecture: 'x64' # 'x86' | 'x64'. Required. Architecture. Default: x64.
+  displayName: 'Use specific python version'
 
 
-# - powershell: |
-#    Write-Host "Displaying Python version"
-#    python --version
-#    Write-Host "Displaying current folder"
-#    Get-Location
-#    python -m venv myenv
-#    Write-Host "Created virtual environment"
-#    Write-Host "Activating environment"
-#    myenv/Scripts/Activate.ps1
-#    Write-Host "Activated environment"
-#    pip install pytest
-#    pip install -r requirements.txt
-#    pytest
-#   workingDirectory: /ci-cd-stages-demo/src-python/
-#   displayName: 'Run python tests'
-
-- script: |
-   echo "Displaying contents"
-   find
-  displayName: 'Bash Script display contents'
 
 - script: |
    echo "Displaying Python version"
@@ -58,8 +41,3 @@ steps:
   displayName: 'Bash Script-pytest'
 
 
-- task: Bash@3
-  displayName: 'Display variables'
-  inputs:
-    targetType: 'inline'
-    script: set
