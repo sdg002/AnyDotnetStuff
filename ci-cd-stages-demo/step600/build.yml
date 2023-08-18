@@ -21,7 +21,7 @@ steps:
 
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: {{ parameters.pythonversion}} # string. Required. Version spec. Default: 3.x.
+    versionSpec: ${{ parameters.pythonversion}} # string. Required. Version spec. Default: 3.x.
     #disableDownloadFromRegistry: false # boolean. Disable downloading releases from the GitHub registry. Default: false.
     #allowUnstable: false # boolean. Optional. Use when disableDownloadFromRegistry = false. Allow downloading unstable releases. Default: false.
     #githubToken: # string. Optional. Use when disableDownloadFromRegistry = false. GitHub token for GitHub Actions python registry. 
