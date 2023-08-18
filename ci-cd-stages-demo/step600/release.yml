@@ -3,7 +3,7 @@ parameters:
   type: string
 - name: DOCKER_VER
   type: string
-  value: '20.10.12'
+  default: '20.10.12'
 
 steps:
 - task: DownloadPipelineArtifact@2

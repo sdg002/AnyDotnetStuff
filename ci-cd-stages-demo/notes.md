@@ -152,7 +152,7 @@ variables:
 parameters:
 - name: SOME_VARIABLE
   type: string
-  value: '20.10.12'
+  default: '20.10.12'
 
 ``````
 ---
