@@ -2,9 +2,9 @@ parameters:
 - name: pythonversion
   default: 3.9
   type: string
-- name: pythonsrcexportfolder
-  default: $(Build.ArtifactStagingDirectory)/pythonsrc
-  type: string
+# - name: pythonsrcexportfolder
+#   default: $(Build.ArtifactStagingDirectory)/pythonsrc
+#   type: string
 
 steps:
 - task: Bash@3
@@ -22,13 +22,15 @@ steps:
 - task: UsePythonVersion@0
   inputs:
     versionSpec: ${{ parameters.pythonversion}} # string. Required. Version spec. Default: 3.x.
-    #disableDownloadFromRegistry: false # boolean. Disable downloading releases from the GitHub registry. Default: false.
-    #allowUnstable: false # boolean. Optional. Use when disableDownloadFromRegistry = false. Allow downloading unstable releases. Default: false.
-    #githubToken: # string. Optional. Use when disableDownloadFromRegistry = false. GitHub token for GitHub Actions python registry. 
-    #addToPath: true # boolean. Add to PATH. Default: true.
-  # Advanced
+    addToPath: true # boolean. Add to PATH. Default: true.
     architecture: 'x64' # 'x86' | 'x64'. Required. Architecture. Default: x64.
-  displayName: 'Use specific python version {{ parameters.pythonversion}}'
+  displayName: 'Use specific python version ${{ parameters.pythonversion}}'
+
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish Python source folder'
+  inputs:
+    targetPath: $(Build.SourcesDirectory)/ci-cd-stages-demo/src-python/
+    artifact: 'pythonsource'
 
 
 
