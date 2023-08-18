@@ -140,6 +140,21 @@ The following snippet demonstrates how to access the parameter value
 
 ![Alt text](docs/ppt-images/parameter-expansion.png)
 
+#### Caveats
+You cannot declare variables within a template. If you need a variable you could use a parameter with a default value.
+```yml
+
+#Not allowed
+variables:
+  SOME_VARIABLE: '20.10.12'
+
+#Allowed
+parameters:
+- name: SOME_VARIABLE
+  type: string
+  value: '20.10.12'
+
+``````
 ---
 
 # Step 300-Semantic build name
