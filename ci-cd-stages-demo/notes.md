@@ -10,7 +10,7 @@ In this article I have demonstrated how to make the simplest build pipeline and 
 # Source code and pipeline
 
 #### Link to Repo
-https://github.com/sdg002/AnyDotnetStuff/activity?ref=master
+https://github.com/sdg002/AnyDotnetStuff/tree/master/ci-cd-stages-demo
 
 
 #### Link to Devops pipeline

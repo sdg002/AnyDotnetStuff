@@ -21,7 +21,7 @@ steps:
 - task: PublishPipelineArtifact@1
   displayName: 'Publish Python source folder'
   inputs:
-    targetPath: $(Build.SourcesDirectory)/ci-cd-stages-demo/src-python/src
+    targetPath: $(Build.SourcesDirectory)/ci-cd-stages-demo/src-python/  #You want the requirements.txt
     artifact: 'pythonsource'
 
 
