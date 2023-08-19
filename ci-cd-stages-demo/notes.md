@@ -434,7 +434,20 @@ az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile 
 
 ```
 
+---
 
+# Step-600-Deploy a containerized Python Application
+
+## Problem
+- Sample code to run a scheduled job every 1 minute
+- Deploy a batch job which runs on a schedule
+- Dockerfile
+- Copy python source, 
+- Supply some dummy environment variables
+- Install requirements
+- You would then do a Docker push
+- 
+## blah
 
 ---
 
@@ -457,6 +470,15 @@ https://bartwullems.blogspot.com/2021/05/build-your-aspnet-core-application.html
 
 #### Azure Container Registry for building a docker image
 https://learn.microsoft.com/en-us/cli/azure/acr?view=azure-cli-latest#az-acr-build
+
+#### AP Scheduler - Using the simple Blocking scheduler
+https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html?highlight=BlockingScheduler#examples
+
+#### AP Scheduler - How to use decorators to defined scheduled jobs?
+https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html?highlight=decorator
+
+#### AP Scheduler - Good article with explanation of triggers and more
+https://betterprogramming.pub/introduction-to-apscheduler-86337f3bb4a6
 
 ---
 
