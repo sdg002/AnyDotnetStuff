@@ -437,6 +437,46 @@ az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile 
 ---
 
 # Step-600-Deploy a containerized Python Application
+## Problem
+- Imagine a hypothetical Python application which contains scheduled jobs. 
+- For the purpose of demonstraton we have used the [APScheduler component](https://apscheduler.readthedocs.io/en/3.x/userguide.html) with a couple of dummy job implementations
+- In this section we will delive into deploying this application as a containerized application from the Deployment stage of our CI-CD pipeline
+
+
+## Anatomy of a containerized Python application
+
+```
+----
+    |
+    +--src----
+    |        |
+    |        |---sample_job.py
+    |        |
+    |        |
+    |
+    +--tests--
+    |        |
+    |        |---test_demo.py
+    |        |
+    |
+    |--requirements.txt
+    |
+    |--Dockerfile
+    |
+    |--.dockerignore
+    |
+    |--pytest.ini
+    |
+    +--.venv
+    |        
+    |        
+    +--.vscode
+    |        
+    |        
+    
+    
+
+```
 
 ## Problem
 - Sample code to run a scheduled job every 1 minute
@@ -446,7 +486,8 @@ az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile 
 - Supply some dummy environment variables
 - Install requirements
 - You would then do a Docker push
-- 
+
+You were here - Try the docker build, then talk about how to push to ACR
 ## blah
 
 ---
