@@ -450,7 +450,26 @@ az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile 
 ## blah
 
 ---
+# Docker notes
 
+#### Build
+
+```
+docker build  .
+```
+
+```
+docker build  . -t cicddemo
+```
+
+```
+docker run --rm cicddemo
+```
+
+#### Why does the problem-Docker build requires 1 Argument
+https://www.baeldung.com/ops/docker-build-argument-error#:~:text=The%20most%20common%20reason%20for,default%20we%20provided%20dot(.)
+
+---
 # References and articles
 
 #### Templates usage reference
