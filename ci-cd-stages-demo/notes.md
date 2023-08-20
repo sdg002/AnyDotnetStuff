@@ -499,6 +499,10 @@ COPY . .
 CMD [ "python" ,  "/python-docker/src/sample_job.py"] #does not produce any output
 
 ```
+## Contents of .dockerignore
+```
+.venv
+```
 
 ## How to build a docker image on your local workstation?
 ```bash
@@ -511,6 +515,28 @@ docker run --rm mycicddemo
 ```
 
 ![Output from dockerized Python application](docs/images/docker-run-output.png)
+
+
+## Docker tasks on the YML
+
+```yml
+- task: DockerInstaller@0
+  displayName: Docker Installer ${{ parameters.DOCKER_VER }}
+  inputs:
+    dockerVersion: ${{ parameters.DOCKER_VER }}
+
+- task: Docker@2
+  enabled: true
+  displayName: 'Build Python docker image'
+  timeoutInMinutes: 10
+  inputs:
+    command: 'build'
+    Dockerfile: '$(Build.Workspace)/ci-cd-stages-demo/artifacts/pythonsource/Dockerfile'
+    buildContext: '.'
+    tags: |
+      $(Build.BuildNumber)
+
+```
 
 ---
 

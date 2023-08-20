@@ -35,7 +35,6 @@ steps:
   timeoutInMinutes: 10
   inputs:
     command: 'build'
-    Dockerfile: '$(Build.Workspace)/ci-cd-stages-demo/artifacts/pythonsource/Dockerfile'
-    buildContext: '.'
+    Dockerfile: '$(Build.Workspace)/ci-cd-stages-demo/artifacts/pythonsource/'
     tags: |
       $(Build.BuildNumber)
