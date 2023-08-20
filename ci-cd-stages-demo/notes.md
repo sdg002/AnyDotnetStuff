@@ -478,7 +478,7 @@ az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile 
 
 ```
 
-## Problem
+## Problem (REMOVE THIS LATER)
 - Sample code to run a scheduled job every 1 minute
 - Deploy a batch job which runs on a schedule
 - Dockerfile
@@ -488,27 +488,31 @@ az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile 
 - You would then do a Docker push
 
 You were here - Try the docker build, then talk about how to push to ACR
-## blah
+## Structure of Dockerfile
+
+```dockerfile
+FROM python:3.9.17
+WORKDIR /python-docker
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
+COPY . .
+#CMD [ "python" ,  "--version"] #this works
+CMD [ "python" ,  "/python-docker/src/sample_job.py"] #does not produce any output
+
+```
+
+## How to build a docker image on your local workstation?
+```bash
+docker build  . -t mycicddemo
+```
+
+## How to test the application on your local workstation?
+```dockerfile
+docker run --rm mycicddemo
+```
 
 ---
-# Docker notes
 
-#### Build
-
-```
-docker build  .
-```
-
-```
-docker build  . -t cicddemo
-```
-
-```
-docker run --rm cicddemo
-```
-
-#### Why does the problem-Docker build requires 1 Argument
-https://www.baeldung.com/ops/docker-build-argument-error#:~:text=The%20most%20common%20reason%20for,default%20we%20provided%20dot(.)
 
 ---
 # References and articles
@@ -539,6 +543,9 @@ https://apscheduler.readthedocs.io/en/3.x/modules/triggers/cron.html?highlight=d
 
 #### AP Scheduler - Good article with explanation of triggers and more
 https://betterprogramming.pub/introduction-to-apscheduler-86337f3bb4a6
+
+#### Fix the problem-Docker build requires 1 Argument
+https://www.baeldung.com/ops/docker-build-argument-error#:~:text=The%20most%20common%20reason%20for,default%20we%20provided%20dot(.)
 
 ---
 
