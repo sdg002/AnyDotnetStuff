@@ -459,24 +459,23 @@ az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile 
     |        |---test_demo.py
     |        |
     |
-    |--requirements.txt
+    |--requirements.txt     <== Packages required by the application. They get installed into the virtual environment
     |
-    |--Dockerfile
+    |--Dockerfile           <== Used by Docker build
     |
-    |--.dockerignore
+    |--.dockerignore        <==Used by Docker build. We want to ignore the virtual environment folder. The docker image will build its own virtual environment
     |
-    |--pytest.ini
+    |--pytest.ini           <== Logging and other configuration for pytest
     |
-    +--.venv
+    +--.venv                <==  The virtual environment folder
     |        
     |        
-    +--.vscode
+    +--.vscode              <== VSCODE settings. Important to share via GIT for a consistent collaborative experience
     |        
     |        
-    
-    
 
 ```
+
 
 ## Problem (REMOVE THIS LATER)
 - Sample code to run a scheduled job every 1 minute

@@ -30,11 +30,9 @@ steps:
     dockerVersion: ${{ parameters.DOCKER_VER }}
 
 - task: Docker@2
-  enabled: true
   displayName: 'Build Python docker image'
   timeoutInMinutes: 10
   inputs:
     command: 'build'
-    Dockerfile: '$(Build.Workspace)/ci-cd-stages-demo/artifacts/pythonsource/'
-    tags: |
-      $(Build.BuildNumber)
+    Dockerfile: $(Build.Workspace)/ci-cd-stages-demo/artifacts/pythonsource/Dockerfile
+    tags: $(Build.BuildNumber)
