@@ -28,3 +28,14 @@ steps:
   displayName: Docker Installer ${{ parameters.DOCKER_VER }}
   inputs:
     dockerVersion: ${{ parameters.DOCKER_VER }}
+
+- task: Docker@2
+  enabled: true
+  displayName: 'Build Python docker image'
+  timeoutInMinutes: 10
+  inputs:
+    command: 'build'
+    Dockerfile: '$(Build.Workspace)/ci-cd-stages-demo/artifacts/pythonsource/Dockerfile'
+    buildContext: '.'
+    tags: |
+      $(Build.BuildNumber)

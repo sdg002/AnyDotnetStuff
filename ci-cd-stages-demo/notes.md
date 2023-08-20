@@ -496,7 +496,6 @@ WORKDIR /python-docker
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 COPY . .
-#CMD [ "python" ,  "--version"] #this works
 CMD [ "python" ,  "/python-docker/src/sample_job.py"] #does not produce any output
 
 ```
@@ -510,6 +509,8 @@ docker build  . -t mycicddemo
 ```dockerfile
 docker run --rm mycicddemo
 ```
+
+![Output from dockerized Python application](docs/images/docker-run-output.png)
 
 ---
 
