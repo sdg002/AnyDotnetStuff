@@ -1,5 +1,7 @@
 [[_TOC_]]
 
+# Single YAML file based Devops pipeline for Build and Deploy stages
+
 # Objective
 Azure Devops in 2023 has gained wide popularity in the developer community. Azure Devops is a complete suite of tools to manage your software development lifecyle.  The self-service CI/CD features of Azure Devops is a very powerful automation tool that should not be ignored. You could be deploying web apps/services to the Cloud or publishing desktop applications or an in house data science team which wants to deploy its Python files to a job server .   YAML based pipelines of Azure Devops is a powerful CI/CD orchestration tool. However, it would be an understatement to conclude that this is an easy tool. I have found that authoring YAML based Azure Devops CI/CD pipelines can be time consuming and hard to troubleshoot at times. The lesson that I have learnt - keep the CI/CD simple and linear!  What do I mean by linear? Build stage, followed by a Dev deployment and then an Uat deployment and finally ending in a Prod deployment.
 
@@ -314,10 +316,16 @@ Imagine a simple C# executable project. We want a Build stage that does the foll
 If the Build stage succeeds, then the published artifact(s) can be further processed in the subsequent Deployment stages.
 
 #### How do artifacts work in Azure Devops CI/CD?  (to be done)
+The following diagram emphasizes the importance of one central CI-CD YAML which orchestrates all the Stages. This solves the issue of Release stages having to be told which version of the resource to be picked.
+
+
 ![how-artifacts-work.png](docs/ppt-images/how-artifacts-work.png)
 
 #### Step-1-Add a C# executable
-We have created a simple **C# Console EXE** project under the **src** folder of this Git repo.
+We have created a simple **C# Console EXE** project under the **src-chsarp** folder of this Git repo.
+
+![csharp-solution-explorer.png
+](docs/images/csharp-solution-explorer.png)
 
 #### Step-2-Add a task to restore all referenced NUGET packages
 
@@ -344,7 +352,7 @@ This will run all the unit tests in the specified projects.
 
 ```
 #### Step-4-Add Publish task
-This will build the specified CSPROJ and produce the binaries in the specified output folder
+This will build the specified CSPROJ and produce the binaries in the specified output folder.
 
 ```yml
 - task: DotNetCoreCLI@2
@@ -359,7 +367,7 @@ This will build the specified CSPROJ and produce the binaries in the specified o
 
 ```
 #### Step-5-Create a ZIP of the DLLs
-The following snippet will create a ZIP of the output from the `dotnet publish` command
+The following snippet will create a ZIP of the output from the `dotnet publish` command. Notice that we are using the output folder location in the **dotnet publish** step as the target of the ZIP (**rootFolderOrFile** parameter)
 
 ```yml
 - task: ArchiveFiles@2
