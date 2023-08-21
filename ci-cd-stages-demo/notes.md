@@ -1,11 +1,28 @@
 [[_TOC_]]
 
-# Single YAML file based Devops pipeline for Build and Deploy stages
+# Single YAML based pipeline split into Build and Deploy stages
 
 # Objective
 Azure Devops in 2023 has gained wide popularity in the developer community. Azure Devops is a complete suite of tools to manage your software development lifecyle.  The self-service CI/CD features of Azure Devops is a very powerful automation tool that should not be ignored. You could be deploying web apps/services to the Cloud or publishing desktop applications or an in house data science team which wants to deploy its Python files to a job server .   YAML based pipelines of Azure Devops is a powerful CI/CD orchestration tool. However, it would be an understatement to conclude that this is an easy tool. I have found that authoring YAML based Azure Devops CI/CD pipelines can be time consuming and hard to troubleshoot at times. The lesson that I have learnt - keep the CI/CD simple and linear!  What do I mean by linear? Build stage, followed by a Dev deployment and then an Uat deployment and finally ending in a Prod deployment.
 
-In this article I have demonstrated how to make the simplest build pipeline and progressively add more steps to it.  **Remember** - CI/CD is a means to an end - not an end by iteself. The end goal is to deliver software which solves end user problems.
+
+---
+
+# What to expect from this article ?
+In this article I have demonstrated how to make the simplest multi-stage CI-CD pipeline and progressively add more steps to it.  **Remember** - CI/CD is a means to an end - not an end by iteself. The end goal is to deliver software which solves end user problems.
+
+#### Option-1-Multiple YAML pipelines orchestrated via triggers
+Multiple independent pipelines (YAML) - each one is trigerred by the completion of another pipeline.
+```
+Start --> Build pipeline (YAML) ---> publish artifact ---> DEV Release pipeline (YAML) ---> PROD Release pipeline (YAML)
+```
+
+#### Option-2-Single YAML pipeline split into stages
+Single YAML pipeline which orchestrates itself via multiple sequential stages
+```
+Start ---> CI/CD pipeline (YAML) --> run the Build stage (template YAML) ---> DEV Release stage (template YAML) ---> PROD Release stage (template YAML)
+```
+This article will be focus on the **Single YAML pipeline** approach
 
 ---
 
@@ -315,7 +332,7 @@ Imagine a simple C# executable project. We want a Build stage that does the foll
 
 If the Build stage succeeds, then the published artifact(s) can be further processed in the subsequent Deployment stages.
 
-#### How do artifacts work in Azure Devops CI/CD?  (to be done)
+#### How do artifacts work in Azure Devops CI/CD?
 The following diagram emphasizes the importance of one central CI-CD YAML which orchestrates all the Stages. This solves the issue of Release stages having to be told which version of the resource to be picked.
 
 
@@ -447,13 +464,13 @@ az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile 
 ---
 
 # Step-600-Deploy a containerized Python Application
-## Problem
+#### Problem
 - Imagine a hypothetical Python application which contains scheduled jobs. 
 - For the purpose of demonstraton we have used the [APScheduler component](https://apscheduler.readthedocs.io/en/3.x/userguide.html) with a couple of dummy job implementations
 - In this section we will delive into deploying this application as a containerized application from the Deployment stage of our CI-CD pipeline
 
 
-## Anatomy of a containerized Python application
+#### Anatomy of a containerized Python application
 
 ```
 ----
@@ -486,14 +503,14 @@ az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile 
 
 ```
 
-## Build and Deploy stages for a Python application (to be done)
+#### Build and Deploy stages for a Python application (to be done)
 
 - show a picture of stages
 - Show what happens in the build
 - show what happens in the release
 - 
 
-## Structure of Dockerfile
+#### Structure of Dockerfile
 
 ```dockerfile
 FROM python:3.9.17
@@ -504,7 +521,7 @@ COPY . .
 CMD [ "python" ,  "/python-docker/src/sample_job.py"]
 
 ```
-## Contents of .dockerignore
+#### Contents of .dockerignore
 
 In the world of dotnet, your published DLLs can be carried forward by simple XCOPY. However, in the world of Python, the virtual environment has to be recreated inside the Docker image and all packages freshly installed. Hence we instruct the `docker build` command to skip this folder by listing this folder in the `.dockerignore` file
 
@@ -512,14 +529,14 @@ In the world of dotnet, your published DLLs can be carried forward by simple XCO
 .venv
 ```
 
-## How to build a docker image on your local workstation?
+#### How to build a docker image on your local workstation?
 This assumes you have installed Docker or Podman on your workstation.
 
 ```bash
 docker build  . -t mycicddemo
 ```
 
-## How to test the application on your local workstation?
+#### How to test the application on your local workstation?
 ```dockerfile
 docker run --rm mycicddemo
 ```
@@ -527,7 +544,7 @@ docker run --rm mycicddemo
 ![Output from dockerized Python application](docs/images/docker-run-output.png)
 
 
-## Docker tasks on the YML
+#### Docker tasks on the YML
 
 ```yml
 
