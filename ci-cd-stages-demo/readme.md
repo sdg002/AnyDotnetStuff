@@ -3,7 +3,9 @@
 # Single YAML based pipeline split into Build and Deploy stages
 
 # Objective
-Azure Devops in 2023 has gained wide popularity in the developer community. Azure Devops is a complete suite of tools to manage your software development lifecyle.  The self-service CI/CD features of Azure Devops is a very powerful automation tool that should not be ignored. You could be deploying web apps/services to the Cloud or publishing desktop applications or an in house data science team which wants to deploy its Python files to a job server .   YAML based pipelines of Azure Devops is a powerful CI/CD orchestration tool. However, it would be an understatement to conclude that this is an easy tool. I have found that authoring YAML based Azure Devops CI/CD pipelines can be time consuming and hard to troubleshoot at times. The lesson that I have learnt - keep the CI/CD simple and linear!  What do I mean by linear? Build stage, followed by a Dev deployment and then an Uat deployment and finally ending in a Prod deployment.
+`Azure Devops in 2023` has gained wide popularity in the developer community. `Azure Devops` is a near-complete suite of tools to manage your software development lifecyle.  The self-service CI/CD nature of Azure Devops is a compelling characteristic that should not be ignored. You could be deploying web apps/services to the Cloud or publishing desktop applications or an in house data science team which wants to deploy its Python files to a job server - Azure Devops can handle them very well.   
+
+As I write this article in middle of 2023, the YAML based syntax of Azure Devops has matured and offers nearly the same feature set as its cousin `Classic pipelines``. However, it would be an understatement to conclude that this is an easy tool. I have found that authoring YAML based Azure Devops CI/CD pipelines can be time consuming, quirky and hard to troubleshoot at times. I have often found myself doing several iterations to get make the YAML right. The lesson that I have learnt - keep the CI/CD simple and linear!  What do I mean by linear? Build stage, followed by a Dev deployment and then an Uat deployment and finally ending in a Prod deployment.
 
 
 ---
@@ -20,7 +22,7 @@ Start --> Build pipeline (YAML) ---> publish artifact ---> DEV Release pipeline 
 #### Option-2-Single YAML pipeline split into stages
 Single YAML pipeline which orchestrates itself via multiple sequential stages
 ```
-Start ---> CI/CD pipeline (YAML) --> run the Build stage (template YAML) ---> DEV Release stage (template YAML) ---> PROD Release stage (template YAML)
+Start ---> CI/CD pipeline (YAML) --> run the Build stage (template YAML) ---> run the DEV Release stage (template YAML) ---> run the PROD Release stage (template YAML)
 ```
 This article will be focus on the **Single YAML pipeline** approach
 
@@ -436,7 +438,7 @@ The following snippet instructs Azure Devops to download all artifacts that are 
 
 ```
 
-# What do we with the pipeline artifacts?
+# What do we do with the pipeline artifacts?
 
 You have the artifacts produced by the **Build** stage. What are the possible ways we might consume these artifacts in the Release stage ?
 
@@ -473,7 +475,7 @@ az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile 
 
 # Step-600-Deploy a containerized Python Application
 #### Problem
-- Imagine a hypothetical Python application which contains scheduled jobs. 
+- Imagine a hypothetical Python application which contains scheduled jobs. These could be any scheduled activity such as a weather information scraper or a some calculation jobs
 - For the purpose of demonstraton we have used the [APScheduler component](https://apscheduler.readthedocs.io/en/3.x/userguide.html) with a couple of dummy job implementations
 - In this section we will delive into deploying this application as a containerized application from the Deployment stage of our CI-CD pipeline
 
@@ -511,12 +513,19 @@ az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile 
 
 ```
 
-#### Build and Deploy stages for a Python application (to be done)
+#### What happens in the build stage ?
 
-- show a picture of stages
-- Show what happens in the build
-- show what happens in the release
-- 
+1. Publish the Python source file as a build artifact
+1. Install the packages from the `requirements.txt` file
+1. Run the unit tests
+
+#### What happnes in the deployment stage ?
+
+Several options are possible.
+1. Deploy the Python code to a Docker container on Azure Container Instances or Azure Container Apps or Kubernetes Cluster
+1. Deploy the Python code to an Azure function(lambda function on AWS) or an Azure Web app (if this were a Flask application)
+1. Copy over the code to a virtual machine 
+
 
 #### Structure of Dockerfile
 
@@ -552,7 +561,7 @@ docker run --rm mycicddemo
 ![Output from dockerized Python application](docs/images/docker-run-output.png)
 
 
-#### Docker tasks on the YML
+#### Docker YML tasks
 
 ```yml
 
