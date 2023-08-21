@@ -50,7 +50,7 @@ https://dev.azure.com/docxreview/devops001/_build?definitionId=8
 
 #### YAML structure
 
-```
+```yml
     CICD.YML
         |
         |----BUILD ------------> template=>BUILD.YAML
@@ -119,6 +119,7 @@ Lets do this by passing a parameter named **environment** to the **DEPLOY_DEV** 
 #### How to access a parameter inside the child YAML ?
 
 **Step 1** - Define the parameter within the template
+
 ```yml
 parameters:
 - name: environment # name of the parameter; required
@@ -161,6 +162,7 @@ The following snippet demonstrates how to access the parameter value
 
 #### Caveats
 You cannot declare variables within a template. If you need a variable you could use a parameter with a default value.
+
 ```yml
 
 #Not allowed
@@ -173,17 +175,20 @@ parameters:
   type: string
   default: '20.10.12'
 
-``````
+```
 ---
 
 # Step 300-Semantic build name
 
 #### Problem
 We want to generate a [semantic build name](https://semver.org/).  Any release from a non-master branch should be as follows:
+
 ```
 1.2.3-prerelease.100
 ```
+
 A release from master branch would look:
+
 ```
 1.2.3.100
 ```
@@ -299,6 +304,7 @@ variables:
     - group: ci-cd-stages-demo
 
 ```
+
 #### Step-3-Access the secret variable in the deployment pipeline
 
 Azure Devops is very protective about secrets. You will not be able to display any secret on the log files using conventional means. However, for the purpose of verification you could use the `ToCharArray` approach below.
@@ -346,7 +352,7 @@ We have created a simple **C# Console EXE** project under the **src-chsarp** fol
 
 #### Step-2-Add a task to restore all referenced NUGET packages
 
-```
+```yml
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
   inputs:
@@ -368,6 +374,7 @@ This will run all the unit tests in the specified projects.
 
 
 ```
+
 #### Step-4-Add Publish task
 This will build the specified CSPROJ and produce the binaries in the specified output folder.
 
@@ -443,6 +450,7 @@ You could use Visual Studio Installer or [Wix Toolset](https://wixtoolset.org/) 
 
 #### Example 3 - Deploy to an Azure Web App or Azure Functions
 If using Azure App Services, then deployment could be done using the following:
+
 ```
 az webapp deploy --name devmycrmwebapp --resource-group rg-dev-crm-apps --type zip --restart true
 ```
