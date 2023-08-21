@@ -313,6 +313,8 @@ Imagine a simple C# executable project. We want a Build stage that does the foll
 
 If the Build stage succeeds, then the published artifact(s) can be further processed in the subsequent Deployment stages.
 
+#### How do artifacts work in Azure Devops CI/CD?  (to be done)
+![how-artifacts-work.png](docs/ppt-images/how-artifacts-work.png)
 
 #### Step-1-Add a C# executable
 We have created a simple **C# Console EXE** project under the **src** folder of this Git repo.
@@ -476,17 +478,13 @@ az acr build --resource-group rg-crm-dev --registry acr-dev --file MyDockerFile 
 
 ```
 
+## Build and Deploy stages for a Python application (to be done)
 
-## Problem (REMOVE THIS LATER)
-- Sample code to run a scheduled job every 1 minute
-- Deploy a batch job which runs on a schedule
-- Dockerfile
-- Copy python source, 
-- Supply some dummy environment variables
-- Install requirements
-- You would then do a Docker push
+- show a picture of stages
+- Show what happens in the build
+- show what happens in the release
+- 
 
-You were here - Try the docker build, then talk about how to push to ACR
 ## Structure of Dockerfile
 
 ```dockerfile
@@ -495,15 +493,20 @@ WORKDIR /python-docker
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 COPY . .
-CMD [ "python" ,  "/python-docker/src/sample_job.py"] #does not produce any output
+CMD [ "python" ,  "/python-docker/src/sample_job.py"]
 
 ```
 ## Contents of .dockerignore
+
+In the world of dotnet, your published DLLs can be carried forward by simple XCOPY. However, in the world of Python, the virtual environment has to be recreated inside the Docker image and all packages freshly installed. Hence we instruct the `docker build` command to skip this folder by listing this folder in the `.dockerignore` file
+
 ```
 .venv
 ```
 
 ## How to build a docker image on your local workstation?
+This assumes you have installed Docker or Podman on your workstation.
+
 ```bash
 docker build  . -t mycicddemo
 ```
@@ -519,21 +522,19 @@ docker run --rm mycicddemo
 ## Docker tasks on the YML
 
 ```yml
+
 - task: DockerInstaller@0
   displayName: Docker Installer ${{ parameters.DOCKER_VER }}
   inputs:
     dockerVersion: ${{ parameters.DOCKER_VER }}
 
 - task: Docker@2
-  enabled: true
   displayName: 'Build Python docker image'
   timeoutInMinutes: 10
   inputs:
     command: 'build'
-    Dockerfile: '$(Build.Workspace)/ci-cd-stages-demo/artifacts/pythonsource/Dockerfile'
-    buildContext: '.'
-    tags: |
-      $(Build.BuildNumber)
+    Dockerfile: $(Build.Workspace)/ci-cd-stages-demo/artifacts/pythonsource/Dockerfile
+    tags: $(Build.BuildNumber)
 
 ```
 
