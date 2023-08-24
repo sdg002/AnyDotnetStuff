@@ -6,6 +6,8 @@ namespace TestProject1
         [TestMethod]
         public void TestMethod1()
         {
+            var source = new MyPocoLib.DemoSource1();
+            var dest = new MyPocoLib.DemoDest1();
         }
     }
 }
