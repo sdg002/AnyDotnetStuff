@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyPocoLib", "MyPocoLib\MyPocoLib.csproj", "{7FA7A48A-CBE3-4550-A7BD-BBDEC4AB7423}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapperLib", "MapperLib\MapperLib.csproj", "{124B2516-E960-43F4-81B7-4D678997F1C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{7FA7A48A-CBE3-4550-A7BD-BBDEC4AB7423}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FA7A48A-CBE3-4550-A7BD-BBDEC4AB7423}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FA7A48A-CBE3-4550-A7BD-BBDEC4AB7423}.Release|Any CPU.Build.0 = Release|Any CPU
+		{124B2516-E960-43F4-81B7-4D678997F1C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{124B2516-E960-43F4-81B7-4D678997F1C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{124B2516-E960-43F4-81B7-4D678997F1C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{124B2516-E960-43F4-81B7-4D678997F1C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
