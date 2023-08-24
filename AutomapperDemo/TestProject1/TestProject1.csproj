@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MapperLib\MapperLib.csproj" />
     <ProjectReference Include="..\MyPocoLib\MyPocoLib.csproj" />
   </ItemGroup>
 
